@@ -2,7 +2,7 @@ float e_intra_score (int,int) ;
 float e_inter_score (int,int) ;
 
  
-affine bpmax_k1_reductions{M, N, I1, J1, ts1 , ts2, ts3| M>=3 && N>=3 && ts1 >=3 && ts2 >=3 && ts3 >= 3 &&  M>=J1+1 && I1>=0 && J1> I1}
+affine bpmax_k1_reductions{M, N, I1, J1, ts1 , ts2, ts3| M>=3 && N>=3 && ts1 >=1 && ts2 >=1 && ts3 >= 1 &&  M>=J1+1 && I1>=0 && J1> I1}
 	input
 	  float FTable {i1,j1,i2,j2| M>=j1+1 && i2>=0 && N>=j2+1 && j2>=i2 && i1>=0 && j1>=i1 } ;
 	  float S1 {i,j| i>=0 && M>=j+1 && j>=i } ; 
@@ -12,7 +12,7 @@ affine bpmax_k1_reductions{M, N, I1, J1, ts1 , ts2, ts3| M>=3 && N>=3 && ts1 >=3
 	  Outer_Max_Res[i,j]=0; // This will be replaced by the outer 
 .
  
-affine bpmax{M, N, ts1, ts2, ts3| M>=3 && N>=3 && ts1 >=3 && ts2 >=3 && ts3 >= 3}
+affine bpmax{M, N, ts1, ts2, ts3| M>=3 && N>=3 && ts1 >=1 && ts2 >=1 && ts3 >= 1}
 	input
 		int seq1 {i| i>=0 && M>=i+1 } ;
 		int seq2 {i| i>=0 && N>=i+1 } ;

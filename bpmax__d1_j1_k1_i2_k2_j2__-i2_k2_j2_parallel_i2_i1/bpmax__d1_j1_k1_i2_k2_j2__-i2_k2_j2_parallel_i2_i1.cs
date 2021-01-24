@@ -1,6 +1,6 @@
 prog = ReadAlphabets("bpmax_float.ab");
 #prog = ReadAlphabets("bpmax_" + data_type+ ".ab");
-base_folder = "./";
+base_folder = "./src";
 
 system = "bpmax";
 NormalizeReduction(prog, system, "FTable");

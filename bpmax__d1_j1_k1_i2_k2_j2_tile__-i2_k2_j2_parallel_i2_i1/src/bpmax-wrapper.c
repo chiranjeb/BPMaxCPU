@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
 	
 	
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && ts1 >= 3 && ts2 >= 3 && ts3 >= 3))) {
+	if (!((M >= 3 && N >= 3 && ts1 >= 1 && ts2 >= 1 && ts3 >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}

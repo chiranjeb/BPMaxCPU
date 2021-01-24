@@ -1,19 +1,14 @@
-prog = ReadAlphabets("bpmax_final_computation.ab");
-base_folder = "./bpmax_subsystem";
+prog = ReadAlphabets("bpmax_final_ftable.ab");
 
 rootSystem = "bpmax";
 subSystem  = "bpmax_k1_reductions";
 
-#NormalizeReduction(prog, system, "FTable");
 Normalize(prog);  
-#AShow(prog, rootSystem);
 AShow(prog, subSystem);
 CheckProgram(prog);
 
-outDir = "./bpmax_tile";
-#setMemoryMap(prog, subSystem, "Outer_Max_Res",   "FTable",   "(i,j -> I1, J1, i, j)");                                                                                                
+outDir = "./src";
 CheckProgram(prog);
-#generateScheduledCode(prog, subSystem, outDir);
 
 
 

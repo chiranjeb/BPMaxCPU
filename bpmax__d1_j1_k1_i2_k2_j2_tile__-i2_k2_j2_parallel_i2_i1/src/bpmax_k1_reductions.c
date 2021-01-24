@@ -115,7 +115,7 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 
 void bpmax_k1_reductions(long M, long N, long I1, long J1, long ts1, long  ts2, long ts3, float**** FTable, float** S1, float** Outer_Max_Res){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && ts1 >= 3 && ts2 >= 3 && ts3 >= 3 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {
+	if (!((M >= 3 && N >= 3 && ts1 >= 1 && ts2 >= 1 && ts3 >= 1 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -128,7 +128,7 @@ void bpmax_k1_reductions(long M, long N, long I1, long J1, long ts1, long  ts2, 
 	#define S0(i,j) //FTable(I1, J1, i, j) = 1.401298464324817E-45 ;// change
 	{
 		//Domain
-		//{i,j|M>=3 && N>=3 && ts1>=3 && ts2>=3 && ts3>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && N>=j+1 && j>=i+1}
+		//{i,j|M>=3 && N>=3 && ts1>=1 && ts2>=1 && ts3>=1 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && N>=j+1 && j>=i+1}
 		int c1,c2;
 		for(c1=0;c1 <= N-2;c1+=1)
 		 {
