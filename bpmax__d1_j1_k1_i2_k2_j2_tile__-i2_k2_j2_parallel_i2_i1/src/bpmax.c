@@ -121,7 +121,7 @@ float reduce_bpmax_S2_1(long, long, int, int, int, int, int, float**);
 #define NR_FTable1(i1,j1) NR_FTable1[i1][j1]
 #define NR_FTable2(i1,j1) NR_FTable2[i1][j1]
 
-void bpmax(long M, long N, int ts1, int ts2, int ts3, int* seq1, int* seq2, float**** FTable){
+void bpmax(long M, long N, long ts1, long ts2, long ts3, int* seq1, int* seq2, float**** FTable){
 	///Parameter checking
 	if (!((M >= 3 && N >= 3 && ts1 >= 1 && ts2 >= 1 && ts3 >= 1))) {
 		printf("The value of parameters are not valid.\n");
