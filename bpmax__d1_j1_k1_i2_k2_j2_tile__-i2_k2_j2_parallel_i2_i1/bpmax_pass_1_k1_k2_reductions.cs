@@ -20,6 +20,5 @@ setSpaceTimeMap(prog, subSystem, "_FTable",         "(i,j      ->   M,     i,   
 options = createTiledCGOptionForScheduledC();
 setDefaultDTilerConfiguration(prog, subSystem, 1, 3, "sequential");
 generateScheduledCode(prog, subSystem, options, outDir);
-#generateScheduledCode(prog, subSystem, outDir);
                              
                                              

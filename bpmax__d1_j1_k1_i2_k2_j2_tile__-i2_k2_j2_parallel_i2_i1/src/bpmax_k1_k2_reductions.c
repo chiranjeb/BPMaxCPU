@@ -119,10 +119,10 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 	//Memory Allocation
 	
 	#define S0(i,j,i2,i3) //_FTable(j,i2) = __max_float(_FTable(j,i2),__max_float(_FTable(j,i2),_FTable(j,i2)))
-	#define S_1(i,j,i2,i3)// _FTable(j,i2) = __max_float(0,__max_float(_FTable(j,i2),_FTable(j,i2)))
+	#define S_1(i,j,i2,i3) //_FTable(j,i2) = __max_float(0,__max_float(_FTable(j,i2),_FTable(j,i2)))
 	#define S5(i,j,i2,i3) //_FTable(j,i3) = 1.401298464324817E-45
 	#define S6(i,j,i2,i3) //_FTable(j,i3) = 1.401298464324817E-45
-	#define S7(i,j,i2,i3) _FTable(j,i3) = 1.401298464324817E-45
+	#define S7(i,j,i2,i3) //_FTable(j,i3) = 1.401298464324817E-45
 	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable(I1,i0,i1,i2))+(FTable(i0+1,J1,i2+1,i3)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }
 	#define S3(i0,i1,i2,i3) {float __temp__ = (S1(I1,i0))+(FTable(i0+1,J1,i1,i3)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }
 	#define S4(i0,i1,i2,i3) {float __temp__ = (FTable(I1,i0,i1,i3))+(S1(i0+1,J1)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }

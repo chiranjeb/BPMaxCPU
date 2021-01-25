@@ -110,37 +110,32 @@ inline double __min_double(double x, double y){
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
 #define Outer_Max_Res(i,j) Outer_Max_Res[i][j]
-void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable, float** S1, float** Outer_Max_Res);
-//void bpmax_outer_reductions(long M, long N, long I1, long J1, float**** FTable, float** S1, float** Outer_Max_Res);
+void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable, float** S1, float** _FTable);
 
-void bpmax_k1_reductions(long M, long N, long I1, long J1, long ts1, long  ts2, long ts3, float**** FTable, float** S1, float** Outer_Max_Res){
+void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable, float** S1, float** Outer_Max_Res){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && ts1 >= 1 && ts2 >= 1 && ts3 >= 1 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {
+	if (!((M >= 3 && N >= 3 && T1 >= 1 && T2 >= 1 && T3 >= 1 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	
-	// Chiranjeb: Modified by hand. Call outer reductions.
-	bpmax_k1_k2_reductions(M, N, I1, J1, ts1, ts2, ts3, FTable, S1, FTable[I1][J1]);
-//	bpmax_outer_reductions(M, N, I1, J1, FTable, S1, FTable[I1][J1]);
 
-	#define S0(i,j) //FTable(I1, J1, i, j) = 1.401298464324817E-45 ;// change
+	#define S0(i,j) Outer_Max_Res(i,j) = 0
 	{
 		//Domain
-		//{i,j|M>=3 && N>=3 && ts1>=1 && ts2>=1 && ts3>=1 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && N>=j+1 && j>=i+1}
+		//{i,j|M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && j>=i && N>=j+1}
 		int c1,c2;
-		for(c1=0;c1 <= N-2;c1+=1)
+		for(c1=0;c1 <= N-1;c1+=1)
 		 {
-		 	for(c2=c1+1;c2 <= N-1;c2+=1)
+		 	for(c2=c1;c2 <= N-1;c2+=1)
 		 	 {
-                                
 		 	 	S0((c1),(c2));
 		 	 }
 		 }
 	}
 	#undef S0
-	
+	bpmax_k1_k2_reductions(M, N, I1, J1, T1, T2, T3, FTable, S1, Outer_Max_Res);
+
 	//Memory Free
 }
 
