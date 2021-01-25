@@ -21,7 +21,7 @@ output
 local
 	double S1 {i,j| 0 <= i <= j < M };
 	double S2 {i,j| 0 <= i <= j < N };
-	double FTable_outer_k1_k2  {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
+	double FTable_outer_k1_k2  {i1,j1,i2,j2| 0<=i1<=M-1 && i1<j1<=M-1 && 0<=i2<=j2<=N-1};
 	
 
 let
@@ -42,8 +42,7 @@ let
 	         ((ei1, ej1, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable,
 	         (ei1, ej1, i1, j1 -> i1, j1)@S1) 
 	    returns (FTable_outer_k1_k2);
-	
-	
+		
 	FTable[i1,j1,i2,j2] = case
 		{ | i1<= j1  && j2< i2} : S1[i1, j1];
 		{ | j1 < i1  && i2<=j2} : S2[i2, j2];
@@ -53,11 +52,13 @@ let
 				       {|j1-i1 <= 3}: 0; esac +
 			     case  {|j2-i2  > 3}: FTable[i1, j1, i2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
 			 	       {|j2-i2  <=3}: 0; esac +
-			 	       S1[i1, j1] + S2[i2, j2]   + FTable_outer_k1_k2   +
-            		  case {|i2<j2  && i1<=j1} : reduce(+, [k2],  {|i2<=k2<j2} : FTable[i1, j1, i2, k2] + S2[k2+1, j2]);
-            			   {|i2==j2 && i1<=j1} : 0; esac +
-            	      case {|i2<j2  && i1<=j1} : reduce(+, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable[i1, j1, k2+1, j2]);
-            			   {|i2==j2 && i1<=j1} : 0; esac;
+			 	       S1[i1, j1] + S2[i2, j2]   + 
+			 	 case  {|i1<j1}: FTable_outer_k1_k2;
+			 	       {|i1==j1}:  0;   esac +
+                 case  {|i2<j2  && i1<=j1} : reduce(+, [k2],  {|i2<=k2<j2} : FTable[i1, j1, i2, k2] + S2[k2+1, j2]);
+            	       {|i2==j2 && i1<=j1} : 0; esac +
+            	 case  {|i2<j2  && i1<=j1} : reduce(+, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable[i1, j1, k2+1, j2]);
+            		   {|i2==j2 && i1<=j1} : 0; esac;
 		esac;
 .
 

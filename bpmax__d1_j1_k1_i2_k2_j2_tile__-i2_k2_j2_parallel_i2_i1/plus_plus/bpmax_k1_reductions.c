@@ -110,7 +110,7 @@ inline double __min_double(double x, double y){
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
 #define Outer_Max_Res(i,j) Outer_Max_Res[i][j]
-void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, double**** FTable, double** S1, double** _FTable);
+
 void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, double**** FTable, double** S1, double** Outer_Max_Res){
 	///Parameter checking
 	if (!((M >= 3 && N >= 3 && T1 >= 1 && T2 >= 1 && T3 >= 1 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {

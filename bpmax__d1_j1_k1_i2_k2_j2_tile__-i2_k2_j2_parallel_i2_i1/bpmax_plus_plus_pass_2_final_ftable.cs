@@ -1,4 +1,4 @@
-prog = ReadAlphabets("bpmax_final_ftable.ab");
+prog = ReadAlphabets("bpmax_plus_plus_final_ftable.ab");
 
 rootSystem = "bpmax";
 subSystem  = "bpmax_k1_reductions";
@@ -8,7 +8,7 @@ Normalize(prog);
 #AShow(prog, subSystem);
 CheckProgram(prog);
 
-outDir = "./src";
+outDir = "./plus_plus";
 CheckProgram(prog);
 
 
@@ -17,8 +17,8 @@ CheckProgram(prog);
 #PrintAST(prog, rootSystem);
 label="UseEquation_FTable_outer_k1_k2";
  
-##setMemoryMap(prog, rootSystem,   "NR_FTable_1", "NR_FTable1",   "(i1,j1,i2,j2->i1, j2)");
-##setMemoryMap(prog, rootSystem,   "NR_FTable_2", "NR_FTable2",   "(i1,j1,i2,j2->i1, j2)");                                        
+setMemoryMap(prog, rootSystem,   "NR_FTable", "NR_FTable1",   "(i1,j1,i2,j2->i1, j2)");
+setMemoryMap(prog, rootSystem,   "NR_FTable_1", "NR_FTable2",   "(i1,j1,i2,j2->i1, j2)");                                        
                                                 
 setSpaceTimeMap(prog, rootSystem, "S1",          "(i,j               ->  0, j-i,     i,   0,      0,       0,     0)");
 setSpaceTimeMap(prog, rootSystem, "S2",          "(i,j               ->  0, j-i,     i,   0,      0,       0,     0)");

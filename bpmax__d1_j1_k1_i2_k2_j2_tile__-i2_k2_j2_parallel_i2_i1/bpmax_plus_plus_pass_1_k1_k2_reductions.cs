@@ -1,4 +1,4 @@
-prog = ReadAlphabets("bpmax_k1_k2_reductions.ab");
+prog = ReadAlphabets("bpmax_plus_plus_k1_k2_reductions.ab");
 subSystem = "bpmax_k1_k2_reductions";
 
 NormalizeReduction(prog, subSystem, "_FTable");
@@ -6,7 +6,7 @@ Normalize(prog);
 AShow(prog, subSystem);
 CheckProgram(prog);
 
-outDir = "./src";
+outDir = "./plus_plus";
 setMemorySpace(prog, subSystem, "_FTable", "NR__FTable, NR__FTable_1, NR__FTable_2, _FTable");
 setSpaceTimeMap(prog, subSystem, "NR__FTable",      "(i,j,k1,k2 ->  k1,    i,       k2,    j)", 
                                                     "(i,j      ->  -1,     i,       0,     j)");
