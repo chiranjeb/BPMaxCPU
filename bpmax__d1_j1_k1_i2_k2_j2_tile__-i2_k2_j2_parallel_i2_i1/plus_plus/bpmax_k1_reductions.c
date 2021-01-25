@@ -110,6 +110,7 @@ inline double __min_double(double x, double y){
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
 #define Outer_Max_Res(i,j) Outer_Max_Res[i][j]
+void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, double**** FTable, double** S1, double** _FTable);
 
 void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, double**** FTable, double** S1, double** Outer_Max_Res){
 	///Parameter checking
@@ -124,37 +125,16 @@ void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, lon
 		//Domain
 		//{i,j|M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && j>=i && N>=j+1}
 		int c1,c2;
-		/*for(c1=0;c1 <= N-1;c1+=1)
+		for(c1=0;c1 <= N-1;c1+=1)
 		 {
 		 	for(c2=c1;c2 <= N-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
 		 	 }
 		 }
-
-                for(c1=0;c1 <= N-1;c1+=1)
-                 {
-                        for(c2=c1;c2 <= N-1;c2+=1)
-                         {
-                                printf(" %10e", Outer_Max_Res[c1][c2]);
-                         }
-                       printf("\n");
-                 }
-        printf("BPMax K1 reduction");*/
-        bpmax_k1_k2_reductions(M, N, I1, J1, FTable, S1, Outer_Max_Res);
-
-                /*for(c1=0;c1 <= N-1;c1+=1)
-                 {
-                        for(c2=c1;c2 <= N-1;c2+=1)
-                         {
-                                printf(" %10e", Outer_Max_Res[c1][c2]);
-                         }
-                       printf("\n");
-                 }*/
-
 	}
 	#undef S0
-	
+	bpmax_k1_k2_reductions(M, N, I1, J1, T1, T2, T3, FTable, S1, Outer_Max_Res);
 	//Memory Free
 }
 
