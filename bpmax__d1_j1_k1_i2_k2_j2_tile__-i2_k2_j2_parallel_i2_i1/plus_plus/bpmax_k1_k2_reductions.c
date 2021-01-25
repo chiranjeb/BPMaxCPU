@@ -139,6 +139,7 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 		int ti2_l1,ti3_l1,ti4_l1,c1,c2,c3,c4;
 		for(c1=-1;c1 <= -1;c1+=1)
 		 {
+#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
 		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
 		 	 {
 		 	 	for(ti3_l1=(ceild((-ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= 0;ti3_l1+=ts3_l1)
@@ -187,6 +188,7 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 		 }
 		for(c1=I1;c1 <= J1-1;c1+=1)
 		 {
+#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
 		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
 		 	 {
 		 	 	for(ti3_l1=(ceild((min(N-2,ti2_l1) + -ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= N-1;ti3_l1+=ts3_l1)
@@ -212,6 +214,9 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 		 	 	 	 		 	 }
 		 	 	 	 		 	for(c3=max(ti3_l1,c2+1);c3 <= min(ti3_l1+ts3_l1-1,N-2);c3+=1)
 		 	 	 	 		 	 {
+						                    #pragma ivdep
+                                            #pragma vector always
+                                            #pragma simd
 		 	 	 	 		 	 	for(c4=max(ti4_l1,c3+1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
 		 	 	 	 		 	 	 {
 		 	 	 	 		 	 	 	S2((c1),(c2),(c3),(c4));
@@ -259,6 +264,7 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 		 }
 		for(c1=M;c1 <= M;c1+=1)
 		 {
+#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
 		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
 		 	 {
 		 	 	for(ti3_l1=(ceild((min(ti2_l1,N-1) + -ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= N-1;ti3_l1+=ts3_l1)
