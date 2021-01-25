@@ -211,19 +211,19 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=0;c4 <= 2;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+2;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+3;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
 				 }
-				#pragma omp parallel for 
+				#pragma omp parallel for schedule(dynamic) 
 				for(c5=0;c5 <= M-4;c5+=1)
 				 {
 				 	S0((0),(0),(0),(3),(c5),(0),(0),(0));
@@ -234,13 +234,13 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=0;c4 <= 3;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+N;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -252,19 +252,19 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=0;c4 <= 2;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+2;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+3;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
 				 }
-				#pragma omp parallel for 
+				#pragma omp parallel for schedule(dynamic) 
 				for(c5=0;c5 <= N-4;c5+=1)
 				 {
 				 	S_2((0),(0),(0),(3),(c5),(0),(0),(0));
@@ -275,13 +275,13 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=0;c4 <= 3;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+M;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S_2((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -293,7 +293,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=0;c4 <= min(3,M-1);c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S0((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -306,13 +306,13 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=4;c4 <= N-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S3((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+N;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -320,7 +320,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 }
 				for(c4=N;c4 <= M-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -332,13 +332,13 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=4;c4 <= M-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 	S3((0),(0),(0),(c4),(c5),(0),(0),(0));
 				 	 }
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=-c4+M;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S3((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -346,7 +346,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 }
 				for(c4=M;c4 <= N-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S3((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -358,7 +358,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=4;c4 <= M-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -371,7 +371,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=4;c4 <= M-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+M-1;c5+=1)
 				 	 {
 				 	 	S_1((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -383,7 +383,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 			{
 				for(c4=4;c4 <= N-1;c4+=1)
 				 {
-				 	#pragma omp parallel for 
+				 	#pragma omp parallel for schedule(dynamic) 
 				 	for(c5=0;c5 <= -c4+N-1;c5+=1)
 				 	 {
 				 	 	S3((0),(0),(0),(c4),(c5),(0),(0),(0));
@@ -413,7 +413,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 		 }
 		if ((N >= 6)) {
 			{
-				#pragma omp parallel for private(c6,c7,c8)
+				#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				for(c5=0;c5 <= M-1;c5+=1)
 				 {
 				 	S4((1),(0),(M),(0),(c5),(-N+1),(N-1),(0));
@@ -506,7 +506,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 		}
 		if ((N == 5)) {
 			{
-				#pragma omp parallel for private(c6,c7,c8)
+				#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				for(c5=0;c5 <= M-1;c5+=1)
 				 {
 				 	S4((1),(0),(M),(0),(c5),(-4),(4),(0));
@@ -566,7 +566,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 		}
 		if ((N <= 4)) {
 			{
-				#pragma omp parallel for private(c6,c7,c8)
+				#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				for(c5=0;c5 <= M-1;c5+=1)
 				 {
 				 	S4((1),(0),(M),(0),(c5),(-N+1),(N-1),(0));
@@ -611,7 +611,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= N-3;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -624,6 +624,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= N-2;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= N-1;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -639,7 +642,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(N-1),(N-1),(N-1),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S12((1),(c2),(M),(0),(c5),(-N+1),(N-1),(0));
@@ -739,7 +742,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= 2;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -752,6 +755,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= 3;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= 4;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -767,7 +773,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(4),(4),(4),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S12((1),(c2),(M),(0),(c5),(-4),(4),(0));
@@ -834,7 +840,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= N-3;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -847,6 +853,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= N-2;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= N-1;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -862,7 +871,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(N-1),(N-1),(N-1),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S12((1),(c2),(M),(0),(c5),(-N+1),(N-1),(0));
@@ -908,7 +917,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= N-3;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -921,6 +930,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= N-2;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= N-1;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -936,7 +948,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(N-1),(N-1),(N-1),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S7((1),(c2),(M),(0),(c5),(-N+1),(N-1),(0));
@@ -1036,7 +1048,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= 2;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -1049,6 +1061,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= 3;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= 4;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -1064,7 +1079,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(4),(4),(4),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S7((1),(c2),(M),(0),(c5),(-4),(4),(0));
@@ -1131,7 +1146,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 {
 				 	 	for(c4=-c2+c3;c4 <= c3-1;c4+=1)
 				 	 	 {
-				 	 	 	#pragma omp parallel for private(c6,c7)
+				 	 	 	#pragma omp parallel for schedule(dynamic) private(c6,c7)
 				 	 	 	for(c5=0;c5 <= N-3;c5+=1)
 				 	 	 	 {
 				 	 	 	 	S16((1),(c2),(c3),(c4),(c5),(c5),(c5),(0));
@@ -1144,6 +1159,9 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	 	 }
 				 	 	 	 	for(c6=c5+1;c6 <= N-2;c6+=1)
 				 	 	 	 	 {
+									#pragma ivdep
+                                    #pragma vector always
+                                    #pragma simd
 				 	 	 	 	 	for(c7=c6+1;c7 <= N-1;c7+=1)
 				 	 	 	 	 	 {
 				 	 	 	 	 	 	S13((1),(c2),(c3),(c4),(c5),(c6),(c7),(0));
@@ -1159,7 +1177,7 @@ void bpmax(long M, long N, int* seq1, int* seq2, double**** FTable){
 				 	 	 	S17((1),(c2),(c3),(c4),(N-1),(N-1),(N-1),(0));
 				 	 	 }
 				 	 }
-				 	#pragma omp parallel for private(c6,c7,c8)
+				 	#pragma omp parallel for schedule(dynamic) private(c6,c7,c8)
 				 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 				 	 {
 				 	 	S7((1),(c2),(M),(0),(c5),(-N+1),(N-1),(0));
