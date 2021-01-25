@@ -7,7 +7,7 @@ AShow(prog, subSystem);
 AShow(prog, subSystem);
 CheckProgram(prog);
 
-outDir = "./bpmax_tile";
+outDir = "./src";
 setMemorySpace(prog, subSystem, "_FTable", "NR__FTable, NR__FTable_1, NR__FTable_2, _FTable");
 setSpaceTimeMap(prog, subSystem, "NR__FTable",      "(i,j,k1,k2 ->  k1,    i,       k2,    j)", 
                                                     "(i,j      ->  -1,     i,       0,     j)");
