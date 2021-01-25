@@ -5,9 +5,8 @@ NormalizeReduction(prog, system, "FTable");
 AShow(prog, system);
 CheckProgram(prog);
 Normalize(prog);
-ASave(prog, "plus_plus_IR.ab");
-outDir = "./src_plus_plus";
-#setMemorySpace(prog, system, "FTable",      "FTable, NR_FTable");
+#ASave(prog, "plus_plus_IR.ab");
+outDir = "./plus_plus";
 setMemorySpace(prog, system, "FTable",      "FTable, NR_FTable, NR_FTable_3, NR_FTable_4");
 setMemoryMap(prog, system,   "NR_FTable_1", "NR_FTable1",   "(i1,j1,i2,j2->i1, j2)");
 setMemoryMap(prog, system,   "NR_FTable_2", "NR_FTable2",   "(i1,j1,i2,j2->i1, j2)");
@@ -30,6 +29,6 @@ setSpaceTimeMap(prog, system, "NR_FTable_2",  "(i1,j1,i2,j2,k2    ->  1,   j1-i1
 setParallel(prog, system, "", "4");
 AShow(prog, system);
 generateScheduledCode(prog, system, outDir);
-#generateWrapper(prog, system, outDir);
+generateWrapper(prog, system, outDir);
 generateVerificationCode(prog, system, outDir);
 

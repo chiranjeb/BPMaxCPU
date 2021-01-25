@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
 
-        printf("F(%d, %d, %d, %d)=%10e\n", 0 , M-1, 0, N-1, var_FTable(0, M-1, 0, N-1));  
+    printf("F(%d, %d, %d, %d)=%10e\n", 0 , M-1, 0, N-1, var_FTable(0, M-1, 0, N-1));  
 
 	// timing information
 	printf("Execution time : %lf sec.\n", elapsed_time);
