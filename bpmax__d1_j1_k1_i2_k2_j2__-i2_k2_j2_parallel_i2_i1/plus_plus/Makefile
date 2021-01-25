@@ -31,4 +31,4 @@ bpmax_verify.o : bpmax_verify.c
 	$(CC) bpmax_verify.c -o bpmax_verify.o $(CFLAGS) $(LIBRARIES) -c
 
 clean:
-	rm -f *.o bpmax bpmax.check bpmax.verify bpmax.verify-rand
+	rm -f *.o bpmax bpmax.check bpmax.verify bpmax.verify-rand *.optrpt
