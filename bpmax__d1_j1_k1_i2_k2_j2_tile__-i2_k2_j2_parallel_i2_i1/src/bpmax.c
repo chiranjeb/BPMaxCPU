@@ -177,10 +177,10 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 	for (mz1=0;mz1 < M; mz1++) {
 		NR_FTable2[mz1] = &_lin_NR_FTable2[(mz1*(N))];
 	}
-	#define S0(i,j,i2,i3,i4,i5,i6) S1(i2,j+i2) = 0
-	#define S_1(i,j,i2,i3,i4,i5,i6) S1(i2,j+i2) = __max_float((S1(i2+1,j+i2-1))+(e_intra_score(seq1(i2),seq1(j+i2))),reduce_bpmax_S1_1(M,N,T1,T2,T3,i2,j+i2,S1))
-	#define S_2(i,j,i2,i3,i4,i5,i6) S2(i2,j+i2) = 0
-	#define S3(i,j,i2,i3,i4,i5,i6) S2(i2,j+i2) = __max_float((S2(i2+1,j+i2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j-i2+N-1))),reduce_bpmax_S2_1(M,N,T1,T2,T3,i2,j+i2,S2))
+	#define S0(i,j,i2,i3,i4,i5,i6) S1(i3,i2+i3) = 0
+	#define S_1(i,j,i2,i3,i4,i5,i6) S1(i3,i2+i3) = __max_float((S1(i3+1,i2+i3-1))+(e_intra_score(seq1(i3),seq1(i2+i3))),reduce_bpmax_S1_1(M,N,T1,T2,T3,i3,i2+i3,S1))
+	#define S_2(i,j,i2,i3,i4,i5,i6) S2(i3,i2+i3) = 0
+	#define S3(i,j,i2,i3,i4,i5,i6) S2(i3,i2+i3) = __max_float((S2(i3+1,i2+i3-1))+(e_intra_score(seq2(-i3+N-1),seq2(-i2-i3+N-1))),reduce_bpmax_S2_1(M,N,T1,T2,T3,i3,i2+i3,S2))
 	#define S4(i1,j1,i2,j2,i4,i5,i6) FTable(j2,j1+j2,-i4,i5) = e_inter_score(seq1(j2),seq2(i4+N-1))
 	#define S5(i1,j1,i2,j2,i4,i5,i6) FTable(j2,j1+j2,-i4,i5) = __max_float((FTable(j2+1,j1+j2-1,-i4,i5))+(e_intra_score(seq1(j2),seq1(j1+j2))),__max_float((FTable(j2,j1+j2,-i4+1,i5-1))+(e_intra_score(seq2(i4+N-1),seq2(-i5+N-1))),__max_float((S1(j2,j1+j2))+(S2(-i4,i5)),__max_float(NR_FTable1(j2,i5),__max_float(NR_FTable2(j2,i5),FTable(j2,j1+j2,-i4,i5))))))
 	#define S6(i1,j1,i2,j2,i4,i5,i6) FTable(j2,j1+j2,-i4,i5) = __max_float((FTable(j2+1,j1+j2-1,-i4,i5))+(e_intra_score(seq1(j2),seq1(j1+j2))),__max_float(0,__max_float((S1(j2,j1+j2))+(S2(-i4,i5)),__max_float(NR_FTable1(j2,i5),__max_float(NR_FTable2(j2,i5),FTable(j2,j1+j2,-i4,i5))))))
@@ -192,15 +192,15 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 	#define S12(i1,j1,i2,j2,i4,i5,i6) FTable(j2,j1+j2,-i4,i5) = __max_float(0,__max_float(0,__max_float((S1(j2,j1+j2))+(S2(-i4,i5)),__max_float(0,__max_float(0,FTable(j2,j1+j2,-i4,i5))))))
 	#define S15(i1,j1,i2,j2,i4,i5,i6) NR_FTable1(j2,i6) = 1.401298464324817E-45
 	#define S16(i1,j1,i2,j2,i4,i5,i6) NR_FTable2(j2,i6) = 1.401298464324817E-45
-	#define S17(i1,j1,i2,i3,i4,i5,i6) bpmax_k1_reductions(M,N,-j1+i2,i2,T1,T2,T3,FTable,S1,FTable[-j1+i2][i2])
+	#define S17(i1,j1,i2,i3,i4,i5,i6) bpmax_k1_reductions(M,N,i2,j1+i2,T1,T2,T3,FTable,S1,FTable[i2][j1+i2])
 	#define S13(i0,i1,i2,i3,i4,i5,i6) {float __temp__ = (FTable(i3,i1+i3,-i4,i5))+(S2(i5+1,i6)); NR_FTable1(i3,i6) = __max_float(NR_FTable1(i3,i6),__temp__); }
 	#define S14(i0,i1,i2,i3,i4,i5,i6) {float __temp__ = (S2(-i4,i5))+(FTable(i3,i1+i3,i5+1,i6)); NR_FTable2(i3,i6) = __max_float(NR_FTable2(i3,i6),__temp__); }
 	{
 		//Domain
-		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && 0>=j-3 && M>=j+i2+1 && i2>=0 && j>=0}
-		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j>=4 && i2>=0 && M>=i2+1 && M>=j+i2+1 && j+i2>=0}
-		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && 0>=j-3 && N>=j+i2+1 && i2>=0 && j>=0}
-		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j>=4 && i2>=0 && j+i2>=0 && N>=j+i2+1 && N>=i2+1}
+		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && j==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && 0>=i2-3 && M>=i2+i3+1 && i3>=0 && i2>=0}
+		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && j==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && i2>=4 && i3>=0 && M>=i3+1 && M>=i2+i3+1 && i2+i3>=0}
+		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && j==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && 0>=i2-3 && N>=i2+i3+1 && i3>=0 && i2>=0}
+		//{i,j,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && j==0 && i==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && i2>=4 && i3>=0 && i2+i3>=0 && N>=i2+i3+1 && N>=i3+1}
 		//{i1,j1,i2,j2,i4,i5,i6|i6==0 && i4+i5==0 && i2==M && j1==0 && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j2>=0 && M>=j2+1 && 0>=i4 && N+i4>=1}
 		//{i1,j1,i2,j2,i4,i5,i6|i6==0 && i2==M && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j1>=4 && i4+i5>=4 && j2>=0 && j1+i4+i5>=1 && M>=j1+j2+1 && 0>=i4 && N+i4>=1 && N>=i5+1 && i5>=0 && M>=j2+1 && j1+j2>=0}
 		//{i1,j1,i2,j2,i4,i5,i6|i6==0 && i2==M && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j1>=4 && i4+i5>=1 && 0>=i4+i5-3 && j2>=0 && j1+i4+i5>=1 && M>=j1+j2+1 && 0>=i4 && M>=j2+1 && N>=i5+1 && j1+j2>=0}
@@ -212,128 +212,194 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 		//{i1,j1,i2,j2,i4,i5,i6|i6==0 && i4+i5==0 && i2==M && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && j1>=1 && 0>=j1-3 && 0>=i4 && j2>=0 && N+i4>=1 && M>=j2+1 && M>=j1+j2+1}
 		//{i1,j1,i2,j2,i4,i5,i6|i4+i5==-1 && i2==M && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && N>=i6+1 && i4+i6>=1 && j1+i4+i6>=1 && 0>=i4 && M>=j1+j2+1 && j1>=0 && j2>=0}
 		//{i1,j1,i2,j2,i4,i5,i6|i4+i5==-1 && i2==M && i1==1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && M>=j1+j2+1 && i4+i6>=1 && j1+i4+i6>=1 && j2>=0 && j1>=0 && N>=i6+1 && 0>=i4}
-		//{i1,j1,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==i2-4 && i1==1 && i2>=j1 && M>=i2+1 && j1>=1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1}
+		//{i1,j1,i2,i3,i4,i5,i6|i6==0 && i5==0 && i4==0 && i3==j1+i2-4 && i1==1 && i2>=0 && M>=j1+i2+1 && j1>=1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1}
 		//{i0,i1,i2,i3,i4,i5,i6|i2==M && i0==1 && i4+i5>=0 && i6>=i5+1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && i3>=0 && i1>=0 && M>=i1+i3+1 && 0>=i4 && N>=i6+1 && N>=i5+1 && i5>=-1 && i1+i4+i6>=1 && i4+i6>=1}
 		//{i0,i1,i2,i3,i4,i5,i6|i2==M && i0==1 && i4+i5>=0 && i6>=i5+1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && 0>=i4 && N>=i6+1 && N>=i5+1 && i5>=-1 && M>=i1+i3+1 && i1>=0 && i3>=0 && i1+i4+i6>=1 && i4+i6>=1}
 		int c2,c3,c4,c5,c6,c7;
-		if ((M >= N+1)) {
-			{
-				for(c2=0;c2 <= min(3,N-1);c2+=1)
-				 {
-				 	for(c3=0;c3 <= -c2+N-1;c3+=1)
-				 	 {
-				 	 	S0((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S_2((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 	for(c3=-c2+N;c3 <= -c2+M-1;c3+=1)
-				 	 {
-				 	 	S0((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((M <= N-1)) {
-			{
-				for(c2=0;c2 <= min(3,M-1);c2+=1)
-				 {
-				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
-				 	 {
-				 	 	S0((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S_2((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 	for(c3=-c2+M;c3 <= -c2+N-1;c3+=1)
-				 	 {
-				 	 	S_2((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((M == N)) {
-			{
-				for(c2=0;c2 <= min(3,M-1);c2+=1)
-				 {
-				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
-				 	 {
-				 	 	S0((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S_2((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 }
-			}
-		}
 		if ((M >= 4 && N == 3)) {
 			{
-				for(c3=0;c3 <= M-4;c3+=1)
+				for(c3=0;c3 <= 2;c3+=1)
 				 {
-				 	S0((0),(3),(c3),(0),(0),(0),(0));
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+2;c4+=1)
+				 	 {
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+3;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+				#pragma omp parallel for 
+				for(c4=0;c4 <= M-4;c4+=1)
+				 {
+				 	S0((0),(0),(3),(c4),(0),(0),(0));
+				 }
+			}
+		}
+		if ((M >= N+1 && N >= 4)) {
+			{
+				for(c3=0;c3 <= 3;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+N;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
 				 }
 			}
 		}
 		if ((M == 3 && N >= 4)) {
 			{
-				for(c3=0;c3 <= N-4;c3+=1)
+				for(c3=0;c3 <= 2;c3+=1)
 				 {
-				 	S_2((0),(3),(c3),(0),(0),(0),(0));
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+2;c4+=1)
+				 	 {
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+3;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+				#pragma omp parallel for 
+				for(c4=0;c4 <= N-4;c4+=1)
+				 {
+				 	S_2((0),(0),(3),(c4),(0),(0),(0));
 				 }
 			}
 		}
-		if ((M >= N+1)) {
+		if ((M >= 4 && M <= N-1)) {
 			{
-				for(c2=4;c2 <= N-1;c2+=1)
+				for(c3=0;c3 <= 3;c3+=1)
 				 {
-				 	for(c3=0;c3 <= -c2+N-1;c3+=1)
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
 				 	 {
-				 	 	S_1((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S3((0),(c2),(c3),(0),(0),(0),(0));
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
 				 	 }
-				 	for(c3=-c2+N;c3 <= -c2+M-1;c3+=1)
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+M;c4 <= -c3+N-1;c4+=1)
 				 	 {
-				 	 	S_1((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((M <= N-1)) {
-			{
-				for(c2=4;c2 <= M-1;c2+=1)
-				 {
-				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
-				 	 {
-				 	 	S_1((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S3((0),(c2),(c3),(0),(0),(0),(0));
-				 	 }
-				 	for(c3=-c2+M;c3 <= -c2+N-1;c3+=1)
-				 	 {
-				 	 	S3((0),(c2),(c3),(0),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
 				 	 }
 				 }
 			}
 		}
 		if ((M == N)) {
 			{
-				for(c2=4;c2 <= M-1;c2+=1)
+				for(c3=0;c3 <= min(3,M-1);c3+=1)
 				 {
-				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
 				 	 {
-				 	 	S_1((0),(c2),(c3),(0),(0),(0),(0));
-				 	 	S3((0),(c2),(c3),(0),(0),(0),(0));
+				 	 	S0((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S_2((0),(0),(c3),(c4),(0),(0),(0));
 				 	 }
 				 }
 			}
 		}
-		for(c2=max(4,N);c2 <= M-1;c2+=1)
-		 {
-		 	for(c3=0;c3 <= -c2+M-1;c3+=1)
-		 	 {
-		 	 	S_1((0),(c2),(c3),(0),(0),(0),(0));
-		 	 }
-		 }
-		for(c2=max(4,M);c2 <= N-1;c2+=1)
-		 {
-		 	for(c3=0;c3 <= -c2+N-1;c3+=1)
-		 	 {
-		 	 	S3((0),(c2),(c3),(0),(0),(0),(0));
-		 	 }
-		 }
+		if ((M >= N+1 && N >= 5)) {
+			{
+				for(c3=4;c3 <= N-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+N;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+				for(c3=N;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 5 && M <= N-1)) {
+			{
+				for(c3=4;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=-c3+M;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+				for(c3=M;c3 <= N-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 5 && M == N)) {
+			{
+				for(c3=4;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 5 && N <= 4)) {
+			{
+				for(c3=4;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+M-1;c4+=1)
+				 	 {
+				 	 	S_1((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M <= 4 && N >= 5)) {
+			{
+				for(c3=4;c3 <= N-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=0;c4 <= -c3+N-1;c4+=1)
+				 	 {
+				 	 	S3((0),(0),(c3),(c4),(0),(0),(0));
+				 	 }
+				 }
+			}
+		}
 		if ((N >= 6)) {
 			{
 				#pragma omp parallel for private(c5,c6,c7)
@@ -530,9 +596,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=1;c2 <= min(3,M-1);c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -630,9 +696,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=1;c2 <= min(3,M-1);c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -697,9 +763,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=1;c2 <= min(3,M-1);c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -743,9 +809,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=4;c2 <= M-1;c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -843,9 +909,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=4;c2 <= M-1;c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -910,9 +976,9 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 			{
 				for(c2=4;c2 <= M-1;c2+=1)
 				 {
-				 	for(c3=c2;c3 <= M-1;c3+=1)
+				 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 				 	 {
-				 	 	S17((1),(c2),(c3),(c3-4),(0),(0),(0));
+				 	 	S17((1),(c2),(c3),(c2+c3-4),(0),(0),(0));
 				 	 }
 				 	#pragma omp parallel for private(c5,c6,c7)
 				 	for(c4=0;c4 <= -c2+M-1;c4+=1)

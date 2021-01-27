@@ -20,9 +20,9 @@ label="UseEquation_FTable_outer_k1_k2";
 setMemoryMap(prog, rootSystem,   "NR_FTable", "NR_FTable1",   "(i1,j1,i2,j2->i1, j2)");
 setMemoryMap(prog, rootSystem,   "NR_FTable_1", "NR_FTable2",   "(i1,j1,i2,j2->i1, j2)");                                        
                                                 
-setSpaceTimeMap(prog, rootSystem, "S1",          "(i,j               ->  0, j-i,     i,   0,      0,       0,     0)");
-setSpaceTimeMap(prog, rootSystem, "S2",          "(i,j               ->  0, j-i,     i,   0,      0,       0,     0)");
-setSpaceTimeMap(prog, rootSystem, label,        "(i1,j1             ->  1, j1-i1,   j1,  j1-4,   0,       0,    0)");
+setSpaceTimeMap(prog, rootSystem, "S1",          "(i,j               ->  0,    0,   j-i,   i,      0,       0,     0)");
+setSpaceTimeMap(prog, rootSystem, "S2",          "(i,j               ->  0,    0,   j-i,   i,      0,       0,     0)");
+setSpaceTimeMap(prog, rootSystem, label,        "(i1,j1             ->  1,  j1-i1,   i1,  j1-4,   0,       0,    0)");
 setSpaceTimeMap(prog, rootSystem, "FTable",      "(i1,j1,i2,j2       ->  1, j1-i1,   M,  i1,    -i2,    j2,    0)");
 setSpaceTimeMap(prog, rootSystem, "NR_FTable",   "(i1,j1,i2,j2,k2    ->  1, j1-i1,   M,  i1,    -i2,    k2,    j2)", 
                                                  "(i1,j1,i2,j2       ->  1, j1-i1,   M,  i1,    -i2,    i2-1,  j2)");                                                                           
@@ -59,7 +59,6 @@ setMemorySpaceForUseEquationOptimization(prog, rootSystem, label, 1, 0, "FTable_
 #CheckProgram(prog);
 setParallel(prog, rootSystem, "", "3");
 generateScheduledCode(prog, rootSystem, outDir);
-#generateVerificationCode(prog, rootSystem, outDir);
 
                              
                                              
