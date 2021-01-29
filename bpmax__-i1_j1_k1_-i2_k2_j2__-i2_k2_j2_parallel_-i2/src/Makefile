@@ -1,6 +1,6 @@
-CFLAGS= -O3  -fopenmp -I/usr/include/malloc/ -xCORE-AVX2 -std=c++11 -xhost -fma -ipo -qopt-report-phase=vec  -qopt-report=5
+CFLAGS= -O3  -qopenmp -I/usr/include/malloc/ -xCORE-AVX2 -std=c++11 -xhost -fma -ipo -qopt-report-phase=vec  -qopt-report=5
 LIBRARIES=-lm
-CC=/s/parsons/l/sys/intel/bin/icpc
+CC=icpc
 OBJS = bpmax.o 
 all: plain check
 
@@ -26,4 +26,4 @@ bpmax_verify.o : bpmax_verify.c
 	$(CC) bpmax_verify.c -o bpmax_verify.o $(CFLAGS) $(LIBRARIES) -c
 
 clean:
-	rm -f *.o bpmax bpmax.check bpmax.verify bpmax.verify-rand
+	rm -f *.o bpmax bpmax.check bpmax.verify bpmax.verify-rand *.optrpt
