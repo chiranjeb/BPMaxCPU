@@ -107,10 +107,10 @@ static float**** NR_FTable_3;
 static float**** NR_FTable_4;
 static float**** FTable;
 static float**** NR_FTable_Alpha_Init;
-static float**** NR_FTable_1_Alpha_Init;
-static float**** NR_FTable_2_Alpha_Init;
 static float**** NR_FTable_3_Alpha_Init;
 static float**** NR_FTable_4_Alpha_Init;
+static float**** NR_FTable_1_Alpha_Init;
+static float**** NR_FTable_2_Alpha_Init;
 static char**** _flag_FTable;
 static char** _flag_S1;
 static char** _flag_S2;
@@ -120,33 +120,33 @@ static char**** _flag_NR_FTable_2;
 static char**** _flag_NR_FTable_3;
 static char**** _flag_NR_FTable_4;
 static char**** _flag_NR_FTable_Alpha_Init;
-static char**** _flag_NR_FTable_1_Alpha_Init;
-static char**** _flag_NR_FTable_2_Alpha_Init;
 static char**** _flag_NR_FTable_3_Alpha_Init;
 static char**** _flag_NR_FTable_4_Alpha_Init;
+static char**** _flag_NR_FTable_1_Alpha_Init;
+static char**** _flag_NR_FTable_2_Alpha_Init;
 
 
 //Local Function Declarations
-float reduce_bpmax_verify_S1_1(long, long, long, long, int, int);
-float eval_S1(long, long, long, long, int, int);
-float reduce_bpmax_verify_S2_1(long, long, long, long, int, int);
-float eval_S2(long, long, long, long, int, int);
-float eval_FTable(long, long, long, long, int, int, int, int);
-float reduce_bpmax_verify_NR_FTable_1(long, long, long, long, int, int, int, int);
-float eval_NR_FTable(long, long, long, long, int, int, int, int);
-float reduce_bpmax_verify_NR_FTable_1_1(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_1(long, long, long, long, int, int, int, int);
-float reduce_bpmax_verify_NR_FTable_2_1(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_2(long, long, long, long, int, int, int, int);
-float reduce_bpmax_verify_NR_FTable_3_1(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_3(long, long, long, long, int, int, int, int);
-float reduce_bpmax_verify_NR_FTable_4_1(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_4(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_Alpha_Init(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_1_Alpha_Init(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_2_Alpha_Init(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_3_Alpha_Init(long, long, long, long, int, int, int, int);
-float eval_NR_FTable_4_Alpha_Init(long, long, long, long, int, int, int, int);
+float reduce_bpmax_verify_S1_1(long, long, int, int);
+float eval_S1(long, long, int, int);
+float reduce_bpmax_verify_S2_1(long, long, int, int);
+float eval_S2(long, long, int, int);
+float eval_FTable(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_1(long, long, int, int, int, int);
+float eval_NR_FTable(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_1_1(long, long, int, int, int, int);
+float eval_NR_FTable_1(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_2_1(long, long, int, int, int, int);
+float eval_NR_FTable_2(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_3_1(long, long, int, int, int, int);
+float eval_NR_FTable_3(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_4_1(long, long, int, int, int, int);
+float eval_NR_FTable_4(long, long, int, int, int, int);
+float eval_NR_FTable_Alpha_Init(long, long, int, int, int, int);
+float eval_NR_FTable_3_Alpha_Init(long, long, int, int, int, int);
+float eval_NR_FTable_4_Alpha_Init(long, long, int, int, int, int);
+float eval_NR_FTable_1_Alpha_Init(long, long, int, int, int, int);
+float eval_NR_FTable_2_Alpha_Init(long, long, int, int, int, int);
 
 //Memory Macros
 #define seq1(i) seq1[i]
@@ -160,10 +160,10 @@ float eval_NR_FTable_4_Alpha_Init(long, long, long, long, int, int, int, int);
 #define NR_FTable_4(i1,j1,i2,j2) NR_FTable_4[i1][j1][i2][j2]
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define NR_FTable_Alpha_Init(i1,j1,i2,j2) NR_FTable_Alpha_Init[i1][j1][i2][j2]
-#define NR_FTable_1_Alpha_Init(i1,j1,i2,j2) NR_FTable_1_Alpha_Init[i1][j1][i2][j2]
-#define NR_FTable_2_Alpha_Init(i1,j1,i2,j2) NR_FTable_2_Alpha_Init[i1][j1][i2][j2]
 #define NR_FTable_3_Alpha_Init(i1,j1,i2,j2) NR_FTable_3_Alpha_Init[i1][j1][i2][j2]
 #define NR_FTable_4_Alpha_Init(i1,j1,i2,j2) NR_FTable_4_Alpha_Init[i1][j1][i2][j2]
+#define NR_FTable_1_Alpha_Init(i1,j1,i2,j2) NR_FTable_1_Alpha_Init[i1][j1][i2][j2]
+#define NR_FTable_2_Alpha_Init(i1,j1,i2,j2) NR_FTable_2_Alpha_Init[i1][j1][i2][j2]
 #define _flag_FTable(i1,j1,i2,j2) _flag_FTable[i1][j1][i2][j2]
 #define _flag_S1(i,j) _flag_S1[i][j]
 #define _flag_S2(i,j) _flag_S2[i][j]
@@ -173,14 +173,14 @@ float eval_NR_FTable_4_Alpha_Init(long, long, long, long, int, int, int, int);
 #define _flag_NR_FTable_3(i1,j1,i2,j2) _flag_NR_FTable_3[i1][j1][i2][j2]
 #define _flag_NR_FTable_4(i1,j1,i2,j2) _flag_NR_FTable_4[i1][j1][i2][j2]
 #define _flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_Alpha_Init[i1][j1][i2][j2]
-#define _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_1_Alpha_Init[i1][j1][i2][j2]
-#define _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_2_Alpha_Init[i1][j1][i2][j2]
 #define _flag_NR_FTable_3_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_3_Alpha_Init[i1][j1][i2][j2]
 #define _flag_NR_FTable_4_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_4_Alpha_Init[i1][j1][i2][j2]
+#define _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_1_Alpha_Init[i1][j1][i2][j2]
+#define _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) _flag_NR_FTable_2_Alpha_Init[i1][j1][i2][j2]
 
-void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _local_seq2, float**** _local_FTable){
+void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** _local_FTable){
 	///Parameter checking
-	if (!((M >= WM && WM >= 8 && N >= WN && WN >= 8))) {
+	if (!((M >= 3 && N >= 3))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -224,66 +224,66 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 		}
 	}
 	
-	float* _lin_NR_FTable_1 = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin_NR_FTable_1, ((M-1) * (M) * (N) * (N)), float);
-	NR_FTable_1 = (float****)malloc(sizeof(float***)*(M-1));
-	mallocCheck(NR_FTable_1, (M-1), float***);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	float* _lin_NR_FTable_1 = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable_1, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable_1 = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable_1, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
 		NR_FTable_1[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_1[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_1[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
-			mallocCheck(NR_FTable_1[mz1][mz2], (N), float*);
-			for (mz3=0;mz3 < N; mz3++) {
-				NR_FTable_1[mz1][mz2][mz3] = &_lin_NR_FTable_1[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			NR_FTable_1[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable_1[mz1][mz2], (N-1), float*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				NR_FTable_1[mz1][mz2][mz3] = &_lin_NR_FTable_1[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
 			}
 		}
 	}
 	
-	float* _lin_NR_FTable_2 = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin_NR_FTable_2, ((M-1) * (M) * (N) * (N)), float);
-	NR_FTable_2 = (float****)malloc(sizeof(float***)*(M-1));
-	mallocCheck(NR_FTable_2, (M-1), float***);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	float* _lin_NR_FTable_2 = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable_2, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable_2 = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable_2, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
 		NR_FTable_2[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_2[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_2[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
-			mallocCheck(NR_FTable_2[mz1][mz2], (N), float*);
-			for (mz3=0;mz3 < N; mz3++) {
-				NR_FTable_2[mz1][mz2][mz3] = &_lin_NR_FTable_2[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			NR_FTable_2[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable_2[mz1][mz2], (N-1), float*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				NR_FTable_2[mz1][mz2][mz3] = &_lin_NR_FTable_2[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
 			}
 		}
 	}
 	
-	float* _lin_NR_FTable_3 = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin_NR_FTable_3, ((M) * (M) * (N-1) * (N)), float);
-	NR_FTable_3 = (float****)malloc(sizeof(float***)*(M));
-	mallocCheck(NR_FTable_3, (M), float***);
-	for (mz1=0;mz1 < M; mz1++) {
+	float* _lin_NR_FTable_3 = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin_NR_FTable_3, ((M-1) * (M) * (N) * (N)), float);
+	NR_FTable_3 = (float****)malloc(sizeof(float***)*(M-1));
+	mallocCheck(NR_FTable_3, (M-1), float***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		NR_FTable_3[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_3[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_3[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
-			mallocCheck(NR_FTable_3[mz1][mz2], (N-1), float*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				NR_FTable_3[mz1][mz2][mz3] = &_lin_NR_FTable_3[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			NR_FTable_3[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(NR_FTable_3[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				NR_FTable_3[mz1][mz2][mz3] = &_lin_NR_FTable_3[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
 	
-	float* _lin_NR_FTable_4 = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin_NR_FTable_4, ((M) * (M) * (N-1) * (N)), float);
-	NR_FTable_4 = (float****)malloc(sizeof(float***)*(M));
-	mallocCheck(NR_FTable_4, (M), float***);
-	for (mz1=0;mz1 < M; mz1++) {
+	float* _lin_NR_FTable_4 = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin_NR_FTable_4, ((M-1) * (M) * (N) * (N)), float);
+	NR_FTable_4 = (float****)malloc(sizeof(float***)*(M-1));
+	mallocCheck(NR_FTable_4, (M-1), float***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		NR_FTable_4[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_4[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_4[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
-			mallocCheck(NR_FTable_4[mz1][mz2], (N-1), float*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				NR_FTable_4[mz1][mz2][mz3] = &_lin_NR_FTable_4[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			NR_FTable_4[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(NR_FTable_4[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				NR_FTable_4[mz1][mz2][mz3] = &_lin_NR_FTable_4[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
@@ -304,66 +304,66 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 		}
 	}
 	
-	float* _lin_NR_FTable_1_Alpha_Init = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin_NR_FTable_1_Alpha_Init, ((M-1) * (M) * (N) * (N)), float);
-	NR_FTable_1_Alpha_Init = (float****)malloc(sizeof(float***)*(M-1));
-	mallocCheck(NR_FTable_1_Alpha_Init, (M-1), float***);
+	float* _lin_NR_FTable_3_Alpha_Init = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin_NR_FTable_3_Alpha_Init, ((M-1) * (M) * (N) * (N)), float);
+	NR_FTable_3_Alpha_Init = (float****)malloc(sizeof(float***)*(M-1));
+	mallocCheck(NR_FTable_3_Alpha_Init, (M-1), float***);
 	for (mz1=0;mz1 < M-1; mz1++) {
-		NR_FTable_1_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
-		mallocCheck(NR_FTable_1_Alpha_Init[mz1], (M), float**);
-		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_1_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
-			mallocCheck(NR_FTable_1_Alpha_Init[mz1][mz2], (N), float*);
-			for (mz3=0;mz3 < N; mz3++) {
-				NR_FTable_1_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_1_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
-			}
-		}
-	}
-	
-	float* _lin_NR_FTable_2_Alpha_Init = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin_NR_FTable_2_Alpha_Init, ((M-1) * (M) * (N) * (N)), float);
-	NR_FTable_2_Alpha_Init = (float****)malloc(sizeof(float***)*(M-1));
-	mallocCheck(NR_FTable_2_Alpha_Init, (M-1), float***);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		NR_FTable_2_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
-		mallocCheck(NR_FTable_2_Alpha_Init[mz1], (M), float**);
-		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_2_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
-			mallocCheck(NR_FTable_2_Alpha_Init[mz1][mz2], (N), float*);
-			for (mz3=0;mz3 < N; mz3++) {
-				NR_FTable_2_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_2_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
-			}
-		}
-	}
-	
-	float* _lin_NR_FTable_3_Alpha_Init = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin_NR_FTable_3_Alpha_Init, ((M) * (M) * (N-1) * (N)), float);
-	NR_FTable_3_Alpha_Init = (float****)malloc(sizeof(float***)*(M));
-	mallocCheck(NR_FTable_3_Alpha_Init, (M), float***);
-	for (mz1=0;mz1 < M; mz1++) {
 		NR_FTable_3_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_3_Alpha_Init[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_3_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
-			mallocCheck(NR_FTable_3_Alpha_Init[mz1][mz2], (N-1), float*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				NR_FTable_3_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_3_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			NR_FTable_3_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(NR_FTable_3_Alpha_Init[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				NR_FTable_3_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_3_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
 	
-	float* _lin_NR_FTable_4_Alpha_Init = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin_NR_FTable_4_Alpha_Init, ((M) * (M) * (N-1) * (N)), float);
-	NR_FTable_4_Alpha_Init = (float****)malloc(sizeof(float***)*(M));
-	mallocCheck(NR_FTable_4_Alpha_Init, (M), float***);
-	for (mz1=0;mz1 < M; mz1++) {
+	float* _lin_NR_FTable_4_Alpha_Init = (float*)malloc(sizeof(float)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin_NR_FTable_4_Alpha_Init, ((M-1) * (M) * (N) * (N)), float);
+	NR_FTable_4_Alpha_Init = (float****)malloc(sizeof(float***)*(M-1));
+	mallocCheck(NR_FTable_4_Alpha_Init, (M-1), float***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		NR_FTable_4_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
 		mallocCheck(NR_FTable_4_Alpha_Init[mz1], (M), float**);
 		for (mz2=0;mz2 < M; mz2++) {
-			NR_FTable_4_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
-			mallocCheck(NR_FTable_4_Alpha_Init[mz1][mz2], (N-1), float*);
+			NR_FTable_4_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(NR_FTable_4_Alpha_Init[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				NR_FTable_4_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_4_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	
+	float* _lin_NR_FTable_1_Alpha_Init = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable_1_Alpha_Init, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable_1_Alpha_Init = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable_1_Alpha_Init, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		NR_FTable_1_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(NR_FTable_1_Alpha_Init[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			NR_FTable_1_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable_1_Alpha_Init[mz1][mz2], (N-1), float*);
 			for (mz3=0;mz3 < N-1; mz3++) {
-				NR_FTable_4_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_4_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+				NR_FTable_1_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_1_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	
+	float* _lin_NR_FTable_2_Alpha_Init = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable_2_Alpha_Init, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable_2_Alpha_Init = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable_2_Alpha_Init, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		NR_FTable_2_Alpha_Init[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(NR_FTable_2_Alpha_Init[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			NR_FTable_2_Alpha_Init[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable_2_Alpha_Init[mz1][mz2], (N-1), float*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				NR_FTable_2_Alpha_Init[mz1][mz2][mz3] = &_lin_NR_FTable_2_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
 			}
 		}
 	}
@@ -420,73 +420,73 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	}
 	memset(_lin__flag_NR_FTable, 'N', ((M-1) * (M) * (N-1) * (N)));
 	
-	char* _lin__flag_NR_FTable_1 = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_1, ((M-1) * (M) * (N) * (N)), char);
-	_flag_NR_FTable_1 = (char****)malloc(sizeof(char***)*(M-1));
-	mallocCheck(_flag_NR_FTable_1, (M-1), char***);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	char* _lin__flag_NR_FTable_1 = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_1, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable_1 = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable_1, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
 		_flag_NR_FTable_1[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_1[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_1[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
-			mallocCheck(_flag_NR_FTable_1[mz1][mz2], (N), char*);
-			for (mz3=0;mz3 < N; mz3++) {
-				_flag_NR_FTable_1[mz1][mz2][mz3] = &_lin__flag_NR_FTable_1[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_1[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable_1[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable_1[mz1][mz2][mz3] = &_lin__flag_NR_FTable_1[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_1, 'N', ((M-1) * (M) * (N) * (N)));
+	memset(_lin__flag_NR_FTable_1, 'N', ((M) * (M) * (N-1) * (N)));
 	
-	char* _lin__flag_NR_FTable_2 = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_2, ((M-1) * (M) * (N) * (N)), char);
-	_flag_NR_FTable_2 = (char****)malloc(sizeof(char***)*(M-1));
-	mallocCheck(_flag_NR_FTable_2, (M-1), char***);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	char* _lin__flag_NR_FTable_2 = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_2, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable_2 = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable_2, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
 		_flag_NR_FTable_2[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_2[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_2[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
-			mallocCheck(_flag_NR_FTable_2[mz1][mz2], (N), char*);
-			for (mz3=0;mz3 < N; mz3++) {
-				_flag_NR_FTable_2[mz1][mz2][mz3] = &_lin__flag_NR_FTable_2[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_2[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable_2[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable_2[mz1][mz2][mz3] = &_lin__flag_NR_FTable_2[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_2, 'N', ((M-1) * (M) * (N) * (N)));
+	memset(_lin__flag_NR_FTable_2, 'N', ((M) * (M) * (N-1) * (N)));
 	
-	char* _lin__flag_NR_FTable_3 = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_3, ((M) * (M) * (N-1) * (N)), char);
-	_flag_NR_FTable_3 = (char****)malloc(sizeof(char***)*(M));
-	mallocCheck(_flag_NR_FTable_3, (M), char***);
-	for (mz1=0;mz1 < M; mz1++) {
+	char* _lin__flag_NR_FTable_3 = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_3, ((M-1) * (M) * (N) * (N)), char);
+	_flag_NR_FTable_3 = (char****)malloc(sizeof(char***)*(M-1));
+	mallocCheck(_flag_NR_FTable_3, (M-1), char***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		_flag_NR_FTable_3[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_3[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_3[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
-			mallocCheck(_flag_NR_FTable_3[mz1][mz2], (N-1), char*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				_flag_NR_FTable_3[mz1][mz2][mz3] = &_lin__flag_NR_FTable_3[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_3[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
+			mallocCheck(_flag_NR_FTable_3[mz1][mz2], (N), char*);
+			for (mz3=0;mz3 < N; mz3++) {
+				_flag_NR_FTable_3[mz1][mz2][mz3] = &_lin__flag_NR_FTable_3[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_3, 'N', ((M) * (M) * (N-1) * (N)));
+	memset(_lin__flag_NR_FTable_3, 'N', ((M-1) * (M) * (N) * (N)));
 	
-	char* _lin__flag_NR_FTable_4 = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_4, ((M) * (M) * (N-1) * (N)), char);
-	_flag_NR_FTable_4 = (char****)malloc(sizeof(char***)*(M));
-	mallocCheck(_flag_NR_FTable_4, (M), char***);
-	for (mz1=0;mz1 < M; mz1++) {
+	char* _lin__flag_NR_FTable_4 = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_4, ((M-1) * (M) * (N) * (N)), char);
+	_flag_NR_FTable_4 = (char****)malloc(sizeof(char***)*(M-1));
+	mallocCheck(_flag_NR_FTable_4, (M-1), char***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		_flag_NR_FTable_4[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_4[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_4[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
-			mallocCheck(_flag_NR_FTable_4[mz1][mz2], (N-1), char*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				_flag_NR_FTable_4[mz1][mz2][mz3] = &_lin__flag_NR_FTable_4[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_4[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
+			mallocCheck(_flag_NR_FTable_4[mz1][mz2], (N), char*);
+			for (mz3=0;mz3 < N; mz3++) {
+				_flag_NR_FTable_4[mz1][mz2][mz3] = &_lin__flag_NR_FTable_4[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_4, 'N', ((M) * (M) * (N-1) * (N)));
+	memset(_lin__flag_NR_FTable_4, 'N', ((M-1) * (M) * (N) * (N)));
 	
 	char* _lin__flag_NR_FTable_Alpha_Init = (char*)malloc(sizeof(char)*((M-1) * (M) * (N-1) * (N)));
 	mallocCheck(_lin__flag_NR_FTable_Alpha_Init, ((M-1) * (M) * (N-1) * (N)), char);
@@ -505,85 +505,85 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	}
 	memset(_lin__flag_NR_FTable_Alpha_Init, 'N', ((M-1) * (M) * (N-1) * (N)));
 	
-	char* _lin__flag_NR_FTable_1_Alpha_Init = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_1_Alpha_Init, ((M-1) * (M) * (N) * (N)), char);
-	_flag_NR_FTable_1_Alpha_Init = (char****)malloc(sizeof(char***)*(M-1));
-	mallocCheck(_flag_NR_FTable_1_Alpha_Init, (M-1), char***);
+	char* _lin__flag_NR_FTable_3_Alpha_Init = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_3_Alpha_Init, ((M-1) * (M) * (N) * (N)), char);
+	_flag_NR_FTable_3_Alpha_Init = (char****)malloc(sizeof(char***)*(M-1));
+	mallocCheck(_flag_NR_FTable_3_Alpha_Init, (M-1), char***);
 	for (mz1=0;mz1 < M-1; mz1++) {
-		_flag_NR_FTable_1_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
-		mallocCheck(_flag_NR_FTable_1_Alpha_Init[mz1], (M), char**);
-		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_1_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
-			mallocCheck(_flag_NR_FTable_1_Alpha_Init[mz1][mz2], (N), char*);
-			for (mz3=0;mz3 < N; mz3++) {
-				_flag_NR_FTable_1_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_1_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
-			}
-		}
-	}
-	memset(_lin__flag_NR_FTable_1_Alpha_Init, 'N', ((M-1) * (M) * (N) * (N)));
-	
-	char* _lin__flag_NR_FTable_2_Alpha_Init = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_2_Alpha_Init, ((M-1) * (M) * (N) * (N)), char);
-	_flag_NR_FTable_2_Alpha_Init = (char****)malloc(sizeof(char***)*(M-1));
-	mallocCheck(_flag_NR_FTable_2_Alpha_Init, (M-1), char***);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		_flag_NR_FTable_2_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
-		mallocCheck(_flag_NR_FTable_2_Alpha_Init[mz1], (M), char**);
-		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_2_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
-			mallocCheck(_flag_NR_FTable_2_Alpha_Init[mz1][mz2], (N), char*);
-			for (mz3=0;mz3 < N; mz3++) {
-				_flag_NR_FTable_2_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_2_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
-			}
-		}
-	}
-	memset(_lin__flag_NR_FTable_2_Alpha_Init, 'N', ((M-1) * (M) * (N) * (N)));
-	
-	char* _lin__flag_NR_FTable_3_Alpha_Init = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_3_Alpha_Init, ((M) * (M) * (N-1) * (N)), char);
-	_flag_NR_FTable_3_Alpha_Init = (char****)malloc(sizeof(char***)*(M));
-	mallocCheck(_flag_NR_FTable_3_Alpha_Init, (M), char***);
-	for (mz1=0;mz1 < M; mz1++) {
 		_flag_NR_FTable_3_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_3_Alpha_Init[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_3_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
-			mallocCheck(_flag_NR_FTable_3_Alpha_Init[mz1][mz2], (N-1), char*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				_flag_NR_FTable_3_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_3_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_3_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
+			mallocCheck(_flag_NR_FTable_3_Alpha_Init[mz1][mz2], (N), char*);
+			for (mz3=0;mz3 < N; mz3++) {
+				_flag_NR_FTable_3_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_3_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_3_Alpha_Init, 'N', ((M) * (M) * (N-1) * (N)));
+	memset(_lin__flag_NR_FTable_3_Alpha_Init, 'N', ((M-1) * (M) * (N) * (N)));
 	
-	char* _lin__flag_NR_FTable_4_Alpha_Init = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
-	mallocCheck(_lin__flag_NR_FTable_4_Alpha_Init, ((M) * (M) * (N-1) * (N)), char);
-	_flag_NR_FTable_4_Alpha_Init = (char****)malloc(sizeof(char***)*(M));
-	mallocCheck(_flag_NR_FTable_4_Alpha_Init, (M), char***);
-	for (mz1=0;mz1 < M; mz1++) {
+	char* _lin__flag_NR_FTable_4_Alpha_Init = (char*)malloc(sizeof(char)*((M-1) * (M) * (N) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_4_Alpha_Init, ((M-1) * (M) * (N) * (N)), char);
+	_flag_NR_FTable_4_Alpha_Init = (char****)malloc(sizeof(char***)*(M-1));
+	mallocCheck(_flag_NR_FTable_4_Alpha_Init, (M-1), char***);
+	for (mz1=0;mz1 < M-1; mz1++) {
 		_flag_NR_FTable_4_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
 		mallocCheck(_flag_NR_FTable_4_Alpha_Init[mz1], (M), char**);
 		for (mz2=0;mz2 < M; mz2++) {
-			_flag_NR_FTable_4_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
-			mallocCheck(_flag_NR_FTable_4_Alpha_Init[mz1][mz2], (N-1), char*);
-			for (mz3=0;mz3 < N-1; mz3++) {
-				_flag_NR_FTable_4_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_4_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			_flag_NR_FTable_4_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N));
+			mallocCheck(_flag_NR_FTable_4_Alpha_Init[mz1][mz2], (N), char*);
+			for (mz3=0;mz3 < N; mz3++) {
+				_flag_NR_FTable_4_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_4_Alpha_Init[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
 			}
 		}
 	}
-	memset(_lin__flag_NR_FTable_4_Alpha_Init, 'N', ((M) * (M) * (N-1) * (N)));
-	#define S0(i1,j1,i2,j2) eval_FTable(M,N,WM,WN,i1,j1,i2,j2)
+	memset(_lin__flag_NR_FTable_4_Alpha_Init, 'N', ((M-1) * (M) * (N) * (N)));
+	
+	char* _lin__flag_NR_FTable_1_Alpha_Init = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_1_Alpha_Init, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable_1_Alpha_Init = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable_1_Alpha_Init, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
+		_flag_NR_FTable_1_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
+		mallocCheck(_flag_NR_FTable_1_Alpha_Init[mz1], (M), char**);
+		for (mz2=0;mz2 < M; mz2++) {
+			_flag_NR_FTable_1_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable_1_Alpha_Init[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable_1_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_1_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	memset(_lin__flag_NR_FTable_1_Alpha_Init, 'N', ((M) * (M) * (N-1) * (N)));
+	
+	char* _lin__flag_NR_FTable_2_Alpha_Init = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_2_Alpha_Init, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable_2_Alpha_Init = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable_2_Alpha_Init, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
+		_flag_NR_FTable_2_Alpha_Init[mz1] = (char***)malloc(sizeof(char**)*(M));
+		mallocCheck(_flag_NR_FTable_2_Alpha_Init[mz1], (M), char**);
+		for (mz2=0;mz2 < M; mz2++) {
+			_flag_NR_FTable_2_Alpha_Init[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable_2_Alpha_Init[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable_2_Alpha_Init[mz1][mz2][mz3] = &_lin__flag_NR_FTable_2_Alpha_Init[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	memset(_lin__flag_NR_FTable_2_Alpha_Init, 'N', ((M) * (M) * (N-1) * (N)));
+	#define S0(i1,j1,i2,j2) eval_FTable(M,N,i1,j1,i2,j2)
 	{
 		//Domain
-		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && WM+i1>=j1 && WN+i2>=j2 && M>=WM && WM>=8 && N>=WN && WN>=8}
+		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && M>=3 && N>=3}
 		int c1,c2,c3,c4;
 		for(c1=0;c1 <= M-1;c1+=1)
 		 {
-		 	for(c2=c1;c2 <= min(M-1,c1+WM);c2+=1)
+		 	for(c2=c1;c2 <= M-1;c2+=1)
 		 	 {
 		 	 	for(c3=0;c3 <= N-1;c3+=1)
 		 	 	 {
-		 	 	 	for(c4=c3;c4 <= min(N-1,c3+WN);c4+=1)
+		 	 	 	for(c4=c3;c4 <= N-1;c4+=1)
 		 	 	 	 {
 		 	 	 	 	S0((c1),(c2),(c3),(c4));
 		 	 	 	 }
@@ -610,7 +610,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(NR_FTable);
 	
 	free(_lin_NR_FTable_1);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_1[mz1][mz2]);
 		}
@@ -619,7 +619,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(NR_FTable_1);
 	
 	free(_lin_NR_FTable_2);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_2[mz1][mz2]);
 		}
@@ -628,7 +628,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(NR_FTable_2);
 	
 	free(_lin_NR_FTable_3);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_3[mz1][mz2]);
 		}
@@ -637,7 +637,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(NR_FTable_3);
 	
 	free(_lin_NR_FTable_4);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_4[mz1][mz2]);
 		}
@@ -654,26 +654,8 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	}
 	free(NR_FTable_Alpha_Init);
 	
-	free(_lin_NR_FTable_1_Alpha_Init);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		for (mz2=0;mz2 < M; mz2++) {
-			free(NR_FTable_1_Alpha_Init[mz1][mz2]);
-		}
-		free(NR_FTable_1_Alpha_Init[mz1]);
-	}
-	free(NR_FTable_1_Alpha_Init);
-	
-	free(_lin_NR_FTable_2_Alpha_Init);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		for (mz2=0;mz2 < M; mz2++) {
-			free(NR_FTable_2_Alpha_Init[mz1][mz2]);
-		}
-		free(NR_FTable_2_Alpha_Init[mz1]);
-	}
-	free(NR_FTable_2_Alpha_Init);
-	
 	free(_lin_NR_FTable_3_Alpha_Init);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_3_Alpha_Init[mz1][mz2]);
 		}
@@ -682,13 +664,31 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(NR_FTable_3_Alpha_Init);
 	
 	free(_lin_NR_FTable_4_Alpha_Init);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(NR_FTable_4_Alpha_Init[mz1][mz2]);
 		}
 		free(NR_FTable_4_Alpha_Init[mz1]);
 	}
 	free(NR_FTable_4_Alpha_Init);
+	
+	free(_lin_NR_FTable_1_Alpha_Init);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(NR_FTable_1_Alpha_Init[mz1][mz2]);
+		}
+		free(NR_FTable_1_Alpha_Init[mz1]);
+	}
+	free(NR_FTable_1_Alpha_Init);
+	
+	free(_lin_NR_FTable_2_Alpha_Init);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(NR_FTable_2_Alpha_Init[mz1][mz2]);
+		}
+		free(NR_FTable_2_Alpha_Init[mz1]);
+	}
+	free(NR_FTable_2_Alpha_Init);
 	
 	free(_lin__flag_FTable);
 	for (mz1=0;mz1 < M; mz1++) {
@@ -715,7 +715,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(_flag_NR_FTable);
 	
 	free(_lin__flag_NR_FTable_1);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_1[mz1][mz2]);
 		}
@@ -724,7 +724,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(_flag_NR_FTable_1);
 	
 	free(_lin__flag_NR_FTable_2);
-	for (mz1=0;mz1 < M-1; mz1++) {
+	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_2[mz1][mz2]);
 		}
@@ -733,7 +733,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(_flag_NR_FTable_2);
 	
 	free(_lin__flag_NR_FTable_3);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_3[mz1][mz2]);
 		}
@@ -742,7 +742,7 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(_flag_NR_FTable_3);
 	
 	free(_lin__flag_NR_FTable_4);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_4[mz1][mz2]);
 		}
@@ -759,26 +759,8 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	}
 	free(_flag_NR_FTable_Alpha_Init);
 	
-	free(_lin__flag_NR_FTable_1_Alpha_Init);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		for (mz2=0;mz2 < M; mz2++) {
-			free(_flag_NR_FTable_1_Alpha_Init[mz1][mz2]);
-		}
-		free(_flag_NR_FTable_1_Alpha_Init[mz1]);
-	}
-	free(_flag_NR_FTable_1_Alpha_Init);
-	
-	free(_lin__flag_NR_FTable_2_Alpha_Init);
-	for (mz1=0;mz1 < M-1; mz1++) {
-		for (mz2=0;mz2 < M; mz2++) {
-			free(_flag_NR_FTable_2_Alpha_Init[mz1][mz2]);
-		}
-		free(_flag_NR_FTable_2_Alpha_Init[mz1]);
-	}
-	free(_flag_NR_FTable_2_Alpha_Init);
-	
 	free(_lin__flag_NR_FTable_3_Alpha_Init);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_3_Alpha_Init[mz1][mz2]);
 		}
@@ -787,20 +769,38 @@ void bpmax_verify(long M, long N, long WM, long WN, int* _local_seq1, int* _loca
 	free(_flag_NR_FTable_3_Alpha_Init);
 	
 	free(_lin__flag_NR_FTable_4_Alpha_Init);
-	for (mz1=0;mz1 < M; mz1++) {
+	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			free(_flag_NR_FTable_4_Alpha_Init[mz1][mz2]);
 		}
 		free(_flag_NR_FTable_4_Alpha_Init[mz1]);
 	}
 	free(_flag_NR_FTable_4_Alpha_Init);
+	
+	free(_lin__flag_NR_FTable_1_Alpha_Init);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(_flag_NR_FTable_1_Alpha_Init[mz1][mz2]);
+		}
+		free(_flag_NR_FTable_1_Alpha_Init[mz1]);
+	}
+	free(_flag_NR_FTable_1_Alpha_Init);
+	
+	free(_lin__flag_NR_FTable_2_Alpha_Init);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(_flag_NR_FTable_2_Alpha_Init[mz1][mz2]);
+		}
+		free(_flag_NR_FTable_2_Alpha_Init[mz1]);
+	}
+	free(_flag_NR_FTable_2_Alpha_Init);
 }
-float reduce_bpmax_verify_S1_1(long M, long N, long WM, long WN, int ip, int jp){
+float reduce_bpmax_verify_S1_1(long M, long N, int ip, int jp){
 	float reduceVar = -FLT_MAX;
-	#define S0(i,j,k) {float __temp__ = (eval_S1(M,N,WM,WN,i,k))+(eval_S1(M,N,WM,WN,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i,j,k) {float __temp__ = (eval_S1(M,N,i,k))+(eval_S1(M,N,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|jp>=ip+4 && WM>=8 && M>=WM && WN>=8 && N>=WN && ip>=0 && M>=jp+1 && M>=ip+1 && jp>=0 && M>=i+1 && j>=0 && j>=i+4 && k>=-1 && j>=k+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && ip==i && jp==j}
+		//{i,j,k|M>=3 && N>=3 && M>=jp+1 && ip>=0 && jp>=ip+4 && M>=ip+1 && jp>=0 && j>=i+4 && M>=i+1 && j>=k+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=0 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {
@@ -810,11 +810,11 @@ float reduce_bpmax_verify_S1_1(long M, long N, long WM, long WN, int ip, int jp)
 	#undef S0
 	return reduceVar;
 }
-float eval_S1(long M, long N, long WM, long WN, int i, int j){
+float eval_S1(long M, long N, int i, int j){
 	if ( _flag_S1(i,j) == 'N' ) {
 		_flag_S1(i,j) = 'I';
 	//Body for S1
-		S1(i,j) = (((i >= j-3))?0:(__max_float((eval_S1(M,N,WM,WN,i+1,j-1))+(e_intra_score(seq1(i),seq1(j))),reduce_bpmax_verify_S1_1(M,N,WM,WN,i,j))));
+		S1(i,j) = (((i >= j-3))?0:(__max_float((eval_S1(M,N,i+1,j-1))+(e_intra_score(seq1(i),seq1(j))),reduce_bpmax_verify_S1_1(M,N,i,j))));
 		_flag_S1(i,j) = 'F';
 	} else if ( _flag_S1(i,j) == 'I' ) {
 		printf("There is a self dependence on S1 at (%d,%d) \n",i,j);
@@ -822,12 +822,12 @@ float eval_S1(long M, long N, long WM, long WN, int i, int j){
 	}
 	return S1(i,j);
 }
-float reduce_bpmax_verify_S2_1(long M, long N, long WM, long WN, int ip, int jp){
+float reduce_bpmax_verify_S2_1(long M, long N, int ip, int jp){
 	float reduceVar = -FLT_MAX;
-	#define S0(i,j,k) {float __temp__ = (eval_S2(M,N,WM,WN,i,k))+(eval_S2(M,N,WM,WN,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i,j,k) {float __temp__ = (eval_S2(M,N,i,k))+(eval_S2(M,N,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|jp>=ip+4 && WM>=8 && M>=WM && WN>=8 && N>=WN && ip>=0 && N>=jp+1 && jp>=0 && N>=ip+1 && j>=0 && N>=i+1 && j>=i+4 && k>=-1 && j>=k+1 && i>=0 && k>=i && N>=k+1 && N>=j+1 && ip==i && jp==j}
+		//{i,j,k|M>=3 && N>=3 && N>=jp+1 && ip>=0 && jp>=ip+4 && jp>=0 && N>=ip+1 && j>=i+4 && j>=0 && j>=k+1 && i>=0 && k>=i && N>=k+1 && N>=j+1 && k>=-1 && N>=i+1 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {
@@ -837,11 +837,11 @@ float reduce_bpmax_verify_S2_1(long M, long N, long WM, long WN, int ip, int jp)
 	#undef S0
 	return reduceVar;
 }
-float eval_S2(long M, long N, long WM, long WN, int i, int j){
+float eval_S2(long M, long N, int i, int j){
 	if ( _flag_S2(i,j) == 'N' ) {
 		_flag_S2(i,j) = 'I';
 	//Body for S2
-		S2(i,j) = (((i >= j-3))?0:(__max_float((eval_S2(M,N,WM,WN,i+1,j-1))+(e_intra_score(seq2(-i+N-1),seq2(-j+N-1))),reduce_bpmax_verify_S2_1(M,N,WM,WN,i,j))));
+		S2(i,j) = (((i >= j-3))?0:(__max_float((eval_S2(M,N,i+1,j-1))+(e_intra_score(seq2(-i+N-1),seq2(-j+N-1))),reduce_bpmax_verify_S2_1(M,N,i,j))));
 		_flag_S2(i,j) = 'F';
 	} else if ( _flag_S2(i,j) == 'I' ) {
 		printf("There is a self dependence on S2 at (%d,%d) \n",i,j);
@@ -849,11 +849,11 @@ float eval_S2(long M, long N, long WM, long WN, int i, int j){
 	}
 	return S2(i,j);
 }
-float eval_FTable(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_FTable(i1,j1,i2,j2) == 'N' ) {
 		_flag_FTable(i1,j1,i2,j2) = 'I';
 	//Body for FTable
-		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):(((j2 >= i2+4 && j1 >= i1+4))?__max_float((eval_FTable(M,N,WM,WN,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float((eval_FTable(M,N,WM,WN,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(eval_NR_FTable(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))):(((i2 >= j2-3 && j2 >= i2+1 && j1 >= i1+4))?__max_float((eval_FTable(M,N,WM,WN,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float(0,__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(eval_NR_FTable(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))):(((j2 == i2 && j1 >= i1+4))?__max_float((eval_FTable(M,N,WM,WN,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float(0,__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(0,__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(0,0))))))):(((i1 >= j1-3 && j2 >= i2+4 && j1 >= i1+1))?__max_float(0,__max_float((eval_FTable(M,N,WM,WN,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(eval_NR_FTable(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))):(((j1 == i1 && j2 >= i2+4))?__max_float(0,__max_float((eval_FTable(M,N,WM,WN,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(0,__max_float(0,__max_float(0,__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))):(((i2 >= j2-3 && j1 >= i1+1 && i1 >= j1-3 && j2 >= i2+1))?__max_float(0,__max_float(0,__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(eval_NR_FTable(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))):(((j2 == i2 && i1 >= j1-3 && j1 >= i1+1))?__max_float(0,__max_float(0,__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(0,__max_float(eval_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,WM,WN,i1,j1,i2,j2),__max_float(0,0))))))):(__max_float(0,__max_float(0,__max_float((eval_S1(M,N,WM,WN,i1,j1))+(eval_S2(M,N,WM,WN,i2,j2)),__max_float(0,__max_float(0,__max_float(0,__max_float(eval_NR_FTable_3(M,N,WM,WN,i1,j1,i2,j2),eval_NR_FTable_4(M,N,WM,WN,i1,j1,i2,j2)))))))))))))))));
+		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):(((j2 >= i2+4 && j1 >= i1+4))?__max_float((eval_FTable(M,N,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float((eval_FTable(M,N,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))):(((j2 >= i2+1 && j1 >= i1+4 && i2 >= j2-3))?__max_float((eval_FTable(M,N,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))):(((j2 == i2 && j1 >= i1+4))?__max_float((eval_FTable(M,N,i1+1,j1-1,i2,j2))+(e_intra_score(seq1(i1),seq1(j1))),__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(0,__max_float(0,__max_float(0,__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))):(((i1 >= j1-3 && j1 >= i1+1 && j2 >= i2+4))?__max_float(0,__max_float((eval_FTable(M,N,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))):(((j1 == i1 && j2 >= i2+4))?__max_float(0,__max_float((eval_FTable(M,N,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(0,__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(0,0))))))):(((i2 >= j2-3 && j2 >= i2+1 && i1 >= j1-3 && j1 >= i1+1))?__max_float(0,__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))):(((j1 == i1 && i2 >= j2-3 && j2 >= i2+1))?__max_float(0,__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(0,__max_float(eval_NR_FTable_1(M,N,i1,j1,i2,j2),__max_float(eval_NR_FTable_2(M,N,i1,j1,i2,j2),__max_float(0,0))))))):(__max_float(0,__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(0,__max_float(0,__max_float(0,__max_float(eval_NR_FTable_3(M,N,i1,j1,i2,j2),eval_NR_FTable_4(M,N,i1,j1,i2,j2)))))))))))))))));
 		_flag_FTable(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_FTable(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -861,12 +861,12 @@ float eval_FTable(long M, long N, long WM, long WN, int i1, int j1, int i2, int 
 	}
 	return FTable(i1,j1,i2,j2);
 }
-float reduce_bpmax_verify_NR_FTable_1(long M, long N, long WM, long WN, int i1p, int j1p, int i2p, int j2p){
+float reduce_bpmax_verify_NR_FTable_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
 	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k1,k2) {float __temp__ = (eval_FTable(M,N,WM,WN,i1,k1,i2,k2))+(eval_FTable(M,N,WM,WN,k1+1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i1,j1,i2,j2,k1,k2) {float __temp__ = (eval_FTable(M,N,i1,k1,i2,k2))+(eval_FTable(M,N,k1+1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i1,j1,i2,j2,k1,k2|WM>=8 && M>=WM && WN>=8 && N>=WN && i1p>=0 && j1p>=i1p+1 && 2WM+i1p>=j1p-1 && M>=j1p+1 && i2p>=0 && j2p>=i2p+1 && 2WN+i2p>=j2p-1 && N>=j2p+1 && WN+i2p>=j2p && j1p+j2p>=i1p+i2p+1 && WM+i1p>=j1p && k1>=i1 && j1>=k1+1 && k2>=i2 && j2>=k2+1 && 2WM+i1>=j1-1 && j1>=i1+1 && j2>=i2+1 && 2WN+i2>=j2-1 && i1>=0 && WN+k2>=j2-1 && M>=k1+1 && i2>=0 && WM+k1>=j1-1 && N>=k2+1 && WM+i1>=k1 && WN+i2>=k2 && N>=j2+1 && k2>=-1 && M>=j1+1 && k1>=-1 && WM+i1>=j1 && j1+j2>=i1+i2+1 && WN+i2>=j2 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		//{i1,j1,i2,j2,k1,k2|M>=j1p+1 && j1p>=i1p+1 && i2p>=0 && j2p>=i2p+1 && M>=3 && N>=3 && i1p>=0 && N>=j2p+1 && j1p+j2p>=i1p+i2p+1 && k1>=i1 && j1>=k1+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && j1>=i1+1 && i1>=0 && N>=j2+1 && M>=k1+1 && i2>=0 && k2>=-1 && N>=k2+1 && M>=j1+1 && k1>=-1 && j1+j2>=i1+i2+1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
 		int c5,c6;
 		for(c5=i1p;c5 <= j1p-1;c5+=1)
 		 {
@@ -879,11 +879,11 @@ float reduce_bpmax_verify_NR_FTable_1(long M, long N, long WM, long WN, int i1p,
 	#undef S0
 	return reduceVar;
 }
-float eval_NR_FTable(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable
-		NR_FTable(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1(M,N,WM,WN,i1,j1,i2,j2);
+		NR_FTable(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1(M,N,i1,j1,i2,j2);
 		_flag_NR_FTable(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_NR_FTable(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on NR_FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -891,14 +891,14 @@ float eval_NR_FTable(long M, long N, long WM, long WN, int i1, int j1, int i2, i
 	}
 	return NR_FTable(i1,j1,i2,j2);
 }
-float reduce_bpmax_verify_NR_FTable_1_1(long M, long N, long WM, long WN, int i1p, int j1p, int i2p, int j2p){
+float reduce_bpmax_verify_NR_FTable_1_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
 	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k1) {float __temp__ = (eval_S1(M,N,WM,WN,i1,k1))+(eval_FTable(M,N,WM,WN,k1+1,j1,i2,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_FTable(M,N,i1,j1,i2,k2))+(eval_S2(M,N,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i1,j1,i2,j2,k1|i2p>=0 && WM>=8 && M>=WM && WN>=8 && N>=WN && i1p>=0 && j2p>=i2p && j1p>=i1p+1 && WN+i2p>=j2p && M>=j1p+1 && N>=j2p+1 && j1p+j2p>=i1p+i2p+1 && WM+i1p>=j1p && k1>=i1 && j1>=k1+1 && j1>=i1+1 && j1+j2>=i1+i2+1 && WM+i1>=j1 && M>=j1+1 && i1>=0 && WN+i2>=j2 && M>=k1+1 && WM+k1>=j1-1 && N>=j2+1 && j2>=i2 && i2>=0 && k1>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		//{i1,j1,i2,j2,k2|N>=j2p+1 && j2p>=i2p+1 && M>=3 && N>=3 && i1p>=0 && j1p>=i1p && M>=j1p+1 && i2p>=0 && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && j1+j2>=i1+i2+1 && i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && N>=j2+1 && N>=k2+1 && k2>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
 		int c5;
-		for(c5=i1p;c5 <= j1p-1;c5+=1)
+		for(c5=i2p;c5 <= j2p-1;c5+=1)
 		 {
 		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
 		 }
@@ -906,11 +906,11 @@ float reduce_bpmax_verify_NR_FTable_1_1(long M, long N, long WM, long WN, int i1
 	#undef S0
 	return reduceVar;
 }
-float eval_NR_FTable_1(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_1(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_1(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_1(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_1
-		NR_FTable_1(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1_1(M,N,WM,WN,i1,j1,i2,j2);
+		NR_FTable_1(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1_1(M,N,i1,j1,i2,j2);
 		_flag_NR_FTable_1(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_NR_FTable_1(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on NR_FTable_1 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -918,12 +918,39 @@ float eval_NR_FTable_1(long M, long N, long WM, long WN, int i1, int j1, int i2,
 	}
 	return NR_FTable_1(i1,j1,i2,j2);
 }
-float reduce_bpmax_verify_NR_FTable_2_1(long M, long N, long WM, long WN, int i1p, int j1p, int i2p, int j2p){
+float reduce_bpmax_verify_NR_FTable_2_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
 	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k1) {float __temp__ = (eval_FTable(M,N,WM,WN,i1,k1,i2,j2))+(eval_S1(M,N,WM,WN,k1+1,j1)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_S2(M,N,i2,k2))+(eval_FTable(M,N,i1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i1,j1,i2,j2,k1|i2p>=0 && WM>=8 && M>=WM && WN>=8 && N>=WN && i1p>=0 && j2p>=i2p && WN+i2p>=j2p && j1p>=i1p+1 && N>=j2p+1 && M>=j1p+1 && j1p+j2p>=i1p+i2p+1 && WM+i1p>=j1p && k1>=i1 && j1>=k1+1 && j1>=i1+1 && j1+j2>=i1+i2+1 && WM+i1>=j1 && k1>=-1 && i1>=0 && M>=j1+1 && M>=k1+1 && i2>=0 && j2>=i2 && N>=j2+1 && WM+i1>=k1 && WN+i2>=j2 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		//{i1,j1,i2,j2,k2|M>=j1p+1 && j2p>=i2p+1 && M>=3 && N>=3 && i2p>=0 && N>=j2p+1 && i1p>=0 && j1p>=i1p && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && j1+j2>=i1+i2+1 && i2>=0 && N>=j2+1 && N>=k2+1 && k2>=-1 && M>=j1+1 && i1>=0 && j1>=i1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		int c5;
+		for(c5=i2p;c5 <= j2p-1;c5+=1)
+		 {
+		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
+		 }
+	}
+	#undef S0
+	return reduceVar;
+}
+float eval_NR_FTable_2(long M, long N, int i1, int j1, int i2, int j2){
+	if ( _flag_NR_FTable_2(i1,j1,i2,j2) == 'N' ) {
+		_flag_NR_FTable_2(i1,j1,i2,j2) = 'I';
+	//Body for NR_FTable_2
+		NR_FTable_2(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_2_1(M,N,i1,j1,i2,j2);
+		_flag_NR_FTable_2(i1,j1,i2,j2) = 'F';
+	} else if ( _flag_NR_FTable_2(i1,j1,i2,j2) == 'I' ) {
+		printf("There is a self dependence on NR_FTable_2 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
+		exit(-1);
+	}
+	return NR_FTable_2(i1,j1,i2,j2);
+}
+float reduce_bpmax_verify_NR_FTable_3_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
+	float reduceVar = -FLT_MAX;
+	#define S0(i1,j1,i2,j2,k1) {float __temp__ = (eval_S1(M,N,i1,k1))+(eval_FTable(M,N,k1+1,j1,i2,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	{
+		//Domain
+		//{i1,j1,i2,j2,k1|i2p>=0 && j1p>=i1p+1 && M>=3 && N>=3 && i1p>=0 && N>=j2p+1 && M>=j1p+1 && j2p>=i2p && j1p+j2p>=i1p+i2p+1 && k1>=i1 && j1>=k1+1 && j1>=i1+1 && j1+j2>=i1+i2+1 && i1>=0 && N>=j2+1 && M>=k1+1 && j2>=i2 && i2>=0 && k1>=-1 && M>=j1+1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
 		int c5;
 		for(c5=i1p;c5 <= j1p-1;c5+=1)
 		 {
@@ -933,38 +960,11 @@ float reduce_bpmax_verify_NR_FTable_2_1(long M, long N, long WM, long WN, int i1
 	#undef S0
 	return reduceVar;
 }
-float eval_NR_FTable_2(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
-	if ( _flag_NR_FTable_2(i1,j1,i2,j2) == 'N' ) {
-		_flag_NR_FTable_2(i1,j1,i2,j2) = 'I';
-	//Body for NR_FTable_2
-		NR_FTable_2(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_2_1(M,N,WM,WN,i1,j1,i2,j2);
-		_flag_NR_FTable_2(i1,j1,i2,j2) = 'F';
-	} else if ( _flag_NR_FTable_2(i1,j1,i2,j2) == 'I' ) {
-		printf("There is a self dependence on NR_FTable_2 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
-		exit(-1);
-	}
-	return NR_FTable_2(i1,j1,i2,j2);
-}
-float reduce_bpmax_verify_NR_FTable_3_1(long M, long N, long WM, long WN, int i1p, int j1p, int i2p, int j2p){
-	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_FTable(M,N,WM,WN,i1,j1,i2,k2))+(eval_S2(M,N,WM,WN,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
-	{
-		//Domain
-		//{i1,j1,i2,j2,k2|N>=j2p+1 && WM>=8 && M>=WM && WN>=8 && N>=WN && i1p>=0 && j1p>=i1p && WM+i1p>=j1p && M>=j1p+1 && i2p>=0 && j2p>=i2p+1 && WN+i2p>=j2p && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && WN+i2>=j2 && j1+j2>=i1+i2+1 && k2>=-1 && i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && N>=j2+1 && N>=k2+1 && WM+i1>=j1 && WN+i2>=k2 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
-		int c5;
-		for(c5=i2p;c5 <= j2p-1;c5+=1)
-		 {
-		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
-		 }
-	}
-	#undef S0
-	return reduceVar;
-}
-float eval_NR_FTable_3(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_3(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_3(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_3(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_3
-		NR_FTable_3(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_3_1(M,N,WM,WN,i1,j1,i2,j2);
+		NR_FTable_3(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_3_1(M,N,i1,j1,i2,j2);
 		_flag_NR_FTable_3(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_NR_FTable_3(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on NR_FTable_3 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -972,14 +972,14 @@ float eval_NR_FTable_3(long M, long N, long WM, long WN, int i1, int j1, int i2,
 	}
 	return NR_FTable_3(i1,j1,i2,j2);
 }
-float reduce_bpmax_verify_NR_FTable_4_1(long M, long N, long WM, long WN, int i1p, int j1p, int i2p, int j2p){
+float reduce_bpmax_verify_NR_FTable_4_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
 	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_S2(M,N,WM,WN,i2,k2))+(eval_FTable(M,N,WM,WN,i1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	#define S0(i1,j1,i2,j2,k1) {float __temp__ = (eval_FTable(M,N,i1,k1,i2,j2))+(eval_S1(M,N,k1+1,j1)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i1,j1,i2,j2,k2|j2p>=i2p+1 && WM>=8 && M>=WM && WN>=8 && N>=WN && i1p>=0 && j1p>=i1p && WM+i1p>=j1p && M>=j1p+1 && i2p>=0 && N>=j2p+1 && WN+i2p>=j2p && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && WN+i2>=j2 && j1+j2>=i1+i2+1 && j2>=i2+1 && j1>=i1 && i2>=0 && WN+k2>=j2-1 && N>=k2+1 && WM+i1>=j1 && N>=j2+1 && k2>=-1 && M>=j1+1 && i1>=0 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		//{i1,j1,i2,j2,k1|j2p>=i2p && j1p>=i1p+1 && M>=3 && N>=3 && i1p>=0 && M>=j1p+1 && N>=j2p+1 && i2p>=0 && j1p+j2p>=i1p+i2p+1 && k1>=i1 && j1>=k1+1 && j1>=i1+1 && j1+j2>=i1+i2+1 && i1>=0 && M>=j1+1 && M>=k1+1 && i2>=0 && j2>=i2 && N>=j2+1 && k1>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
 		int c5;
-		for(c5=i2p;c5 <= j2p-1;c5+=1)
+		for(c5=i1p;c5 <= j1p-1;c5+=1)
 		 {
 		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
 		 }
@@ -987,11 +987,11 @@ float reduce_bpmax_verify_NR_FTable_4_1(long M, long N, long WM, long WN, int i1
 	#undef S0
 	return reduceVar;
 }
-float eval_NR_FTable_4(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_4(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_4(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_4(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_4
-		NR_FTable_4(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_4_1(M,N,WM,WN,i1,j1,i2,j2);
+		NR_FTable_4(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_4_1(M,N,i1,j1,i2,j2);
 		_flag_NR_FTable_4(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_NR_FTable_4(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on NR_FTable_4 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -999,7 +999,7 @@ float eval_NR_FTable_4(long M, long N, long WM, long WN, int i1, int j1, int i2,
 	}
 	return NR_FTable_4(i1,j1,i2,j2);
 }
-float eval_NR_FTable_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_Alpha_Init
@@ -1011,31 +1011,7 @@ float eval_NR_FTable_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1
 	}
 	return NR_FTable_Alpha_Init(i1,j1,i2,j2);
 }
-float eval_NR_FTable_1_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
-	if ( _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
-		_flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 'I';
-	//Body for NR_FTable_1_Alpha_Init
-		NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 1.401298464324817E-45;
-		_flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 'F';
-	} else if ( _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) == 'I' ) {
-		printf("There is a self dependence on NR_FTable_1_Alpha_Init at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
-		exit(-1);
-	}
-	return NR_FTable_1_Alpha_Init(i1,j1,i2,j2);
-}
-float eval_NR_FTable_2_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
-	if ( _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
-		_flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 'I';
-	//Body for NR_FTable_2_Alpha_Init
-		NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 1.401298464324817E-45;
-		_flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 'F';
-	} else if ( _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) == 'I' ) {
-		printf("There is a self dependence on NR_FTable_2_Alpha_Init at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
-		exit(-1);
-	}
-	return NR_FTable_2_Alpha_Init(i1,j1,i2,j2);
-}
-float eval_NR_FTable_3_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_3_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_3_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_3_Alpha_Init(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_3_Alpha_Init
@@ -1047,7 +1023,7 @@ float eval_NR_FTable_3_Alpha_Init(long M, long N, long WM, long WN, int i1, int 
 	}
 	return NR_FTable_3_Alpha_Init(i1,j1,i2,j2);
 }
-float eval_NR_FTable_4_Alpha_Init(long M, long N, long WM, long WN, int i1, int j1, int i2, int j2){
+float eval_NR_FTable_4_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_4_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_4_Alpha_Init(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_4_Alpha_Init
@@ -1058,6 +1034,30 @@ float eval_NR_FTable_4_Alpha_Init(long M, long N, long WM, long WN, int i1, int 
 		exit(-1);
 	}
 	return NR_FTable_4_Alpha_Init(i1,j1,i2,j2);
+}
+float eval_NR_FTable_1_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
+	if ( _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
+		_flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 'I';
+	//Body for NR_FTable_1_Alpha_Init
+		NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 1.401298464324817E-45;
+		_flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) = 'F';
+	} else if ( _flag_NR_FTable_1_Alpha_Init(i1,j1,i2,j2) == 'I' ) {
+		printf("There is a self dependence on NR_FTable_1_Alpha_Init at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
+		exit(-1);
+	}
+	return NR_FTable_1_Alpha_Init(i1,j1,i2,j2);
+}
+float eval_NR_FTable_2_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
+	if ( _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
+		_flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 'I';
+	//Body for NR_FTable_2_Alpha_Init
+		NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 1.401298464324817E-45;
+		_flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) = 'F';
+	} else if ( _flag_NR_FTable_2_Alpha_Init(i1,j1,i2,j2) == 'I' ) {
+		printf("There is a self dependence on NR_FTable_2_Alpha_Init at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
+		exit(-1);
+	}
+	return NR_FTable_2_Alpha_Init(i1,j1,i2,j2);
 }
 
 //Memory Macros
@@ -1072,10 +1072,10 @@ float eval_NR_FTable_4_Alpha_Init(long M, long N, long WM, long WN, int i1, int 
 #undef NR_FTable_4
 #undef FTable
 #undef NR_FTable_Alpha_Init
-#undef NR_FTable_1_Alpha_Init
-#undef NR_FTable_2_Alpha_Init
 #undef NR_FTable_3_Alpha_Init
 #undef NR_FTable_4_Alpha_Init
+#undef NR_FTable_1_Alpha_Init
+#undef NR_FTable_2_Alpha_Init
 #undef _flag_FTable
 #undef _flag_S1
 #undef _flag_S2
@@ -1085,10 +1085,10 @@ float eval_NR_FTable_4_Alpha_Init(long M, long N, long WM, long WN, int i1, int 
 #undef _flag_NR_FTable_3
 #undef _flag_NR_FTable_4
 #undef _flag_NR_FTable_Alpha_Init
-#undef _flag_NR_FTable_1_Alpha_Init
-#undef _flag_NR_FTable_2_Alpha_Init
 #undef _flag_NR_FTable_3_Alpha_Init
 #undef _flag_NR_FTable_4_Alpha_Init
+#undef _flag_NR_FTable_1_Alpha_Init
+#undef _flag_NR_FTable_2_Alpha_Init
 
 
 //Common Macro undefs

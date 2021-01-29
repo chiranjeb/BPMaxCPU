@@ -36,13 +36,13 @@ let
 			 	 max( S1[i1, j1] + S2[i2, j2],
 			 	 	  case {|i1<j1  && i2<j2}:  reduce(max, [k1, k2], {|i1<=k1<j1 && i2<=k2<j2 }: FTable[i1, k1, i2, k2] + FTable[k1+1, j1, k2+1, j2]);
 			               {|i1==j1 && i2<j2} || {|i1<j1 && i2 == j2} || {|i1==j1 && i2==j2}: 0; esac ,  
-            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : S1[i1, k1] + FTable[k1+1, j1, i2, j2]);
-            			   {|i1==j1 && i2<=j2} : 0; esac,
-            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : FTable[i1, k1, i2, j2] + S1[k1+1, j1]);
-            			   {|i1==j1 && i2<=j2} : 0; esac,
             		  case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : FTable[i1, j1, i2, k2] + S2[k2+1, j2]);
             			   {|i2==j2 && i1<=j1} : 0; esac,
             	      case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable[i1, j1, k2+1, j2]);
-            			   {|i2==j2 && i1<=j1} : 0; esac));
+            			   {|i2==j2 && i1<=j1} : 0; esac,
+            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : S1[i1, k1] + FTable[k1+1, j1, i2, j2]);
+            			   {|i1==j1 && i2<=j2} : 0; esac,
+            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : FTable[i1, k1, i2, j2] + S1[k1+1, j1]);
+            			   {|i1==j1 && i2<=j2} : 0; esac ));
 		esac;
 .
