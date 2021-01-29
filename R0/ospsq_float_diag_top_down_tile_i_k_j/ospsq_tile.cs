@@ -1,5 +1,3 @@
-base_prog = "ospsqmax";
-data_type="float";
 system = "ospsq_float";
 prog = ReadAlphabets("ospsq_float.ab");
 
@@ -20,9 +18,9 @@ outDir = "src" ;
 ##################################################################################################################
 
 generateScheduledCode(prog, system, options, outDir);
-#generateWrapper(prog, system, outDir);
-#generateMakefile(prog, system, outDir);
-#generateVerificationCode(prog, system, outDir);
+generateWrapper(prog, system, outDir);
+generateMakefile(prog, system, outDir);
+generateVerificationCode(prog, system, outDir);
 
 
 

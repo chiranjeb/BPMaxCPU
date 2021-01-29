@@ -99,6 +99,7 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
+	//Initialisation of ts4_l1
 	errno = 0;
 	end = 0;
 	val = argv[3];
@@ -116,6 +117,7 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
+	//Initialisation of ts5_l1
 	errno = 0;
 	end = 0;
 	val = argv[4];
@@ -132,6 +134,8 @@ int main(int argc, char** argv) {
 		printf("For parameter ts5_l1: Converted part: %ld, non-convertible part: %s\n", ts5_l1, end);
 		exit(EXIT_FAILURE);
 	}
+	
+	//Initialisation of ts6_l1
 	errno = 0;
 	end = 0;
 	val = argv[5];
@@ -148,6 +152,8 @@ int main(int argc, char** argv) {
 		printf("For parameter ts6_l1: Converted part: %ld, non-convertible part: %s\n", ts6_l1, end);
 		exit(EXIT_FAILURE);
 	}
+	
+	
 	///Parameter checking
 	if (!((M >= 3 && N >= 3 && ts4_l1 > 0 && ts5_l1 > 0 && ts6_l1 > 0))) {
 		printf("The value of parameters are not valid.\n");
@@ -200,7 +206,7 @@ int main(int argc, char** argv) {
 	//Input Initialization
 	{
 		#if defined (RANDOM)
-			#define S0(i) (seq1(i) = rand()) 
+			#define S0(i) (seq1(i) = rand()%3) 
 		#elif defined (CHECKING) || defined (VERIFY)
 			#ifdef NO_PROMPT
 				#define S0(i) scanf("%d", &seq1(i))
@@ -221,7 +227,7 @@ int main(int argc, char** argv) {
 	}
 	{
 		#if defined (RANDOM)
-			#define S0(i) (seq2(i) = rand()) 
+			#define S0(i) (seq2(i) = rand()%3) 
 		#elif defined (CHECKING) || defined (VERIFY)
 			#ifdef NO_PROMPT
 				#define S0(i) scanf("%d", &seq2(i))
@@ -256,6 +262,8 @@ int main(int argc, char** argv) {
 
 	// timing information
 	printf("Execution time : %lf sec.\n", elapsed_time);
+
+        printf("Element:0, M-1, 0, N-1, %10e\n",var_FTable(0, M-1, 0, N-1));
 	
 	#ifdef TIMING
 		FILE * fp = fopen( "trace.dat","a+");
