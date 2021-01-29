@@ -121,8 +121,8 @@ void ospsq_float(long M, long N, long ts4_l1, long ts5_l1, long ts6_l1, int* seq
 	#define S0(i1,j1,i2,j2,i4,i5) FTable(j1,i1+j1,j2,i5) = seq2(j2)
 	#define S1(i1,j1,i2,j2,i4,i5) FTable(j1,i1+j1,j2,i5) = seq1(j1)
 	#define S2(i1,j1,i2,j2,i4,i5) FTable(j1,i1+j1,j2,i5) = FTable(j1,i1+j1,j2,i5)
-	#define S4(i1,j1,i2,j2,i4,i5) FTable(j1,i1+j1,j2,i5) = 0.0
-	#define S3(i0,i1,i2,i3,i4,i5) FTable(i1,i0+i1,i3,i5) = (FTable(i1,i0+i1,i3,i5))+((FTable(i1,i2,i3,i4))*(FTable(i2+1,i0+i1,i4+1,i5)))
+	#define S4(i1,j1,i2,j2,i4,i5) FTable(j1,i1+j1,j2,i5) = 1.401298464324817E-45
+	#define S3(i0,i1,i2,i3,i4,i5) {float __temp__ = (FTable(i1,i2,i3,i4))+(FTable(i2+1,i0+i1,i4+1,i5)); FTable(i1,i0+i1,i3,i5) = __max_float(FTable(i1,i0+i1,i3,i5),__temp__); }
 	{
 		//Domain
 		//{i1,j1,i2,j2,i4,i5|i4==j2 && i2==j1 && i1==0 && M>=3 && N>=3 && j2>=0 && N>=j2+1 && N>=i5+1 && i5>=j2 && M>=j1+1 && j1>=0}
