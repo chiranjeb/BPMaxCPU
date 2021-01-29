@@ -10,7 +10,7 @@ let
 		{ | j1==i1 } : seq2[i2];
 		{ | j2==i2 && j1>=i1+1} : seq1[i1];
 		{ | j2>=i2+1 && j1>=i1+1} :
-					case {|i1<j1  && i2<j2}:  reduce(max, [k1, k2], {|i1<=k1<j1 && i2<=k2<j2 }: FTable[i1, k1, i2, k2] * FTable[k1+1, j1, k2+1, j2]);
+					case {|i1<j1  && i2<j2}:  reduce(max, [k1, k2], {|i1<=k1<j1 && i2<=k2<j2 }: FTable[i1, k1, i2, k2] + FTable[k1+1, j1, k2+1, j2]);
 			             {|i1==j1 && i2<j2} || {|i1<j1 && i2 == j2} || {|i1==j1 && i2==j2}: 0; esac;
 		esac;
 .
