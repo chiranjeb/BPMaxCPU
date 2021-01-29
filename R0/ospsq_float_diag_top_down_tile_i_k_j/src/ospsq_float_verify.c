@@ -123,7 +123,7 @@ float eval_NR_FTable_Alpha_Init(long, long, int, int, int, int);
 
 void ospsq_float_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** _local_FTable){
 	///Parameter checking
-	if (!((M >= 2 && N >= 2))) {
+	if (!((M >= 3 && N >= 3))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -220,7 +220,7 @@ void ospsq_float_verify(long M, long N, int* _local_seq1, int* _local_seq2, floa
 	#define S0(i1,j1,i2,j2) eval_FTable(M,N,i1,j1,i2,j2)
 	{
 		//Domain
-		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && M>=2 && N>=2}
+		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && M>=3 && N>=3}
 		int c1,c2,c3,c4;
 		for(c1=0;c1 <= M-1;c1+=1)
 		 {
@@ -297,11 +297,11 @@ float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	return FTable(i1,j1,i2,j2);
 }
 float reduce_ospsq_float_verify_NR_FTable_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
-	float reduceVar = -FLT_MAX;
-	#define S0(i1,j1,i2,j2,k1,k2) {float __temp__ = (eval_FTable(M,N,i1,k1,i2,k2))*(eval_FTable(M,N,k1+1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	float reduceVar = 0;
+	#define S0(i1,j1,i2,j2,k1,k2) reduceVar = (reduceVar)+((eval_FTable(M,N,i1,k1,i2,k2))*(eval_FTable(M,N,k1+1,j1,k2+1,j2)))
 	{
 		//Domain
-		//{i1,j1,i2,j2,k1,k2|i1p>=0 && j1p>=i1p+1 && N>=j2p+1 && j2p>=i2p+1 && M>=j1p+1 && i2p>=0 && M>=2 && N>=2 && k1>=i1 && j1>=k1+1 && k2>=i2 && j2>=k2+1 && j1>=i1+1 && j2>=i2+1 && i1>=0 && N>=j2+1 && M>=k1+1 && i2>=0 && k2>=-1 && N>=k2+1 && M>=j1+1 && k1>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		//{i1,j1,i2,j2,k1,k2|M>=j1p+1 && j1p>=i1p+1 && i2p>=0 && j2p>=i2p+1 && M>=3 && N>=3 && i1p>=0 && N>=j2p+1 && k1>=i1 && j1>=k1+1 && k2>=i2 && j2>=k2+1 && j1>=i1+1 && j2>=i2+1 && i1>=0 && N>=j2+1 && M>=k1+1 && i2>=0 && k2>=-1 && N>=k2+1 && M>=j1+1 && k1>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
 		int c5,c6;
 		for(c5=i1p;c5 <= j1p-1;c5+=1)
 		 {
@@ -330,7 +330,7 @@ float eval_NR_FTable_Alpha_Init(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) == 'N' ) {
 		_flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) = 'I';
 	//Body for NR_FTable_Alpha_Init
-		NR_FTable_Alpha_Init(i1,j1,i2,j2) = 1.401298464324817E-45;
+		NR_FTable_Alpha_Init(i1,j1,i2,j2) = 0.0;
 		_flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_NR_FTable_Alpha_Init(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on NR_FTable_Alpha_Init at (%d,%d,%d,%d) \n",i1,j1,i2,j2);

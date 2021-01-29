@@ -99,7 +99,6 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
-	//Initialisation of ts4_l1
 	errno = 0;
 	end = 0;
 	val = argv[3];
@@ -117,7 +116,6 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
-	//Initialisation of ts5_l1
 	errno = 0;
 	end = 0;
 	val = argv[4];
@@ -134,8 +132,6 @@ int main(int argc, char** argv) {
 		printf("For parameter ts5_l1: Converted part: %ld, non-convertible part: %s\n", ts5_l1, end);
 		exit(EXIT_FAILURE);
 	}
-	
-	//Initialisation of ts6_l1
 	errno = 0;
 	end = 0;
 	val = argv[5];
@@ -152,8 +148,6 @@ int main(int argc, char** argv) {
 		printf("For parameter ts6_l1: Converted part: %ld, non-convertible part: %s\n", ts6_l1, end);
 		exit(EXIT_FAILURE);
 	}
-	
-	
 	///Parameter checking
 	if (!((M >= 3 && N >= 3 && ts4_l1 > 0 && ts5_l1 > 0 && ts6_l1 > 0))) {
 		printf("The value of parameters are not valid.\n");
