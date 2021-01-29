@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <sys/errno.h>
 #include <omp.h>
-
+#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -158,15 +158,16 @@ int main(int argc, char** argv) {
 	//Input Initialization
 	{
 		#if defined (RANDOM)
-			#define S0(i) (seq1(i) = rand()) 
+			#define S0(i) (seq1(i) = rand()%4); 
 		#elif defined (CHECKING) || defined (VERIFY)
 			#ifdef NO_PROMPT
-				#define S0(i) scanf("%d", &seq1(i))
+				#define S0(i) scanf("%c", &seq1(i));seq1(i) = toNum(seq1(i));
 			#else
 				#define S0(i) printf("seq1(%ld)=",(long) i); scanf("%d", &seq1(i))
 			#endif
 		#else
-			#define S0(i) (seq1(i) = 1)   //Default value
+                        #define S0(i) 
+                        ReadSequencesFromFiles(argc>=6? argv[5] : NULL, seq1, M, true);
 		#endif
 		
 		
@@ -179,15 +180,16 @@ int main(int argc, char** argv) {
 	}
 	{
 		#if defined (RANDOM)
-			#define S0(i) (seq2(i) = rand()) 
+			#define S0(i) (seq2(i) = rand()%4); 
 		#elif defined (CHECKING) || defined (VERIFY)
 			#ifdef NO_PROMPT
-				#define S0(i) scanf("%d", &seq2(i))
+				#define S0(i) scanf("%c", &seq2(i)); seq2(i) = toNum(seq2(i));
 			#else
 				#define S0(i) printf("seq2(%ld)=",(long) i); scanf("%d", &seq2(i))
 			#endif
 		#else
-			#define S0(i) (seq2(i) = 1)   //Default value
+                        #define S0(i) 
+                        ReadSequencesFromFiles(argc==7? argv[6] : NULL, seq2, N, true);
 		#endif
 		
 		
@@ -214,6 +216,7 @@ int main(int argc, char** argv) {
 
 	// timing information
 	printf("Execution time : %lf sec.\n", elapsed_time);
+	printf("FTable(%d, %d, %d, %d):\t%f\n", 0, M-1, 0, N-1, var_FTable(0, M-1, 0, N-1));
 	
 	#ifdef TIMING
 		FILE * fp = fopen( "trace.dat","a+");
@@ -275,7 +278,7 @@ int main(int argc, char** argv) {
 		//Compare outputs for verification
 		{
 			//Error Counter
-			int _errors_ = 0;
+			volatile int _errors_ = 0;
 			#define S0(i1,j1,i2,j2) if (fabsf(1.0f - var_FTable_verify(i1,j1,i2,j2)/var_FTable(i1,j1,i2,j2)) > EPSILON) _errors_++;
 			int c1,c2,c3,c4;
 			for(c1=0;c1 <= M-1;c1+=1)
