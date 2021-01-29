@@ -27,7 +27,7 @@ setSpaceTimeMap(prog, system, "NR_FTable_2",  "(i1,j1,i2,j2,k2    ->  1,   -i1, 
                                               "(i1,j1,i2,j2       ->  1,   -i1,   j1,   j1,     -i2,      0,      i2-1,  j2)");
 setParallel(prog, system, "", "5");
 generateScheduledCode(prog, system, outDir);
-generateMakefile(prog, system, outDir);
-generateWrapper(prog, system, outDir);
-generateVerificationCode(prog, system, outDir);
+#generateMakefile(prog, system, outDir);
+#generateWrapper(prog, system, outDir);
+#generateVerificationCode(prog, system, outDir);
 
