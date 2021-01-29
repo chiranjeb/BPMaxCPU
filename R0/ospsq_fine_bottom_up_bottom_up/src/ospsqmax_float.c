@@ -108,10 +108,9 @@ inline double __min_double(double x, double y){
 //Memory Macros
 #define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
-#define FTable(i1,j1,i2,j2) FTable[(i1) * ((M) * (N) * (N)) + (j1) * ((N) * (N)) + (i2) * (N) + j2]
+#define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 
-
-void ospsqmax_float(long M, long N, int* seq1, int* seq2, float* FTable){
+void ospsqmax_float(long M, long N, int* seq1, int* seq2, float**** FTable){
 	///Parameter checking
 	if (!((M >= 2 && N >= 2))) {
 		printf("The value of parameters are not valid.\n");

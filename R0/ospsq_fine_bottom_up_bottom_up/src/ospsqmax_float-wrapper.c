@@ -41,15 +41,15 @@
 //Memory Macros
 #define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
-#define FTable(i1,j1,i2,j2) FTable[(i1) * ((M) * (N) * (N)) + (j1) * ((N) * (N)) + (i2) * (N) + j2]
+#define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 
-#define FTable_verify(i1,j1,i2,j2) FTable_verify[(i1) * ((M) * (N) * (N)) + (j1) * ((N) * (N)) + (i2) * (N) + j2]
+#define FTable_verify(i1,j1,i2,j2) FTable_verify[i1][j1][i2][j2]
 #define var_FTable(i1,j1,i2,j2) FTable(i1,j1,i2,j2)
 #define var_FTable_verify(i1,j1,i2,j2) FTable_verify(i1,j1,i2,j2)
 
 //function prototypes
-void ospsqmax_float(long, long, int*, int*, float*);
-void ospsqmax_float_verify(long, long, int*, int*, float*);
+void ospsqmax_float(long, long, int*, int*, float****);
+void ospsqmax_float_verify(long, long, int*, int*, float****);
 
 //main
 int main(int argc, char** argv) {
@@ -113,11 +113,37 @@ int main(int argc, char** argv) {
 	mallocCheck(seq1, (M), int);
 	int* seq2 = (int*)malloc(sizeof(int)*(N));
 	mallocCheck(seq2, (N), int);
-	float* FTable = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
-	mallocCheck(FTable, ((M) * (M) * (N) * (N)), float);
+	float* _lin_FTable = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
+	mallocCheck(_lin_FTable, ((M) * (M) * (N) * (N)), float);
+	float**** FTable = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(FTable, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		FTable[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(FTable[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			FTable[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(FTable[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				FTable[mz1][mz2][mz3] = &_lin_FTable[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			}
+		}
+	}
 	#ifdef VERIFY
-		float* FTable_verify = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
-		mallocCheck(FTable_verify, ((M) * (M) * (N) * (N)), float);
+		float* _lin_FTable_verify = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
+		mallocCheck(_lin_FTable_verify, ((M) * (M) * (N) * (N)), float);
+		float**** FTable_verify = (float****)malloc(sizeof(float***)*(M));
+		mallocCheck(FTable_verify, (M), float***);
+		for (mz1=0;mz1 < M; mz1++) {
+			FTable_verify[mz1] = (float***)malloc(sizeof(float**)*(M));
+			mallocCheck(FTable_verify[mz1], (M), float**);
+			for (mz2=0;mz2 < M; mz2++) {
+				FTable_verify[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+				mallocCheck(FTable_verify[mz1][mz2], (N), float*);
+				for (mz3=0;mz3 < N; mz3++) {
+					FTable_verify[mz1][mz2][mz3] = &_lin_FTable_verify[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+				}
+			}
+		}
 	#endif
 
 	//Initialization of rand
@@ -271,8 +297,22 @@ int main(int argc, char** argv) {
 	//Memory Free
 	free(seq1);
 	free(seq2);
+	free(_lin_FTable);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(FTable[mz1][mz2]);
+		}
+		free(FTable[mz1]);
+	}
 	free(FTable);
 	#ifdef VERIFY
+		free(_lin_FTable_verify);
+		for (mz1=0;mz1 < M; mz1++) {
+			for (mz2=0;mz2 < M; mz2++) {
+				free(FTable_verify[mz1][mz2]);
+			}
+			free(FTable_verify[mz1]);
+		}
 		free(FTable_verify);
 	#endif
 	
