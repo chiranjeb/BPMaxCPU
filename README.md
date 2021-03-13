@@ -1,4 +1,4 @@
-# bpmax cpu
+# BPMax CPU
 
 This repository contains optimized CPU version of the BPMax.
 
