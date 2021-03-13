@@ -1,3 +1,50 @@
 # bpmax_cpu
 
-This repository contains optimized BPMax version.
+This repository contains optimized CPU version of the BPMax.
+
+## Building the code
+    Please go inside the source code folder specific to a version you are interested in and type the following commands
+    make        : build "bpmax" program
+    make clean  : clean all the build artifacts.
+
+
+## Running the code
+    After the code is built, you can execute "bpmax". There are many ways to invoke the program. 
+    For quick measurement you can invoke the following command where M is the length of the first 
+    sequence and N is the length of the second sequence. 
+              command : bpmax M N 32 4 N
+    The code randomly generates two sequences to compute the F-Table score.
+    If you have sequences in a text file, then you may want to pass those directly to the program .
+              command : ./bpmax sequence1.txt sequence2.txt 32 4 N
+    sequence1 and sequence2 are the text file containing the neucleotide sequence A, U, G, C.
+
+
+## Source Code
+    BPMax Hybrid schedule (Tiled)   :   bpmax__d1_j1_k1_i2_k2_j2_tile__-i2_k2_j2_parallel_i2_i1/src 
+    BPMax Hybrid schedule           :   bpmax__d1_j1_k1_i2_k2_j2__-i2_k2_j2_parallel_i2_i1/src 
+    BPMax Fine-grain                :   bpmax__-i1_j1_k1_-i2_k2_j2__-i2_k2_j2_parallel_-i2/src
+    BPMax Coarse-grain              :   bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1/src 
+    Double Max-plus                 :   R0
+
+## Compilation script
+### BPMax Hybrid schedule(Tiled) :
+    Subsystem  :   bpmax__d1_j1_k1_i2_k2_j2_tile__-i2_k2_j2_parallel_i2_i1/bpmax_k1_k2_reductions.ab
+                   bpmax__d1_j1_k1_i2_k2_j2_tile__-i2_k2_j2_parallel_i2_i1/bpmax_pass_1_k1_k2_reductions.cs
+    Root System:   bpmax__d1_j1_k1_i2_k2_j2_tile__-i2_k2_j2_parallel_i2_i1/bpmax_final_ftable.ab
+                   bpmax__d1_j1_k1_i2_k2_j2_tile__-i2_k2_j2_parallel_i2_i1/bpmax_pass_2_final_ftable.cs
+   
+### BPMax Hybrid schedule : 
+       bpmax__d1_j1_k1_i2_k2_j2__-i2_k2_j2_parallel_i2_i1/bpmax_float.ab
+       bpmax__d1_j1_k1_i2_k2_j2__-i2_k2_j2_parallel_i2_i1/bpmax__d1_j1_k1_i2_k2_j2__-i2_k2_j2_parallel_i2_i1.cs
+    
+###  BPMax Fine-grain:
+       bpmax__-i1_j1_k1_-i2_k2_j2__-i2_k2_j2_parallel_-i2/bpmax_float.ab
+       bpmax__-i1_j1_k1_-i2_k2_j2__-i2_k2_j2_parallel_-i2/bpmax__-i1_j1_k1_-i2_k2_j2__-i2_k2_j2_parallel_-i2.cs
+   
+###  BPMax Coarse-grain :
+       bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1/bpmax_float.ab
+       bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1/bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1.cs
+       
+
+## Alphaz resource
+ AlphaZ resource can be found at https://www.cs.colostate.edu/AlphaZ/wiki/doku.php.
