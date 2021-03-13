@@ -46,5 +46,5 @@ This repository contains optimized CPU version of the BPMax.
        bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1/bpmax__d1_i1_k1_i2_k2_j2__-i2_k2_j2_parallel_i1.cs
        
 
-## Alphaz resource
+## AlphaZ resource
  AlphaZ resource can be found at https://www.cs.colostate.edu/AlphaZ/wiki/doku.php.
