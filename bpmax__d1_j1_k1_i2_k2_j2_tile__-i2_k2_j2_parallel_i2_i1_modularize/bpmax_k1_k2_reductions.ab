@@ -1,0 +1,15 @@
+affine bpmax_k1_k2_reductions{M, N, I1, J1| M>=3 && N>=3 &&  M>=J1+1 && I1>=0 && J1> I1}
+	input
+	  float FTable {i1,j1,i2,j2| M>=j1+1 && i2>=0 && N>=j2+1 && j2>=i2 && i1>=0 && j1>=i1 } ;
+	  float S1 {i,j| i>=0 && M>=j+1 && j>=i } ; 
+	output
+	  float _FTable   {i,j| i>=0 && N>=j+1 && j>=i  } ;
+	let
+	_FTable[i2, j2] =  max( case {|I1<J1  && i2<j2}:  reduce(max, [k1, k2], {|I1<=k1<J1 && i2<=k2<j2 }: FTable[I1, k1, i2, k2] + FTable[k1+1, J1, k2+1, j2]);
+			                     {|I1==J1 && i2<j2} || {|I1<J1 && i2 == j2} || {|I1==J1 && i2==j2}: 0; esac , 
+               		        case {|I1<J1  && i2<=j2} : reduce(max, [k1],  {|I1<=k1<J1} : S1[I1, k1] + FTable[k1+1, J1, i2, j2]);
+            			         {|I1==J1 && i2<=j2} : 0; esac,
+            		        case {|I1<J1  && i2<=j2} : reduce(max, [k1],  {|I1<=k1<J1} : FTable[I1, k1, i2, j2] + S1[k1+1, J1]);
+            			         {|I1==J1 && i2<=j2} : 0; esac);
+.
+ 
