@@ -1,4 +1,4 @@
-prog = ReadAlphabets("bpmax_k1_k2_reductions.ab");
+prog = ReadAlphabets("bpmax_R1_R3_R4.ab");
 subSystem = "bpmax_k1_k2_reductions";
 
 NormalizeReduction(prog, subSystem, "_FTable");

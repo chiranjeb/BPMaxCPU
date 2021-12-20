@@ -47,8 +47,9 @@ let
 	    
 	//use {ei | ei>=0 && 1>ei }  bpmax_single_strand_s1[M] ((ei, i->i)@seq1) returns  (S1);
 .
-
 */
+
+
 affine bpmax_outer_reductions{ M, N, I1, J1, T1 , T2, T3| M>=3 && N>=3 && T1 >=1 && T2 >=1 && T3 >= 1 &&  M>=J1+1 && I1>=0 && J1> I1}
 	input
        float FTable  {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
@@ -63,7 +64,6 @@ affine bpmax_outer_reductions{ M, N, I1, J1, T1 , T2, T3| M>=3 && N>=3 && T1 >=1
  
 affine bpmax_final_reductions{M, N, I1, J1, T1 , T2, T3| M>=3 && N>=3 && T1 >=1 && T2 >=1 && T3 >= 1 &&  0<=I1<=J1<=M-1}
 	input
-       //float FTable  {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
        float S2 {i,j| 0 <= i <= j < N };
 	output
 	  float FTable  {i,j| 0<=i<=j<=N-1};
@@ -71,7 +71,8 @@ affine bpmax_final_reductions{M, N, I1, J1, T1 , T2, T3| M>=3 && N>=3 && T1 >=1 
 	  FTable[i,j]=0; // do not initialize
 .
 
- 
+
+
 affine bpmax {M,N, T1, T2, T3| M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1}
 input
 	int seq1 {i| 0 <= i < M} ;
@@ -83,14 +84,11 @@ local
 	float S1 {k,i,j| 0<=k<1 && 0 <= i <= j < M };
 	float S2 {k,i,j| 0<=k<1 && 0 <= i <= j < N };
 	float FTable_outer_reductions       {i1,j1,i2,j2| 0<=i1<=M-1 && i1<j1<=M-1 && 0<=i2<=j2<=N-1};
-	//float FTable_final_reductions       {i1,j1,i2,j2| 0<=i1<=M-1 && i1<j1<=M-1 && 0<=i2<=j2<=N-1};
 let
 	
 	use {ei | ei>=0 && 1>ei }  bpmax_single_strand_s1[M] ((ei, i->i)@seq1) returns  (S1);
 	use {ei | ei>=0 && 1>ei }  bpmax_single_strand_s2[N] ((ei, i->i)@seq2) returns  (S2);
-	
-	//FTable [i1, j1, i2, j2]=0;
-	
+		
     use {ei1,ej1| ei1>=0 && M>=ej1+1 && ej1>ei1 } 
 	    bpmax_outer_reductions[M,N, ei1, ej1, T1, T2, T3] 
 	    ((ei1, ej1, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable, (ei1, ej1, i1, j1 -> 0, i1, j1)@S1) 
@@ -100,8 +98,6 @@ let
 	    bpmax_final_reductions[M,N, ei1, ej1, T1, T2, T3] 
 	    ((ei1, ej1, i1, j1 -> 0, i1, j1)@S2)
 	    returns (FTable);
-	    
-	    	
 .
 
 
