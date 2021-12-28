@@ -1,0 +1,66 @@
+/*float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+affine bpmax_inner_reductions{M, N, I1, J1| M>=3 && N>=3  &&  0<=I1<=J1<=M-1}
+	input
+	  float FTable {i,j,i2,j2| 0<=i<=j<=M-1 && 0<=i2<=j2<=N-1};
+	  float S1 {i,j| 0<=i<=j<=M-1 } ; 
+	  float S2 {i,j| 0<=i<=j<=N-1  } ; 
+	  int seq1 {i| 0 <= i < M} ;
+	  int seq2 {i| 0 <= i < N} ;
+	output
+	  float _FTable {i, j| 0<=i<=j<=N-1};
+	let
+	
+	_FTable[i2,j2] = case
+		{ | i2 <= j2 } : 0;
+		{ | i2 < j2  } :
+            		      max(_FTable[i2,j2],
+            		      	  reduce(max, [k2],  {|i2<=k2<j2} : _FTable[i2, k2] + S2[k2+1, j2]),
+            			      reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  _FTable[k2+1, j2]));
+		esac;*/
+		
+	    /*_FTable[i2,j2] = case
+		{ | I1 <= J1  && j2 <  i2} : S1[I1, J1];
+		{ | J1 < I1   && i2 <= j2} : S2[i2, j2];
+		{ | I1 == J1 && i2 == j2} : e_inter_score(seq1[I1], seq2[N-i2-1]); 
+		{ | I1<J1 && i2<j2} || {|I1 ==J1 && i2<j2} || {|I1<J1 && i2==j2} :
+			max( case  {|J1-I1 >  3}: FTable[I1+1, J1-1, i2, j2] + e_intra_score(seq1[I1], seq1[J1]);
+				       {|J1-I1 <= 3}: 0; esac,
+			     case  {|j2-i2  > 3}: _FTable[2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
+			 	       {|j2-i2  <=3}: 0; esac, 
+			 	 max( S1[I1, J1] + S2[i2, j2],
+            		  case {|i2<j2  && I1<=J1} : reduce(max, [k2],  {|i2<=k2<j2} : _FTable[i2, k2] + S2[k2+1, j2]);
+            			   {|i2==j2 && I1<=J1} : 0; esac,
+            	      case {|i2<j2  && I1<=J1} : reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  _FTable[k2+1, j2]);
+            			   {|i2==j2 && I1<=J1} : 0; esac,
+            	      case {|I1<j1}: _FTable[i2, j2];
+			 	           {|I1==J1}:  0;   esac));
+		esac;*/
+
+
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+affine bpmax_inner_reductions{M, N, J_lower, J_upper| M>=3 && N>=3  &&  0<=J_lower<J_upper<=M-1}
+	input
+	  float FTable {i,j,i2,j2| 0<=i<=j<=M-1 && 0<=i2<=j2<=N-1};
+	  float S1 {i,j| 0<=i<=j<=M-1 } ; 
+	  float S2 {i,j| 0<=i<=j<=N-1  } ; 
+	  int seq1 {i| 0 <= i < M} ;
+	  int seq2 {i| 0 <= i < N} ;
+	output
+	  float _FTable {i, j| 0<=i<J_upper && J_lower<=j<J_upper && 0<=i<=j<=M };
+	let
+	
+	_FTable[i2,j2] = case
+		{ | i2 >= j2 } : 0;
+		{ | i2 < j2  } :
+            		      max(_FTable[i2,j2],
+            		      	  reduce(max, [k2],  {|i2<=k2<j2} : _FTable[i2, k2] + S2[k2+1, j2]),
+            			      reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  _FTable[k2+1, j2]));
+		esac;
+
+.
+
+ 

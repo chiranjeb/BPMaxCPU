@@ -1,5 +1,5 @@
-prog = ReadAlphabets("bpmax_R1_R3_R4.ab");
-subSystem = "bpmax_k1_k2_reductions";
+prog = ReadAlphabets("bpmax_R0_R3_R4.ab");
+subSystem = "bpmax_outer_reductions";
 
 NormalizeReduction(prog, subSystem, "_FTable");
 Normalize(prog);  
@@ -19,6 +19,4 @@ setSpaceTimeMap(prog, subSystem, "_FTable",         "(i,j      ->   M,     i,   
 
 options = createTiledCGOptionForScheduledC();
 setDefaultDTilerConfiguration(prog, subSystem, 1, 3, "sequential");
-generateScheduledCode(prog, subSystem, options, outDir);
-                             
-                                             
+generateScheduledCode(prog, subSystem, options, outDir);                                       

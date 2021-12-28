@@ -110,7 +110,6 @@ inline double __min_double(double x, double y){
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
 #define Outer_Max_Res(i,j) Outer_Max_Res[i][j]
-void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable, float** S1, float** _FTable);
 
 void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable, float** S1, float** Outer_Max_Res){
 	///Parameter checking
@@ -119,7 +118,7 @@ void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, lon
 		exit(-1);
 	}
 	//Memory Allocation
-
+	
 	#define S0(i,j) Outer_Max_Res(i,j) = 0
 	{
 		//Domain
@@ -134,8 +133,7 @@ void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, lon
 		 }
 	}
 	#undef S0
-	bpmax_k1_k2_reductions(M, N, I1, J1, T1, T2, T3, FTable, S1, Outer_Max_Res);
-
+	
 	//Memory Free
 }
 

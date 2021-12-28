@@ -1,4 +1,4 @@
-affine bpmax_k1_k2_reductions{M, N, I1, J1| M>=3 && N>=3 &&  M>=J1+1 && I1>=0 && J1> I1}
+affine bpmax_outer_reductions{M, N, I1, J1| M>=3 && N>=3 &&  M>=J1+1 && I1>=0 && J1> I1}
 	input
 	  float FTable {i1,j1,i2,j2| M>=j1+1 && i2>=0 && N>=j2+1 && j2>=i2 && i1>=0 && j1>=i1 } ;
 	  float S1 {i,j| i>=0 && M>=j+1 && j>=i } ; 
