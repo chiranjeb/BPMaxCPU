@@ -20,9 +20,6 @@ let
 		{ | I1 == J1 && i2 == j2} : e_inter_score(seq1[I1], seq2[N-i2-1]); 
 		{ | I1<J1 && i2<j2} || {|I1 ==J1 && i2<j2} || {|I1<J1 && i2==j2} : 			
 		        max(case {|J1-I1 >  3}: FTable_4D[I1+1, J1-1, i2, j2] + e_intra_score(seq1[I1], seq1[J1]);
-				       {|J1-I1 <= 3}: 0; esac,
-			     case  {|j2-i2  > 3}: FTable_4D[I1, J1, i2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
-			 	       {|j2-i2  <=3}: 0; esac, 
-			 	       S1[I1, J1] + S2[i2, j2]);
+				       {|J1-I1 <= 3}: 0; esac, S1[I1, J1] + S2[i2, j2]);
 		esac;
 .

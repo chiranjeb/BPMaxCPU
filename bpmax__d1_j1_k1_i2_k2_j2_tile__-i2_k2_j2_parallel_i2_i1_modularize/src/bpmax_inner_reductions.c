@@ -13,6 +13,7 @@
 #include <immintrin.h>
 #include <malloc.h>
 
+#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -108,13 +109,14 @@ inline double __min_double(double x, double y){
 //Memory Macros
 #define FTable_4D(i,j,i2,j2) FTable_4D[i][j][i2][j2]
 #define S2(i,j) S2[i][j]
+#define seq2(i) seq2[i]
 #define NR_FTable_2D(i2,j2) NR_FTable_2D[i2][j2]
 #define NR_FTable_2D_1(i2,j2) NR_FTable_2D_1[i2][j2]
 #define FTable_2D(i,j) FTable_2D[i][j]
 
-void bpmax_inner_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable_4D, float** S2, float** FTable_2D){
+void bpmax_inner_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable_4D, float** S2, int* seq2, float** FTable_2D){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && T1 >= 1 && T2 >= 1 && T3 >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((M >= 3 && N >= 8 && T1 >= 1 && T2 >= 1 && T3 >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -137,47 +139,103 @@ void bpmax_inner_reductions(long M, long N, long I1, long J1, long T1, long T2, 
 		NR_FTable_2D_1[mz1] = &_lin_NR_FTable_2D_1[(mz1*(N))];
 	}
 	#define S0(i,j,i2) FTable_2D(-i,j) = FTable_4D(I1,J1,-i,j)
-	#define S1(i,j,i2) FTable_2D(-i,j) = __max_float(FTable_4D(I1,J1,-i,j),__max_float(NR_FTable_2D(-i,j),NR_FTable_2D_1(-i,j)))
-	#define S4(i,j,i2) NR_FTable_2D(-i,i2) = 1.401298464324817E-45
-	#define S5(i,j,i2) NR_FTable_2D_1(-i,i2) = 1.401298464324817E-45
-	#define S_2(i0,i1,i2) {float __temp__ = (FTable_4D(I1,J1,-i0,i1))+(S2(i1+1,i2)); NR_FTable_2D(-i0,i2) = __max_float(NR_FTable_2D(-i0,i2),__temp__); }
-	#define S3(i0,i1,i2) {float __temp__ = (S2(-i0,i1))+(FTable_4D(I1,J1,i1+1,i2)); NR_FTable_2D_1(-i0,i2) = __max_float(NR_FTable_2D_1(-i0,i2),__temp__); }
+	#define S1(i,j,i2) FTable_2D(-i,j) = __max_float(__max_float(FTable_4D(I1,J1,-i,j),(FTable_4D(I1,J1,-i+1,j-1))+(e_intra_score(seq2(i+N-1),seq2(-j+N-1)))),__max_float(NR_FTable_2D(-i,j),NR_FTable_2D_1(-i,j)))
+	#define S_2(i,j,i2) FTable_2D(-i,j) = __max_float(__max_float(FTable_4D(I1,J1,-i,j),0),__max_float(NR_FTable_2D(-i,j),NR_FTable_2D_1(-i,j)))
+	#define S5(i,j,i2) NR_FTable_2D(-i,i2) = 1.401298464324817E-45
+	#define S6(i,j,i2) NR_FTable_2D_1(-i,i2) = 1.401298464324817E-45
+	#define S3(i0,i1,i2) {float __temp__ = (FTable_4D(I1,J1,-i0,i1))+(S2(i1+1,i2)); NR_FTable_2D(-i0,i2) = __max_float(NR_FTable_2D(-i0,i2),__temp__); }
+	#define S4(i0,i1,i2) {float __temp__ = (S2(-i0,i1))+(FTable_4D(I1,J1,i1+1,i2)); NR_FTable_2D_1(-i0,i2) = __max_float(NR_FTable_2D_1(-i0,i2),__temp__); }
 	{
 		//Domain
-		//{i,j,i2|i+i2==0 && i+j==0 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i && N+i>=1}
-		//{i,j,i2|i2==j && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && i+j>=1 && N>=j+1 && 0>=i}
-		//{i,j,i2|i+j==-1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i && i+i2>=1 && N>=i2+1}
-		//{i,j,i2|i+j==-1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && N>=i2+1 && i+i2>=1 && 0>=i}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && N>=i2+1 && i1>=-1 && N>=i1+1 && 0>=i0 && i0+i2>=1}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i0 && i1>=-1 && N>=i1+1 && N>=i2+1 && i0+i2>=1}
+		//{i,j,i2|i+i2==0 && i+j==0 && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i && N+i>=1}
+		//{i,j,i2|i2==j && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && i+j>=4 && N+i>=1 && j>=0 && N>=j+1 && 0>=i}
+		//{i,j,i2|i2==j && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i+j-3 && i+j>=1 && N>=j+1 && 0>=i}
+		//{i,j,i2|i+j==-1 && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i && i+i2>=1 && N>=i2+1}
+		//{i,j,i2|i+j==-1 && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && N>=i2+1 && i+i2>=1 && 0>=i}
+		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && N>=i2+1 && i1>=-1 && N>=i1+1 && 0>=i0 && i0+i2>=1}
+		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=3 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && 0>=i0 && i1>=-1 && N>=i1+1 && N>=i2+1 && i0+i2>=1}
 		int c1,c2,c3;
 		S0((-N+1),(N-1),(N-1));
-		S4((-N+2),(N-3),(N-1));
 		S5((-N+2),(N-3),(N-1));
+		S6((-N+2),(N-3),(N-1));
 		S0((-N+2),(N-2),(N-2));
-		S_2((-N+2),(N-2),(N-1));
 		S3((-N+2),(N-2),(N-1));
-		S1((-N+2),(N-1),(N-1));
-		for(c1=-N+3;c1 <= 0;c1+=1)
+		S4((-N+2),(N-2),(N-1));
+		S_2((-N+2),(N-1),(N-1));
+		for(c1=-N+3;c1 <= -N+4;c1+=1)
 		 {
 		 	for(c3=-c1+1;c3 <= N-1;c3+=1)
 		 	 {
-		 	 	S4((c1),(-c1-1),(c3));
 		 	 	S5((c1),(-c1-1),(c3));
+		 	 	S6((c1),(-c1-1),(c3));
 		 	 }
 		 	S0((c1),(-c1),(-c1));
 		 	for(c3=-c1+1;c3 <= N-1;c3+=1)
 		 	 {
-		 	 	S_2((c1),(-c1),(c3));
 		 	 	S3((c1),(-c1),(c3));
+		 	 	S4((c1),(-c1),(c3));
 		 	 }
 		 	for(c2=-c1+1;c2 <= N-2;c2+=1)
+		 	 {
+		 	 	S_2((c1),(c2),(c2));
+		 	 	for(c3=c2+1;c3 <= N-1;c3+=1)
+		 	 	 {
+		 	 	 	S3((c1),(c2),(c3));
+		 	 	 	S4((c1),(c2),(c3));
+		 	 	 }
+		 	 }
+		 	S_2((c1),(N-1),(N-1));
+		 }
+		for(c3=N-4;c3 <= N-1;c3+=1)
+		 {
+		 	S5((-N+5),(N-6),(c3));
+		 	S6((-N+5),(N-6),(c3));
+		 }
+		S0((-N+5),(N-5),(N-5));
+		for(c3=N-4;c3 <= N-1;c3+=1)
+		 {
+		 	S3((-N+5),(N-5),(c3));
+		 	S4((-N+5),(N-5),(c3));
+		 }
+		for(c2=N-4;c2 <= N-2;c2+=1)
+		 {
+		 	S_2((-N+5),(c2),(c2));
+		 	for(c3=c2+1;c3 <= N-1;c3+=1)
+		 	 {
+		 	 	S3((-N+5),(c2),(c3));
+		 	 	S4((-N+5),(c2),(c3));
+		 	 }
+		 }
+		S1((-N+5),(N-1),(N-1));
+		for(c1=-N+6;c1 <= 0;c1+=1)
+		 {
+		 	for(c3=-c1+1;c3 <= N-1;c3+=1)
+		 	 {
+		 	 	S5((c1),(-c1-1),(c3));
+		 	 	S6((c1),(-c1-1),(c3));
+		 	 }
+		 	S0((c1),(-c1),(-c1));
+		 	for(c3=-c1+1;c3 <= N-1;c3+=1)
+		 	 {
+		 	 	S3((c1),(-c1),(c3));
+		 	 	S4((c1),(-c1),(c3));
+		 	 }
+		 	for(c2=-c1+1;c2 <= -c1+3;c2+=1)
+		 	 {
+		 	 	S_2((c1),(c2),(c2));
+		 	 	for(c3=c2+1;c3 <= N-1;c3+=1)
+		 	 	 {
+		 	 	 	S3((c1),(c2),(c3));
+		 	 	 	S4((c1),(c2),(c3));
+		 	 	 }
+		 	 }
+		 	for(c2=-c1+4;c2 <= N-2;c2+=1)
 		 	 {
 		 	 	S1((c1),(c2),(c2));
 		 	 	for(c3=c2+1;c3 <= N-1;c3+=1)
 		 	 	 {
-		 	 	 	S_2((c1),(c2),(c3));
 		 	 	 	S3((c1),(c2),(c3));
+		 	 	 	S4((c1),(c2),(c3));
 		 	 	 }
 		 	 }
 		 	S1((c1),(N-1),(N-1));
@@ -185,10 +243,11 @@ void bpmax_inner_reductions(long M, long N, long I1, long J1, long T1, long T2, 
 	}
 	#undef S0
 	#undef S1
-	#undef S4
-	#undef S5
 	#undef S_2
+	#undef S5
+	#undef S6
 	#undef S3
+	#undef S4
 	
 	//Memory Free
 	free(_lin_NR_FTable_2D);
@@ -201,6 +260,7 @@ void bpmax_inner_reductions(long M, long N, long I1, long J1, long T1, long T2, 
 //Memory Macros
 #undef FTable_4D
 #undef S2
+#undef seq2
 #undef NR_FTable_2D
 #undef NR_FTable_2D_1
 #undef FTable_2D

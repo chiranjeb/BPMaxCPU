@@ -146,6 +146,11 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_labe
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 1, "S1");
 
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 2, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 2, "seq2");   
 
 # Set space time map for the first output of the Use equation : FTable_final_reductions                                          
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 0, 

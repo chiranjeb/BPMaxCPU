@@ -47,6 +47,7 @@ affine bpmax_inner_reductions{M, N, I1, J1, T1 , T2, T3| M>=8 && N>=8 && T1 >=1 
 	input
 	  float FTable {i1,j1,i2,j2| M>=j1+1 && i2>=0 && N>=j2+1 && j2>=i2 && i1>=0 && j1>=i1 } ;
 	  float S2 {i,j| i>=0 && N>=j+1 && j>=i } ; 
+	  int seq2 {i| 0 <= i < N} ;
 	output
 	  float _FTable  {i,j| 0<=i<=j<=N-1};
 	let
@@ -70,7 +71,6 @@ let
 	 _FTable[i2, j2] = 0;
 		
 .
-
 
 affine bpmax {M,N, T1, T2, T3| M>=8 && N>=8 && T1>=1 && T2>=1 && T3>=1}
 input
@@ -115,7 +115,8 @@ let
 	use {ei1,ej1| 0<=ei1<=ej1<=M-1 } 
 	    bpmax_inner_reductions[M,N, ei1, ej1, T1, T2, T3] 
 	    ((ei1, ej1, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable, 
-	    (ei1, ej1, i1, j1 -> 0, i1, j1)@S2)
+	    (ei1, ej1, i1, j1 -> 0, i1, j1)@S2,
+	    (ei, ej, i->i)@seq2)
 	    returns (FTable_inner_reductions); 
 .
 

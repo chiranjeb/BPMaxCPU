@@ -123,42 +123,44 @@ void bpmax_elementwise_ops(long M, long N, long I1, long J1, int* seq1, int* seq
 	//Memory Allocation
 	
 	#define S0(i,j) FTable_2D(i,j) = e_inter_score(seq1(I1),seq2(-i+N-1))
-	#define S_1(i,j) FTable_2D(i,j) = __max_float((FTable_4D(I1+1,J1-1,i,j))+(e_intra_score(seq1(I1),seq1(J1))),__max_float((FTable_4D(I1,J1,i+1,j-1))+(e_intra_score(seq2(-i+N-1),seq2(-j+N-1))),(S1(I1,J1))+(S2(i,j))))
-	#define S_2(i,j) FTable_2D(i,j) = __max_float((FTable_4D(I1+1,J1-1,i,j))+(e_intra_score(seq1(I1),seq1(J1))),__max_float(0,(S1(I1,J1))+(S2(i,j))))
-	#define S3(i,j) FTable_2D(i,j) = __max_float(0,__max_float((FTable_4D(I1,J1,i+1,j-1))+(e_intra_score(seq2(-i+N-1),seq2(-j+N-1))),(S1(I1,J1))+(S2(i,j))))
-	#define S4(i,j) FTable_2D(i,j) = __max_float(0,__max_float(0,(S1(I1,J1))+(S2(i,j))))
+	#define S_1(i,j) FTable_2D(i,j) = __max_float((FTable_4D(I1+1,J1-1,i,j))+(e_intra_score(seq1(I1),seq1(J1))),(S1(I1,J1))+(S2(i,j)))
+	#define S_2(i,j) FTable_2D(i,j) = __max_float(0,(S1(I1,J1))+(S2(i,j)))
 	{
 		//Domain
 		//{i,j|j==i && J1==I1 && M>=8 && N>=8 && I1>=0 && M>=I1+1 && i>=0 && N>=i+1}
-		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1+4 && M>=J1+1 && j>=i+4 && J1+j>=I1+i+1 && N>=i+1 && j>=0 && M>=I1+1 && i>=0 && J1>=0 && N>=j+1}
-		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1+4 && M>=J1+1 && i>=j-3 && j>=i && J1+j>=I1+i+1 && M>=I1+1 && J1>=0 && N>=j+1 && i>=0}
-		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1 && M>=J1+1 && j>=i+4 && I1>=J1-3 && J1+j>=I1+i+1 && i>=0 && N>=j+1 && N>=i+1 && j>=0}
-		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1 && M>=J1+1 && i>=j-3 && I1>=J1-3 && j>=i && J1+j>=I1+i+1 && i>=0 && N>=j+1}
+		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1+4 && M>=J1+1 && j>=i && J1+j>=I1+i+1 && M>=I1+1 && J1>=0 && N>=j+1 && i>=0}
+		//{i,j|M>=8 && N>=8 && I1>=0 && J1>=I1 && M>=J1+1 && I1>=J1-3 && j>=i && J1+j>=I1+i+1 && i>=0 && N>=j+1}
 		int c1,c2;
-		if ((I1 == J1)) {
+		if ((I1 <= J1-4)) {
 			{
-				for(c1=0;c1 <= N-5;c1+=1)
+				for(c1=0;c1 <= N-1;c1+=1)
 				 {
-				 	S0((c1),(c1));
-				 	for(c2=c1+1;c2 <= c1+3;c2+=1)
+				 	for(c2=c1;c2 <= N-1;c2+=1)
 				 	 {
-				 	 	S4((c1),(c2));
-				 	 }
-				 	for(c2=c1+4;c2 <= N-1;c2+=1)
-				 	 {
-				 	 	S3((c1),(c2));
+				 	 	S_1((c1),(c2));
 				 	 }
 				 }
 			}
 		}
 		if ((I1 == J1)) {
 			{
-				for(c1=N-4;c1 <= N-2;c1+=1)
+				for(c1=0;c1 <= N-2;c1+=1)
 				 {
 				 	S0((c1),(c1));
 				 	for(c2=c1+1;c2 <= N-1;c2+=1)
 				 	 {
-				 	 	S4((c1),(c2));
+				 	 	S_2((c1),(c2));
+				 	 }
+				 }
+			}
+		}
+		if ((I1 >= J1-3 && I1 <= J1-1)) {
+			{
+				for(c1=0;c1 <= N-1;c1+=1)
+				 {
+				 	for(c2=c1;c2 <= N-1;c2+=1)
+				 	 {
+				 	 	S_2((c1),(c2));
 				 	 }
 				 }
 			}
@@ -168,64 +170,10 @@ void bpmax_elementwise_ops(long M, long N, long I1, long J1, int* seq1, int* seq
 				S0((N-1),(N-1));
 			}
 		}
-		if ((I1 >= J1-3 && I1 <= J1-1)) {
-			{
-				for(c1=0;c1 <= N-5;c1+=1)
-				 {
-				 	for(c2=c1;c2 <= c1+3;c2+=1)
-				 	 {
-				 	 	S4((c1),(c2));
-				 	 }
-				 	for(c2=c1+4;c2 <= N-1;c2+=1)
-				 	 {
-				 	 	S3((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 >= J1-3 && I1 <= J1-1)) {
-			{
-				for(c1=N-4;c1 <= N-1;c1+=1)
-				 {
-				 	for(c2=c1;c2 <= N-1;c2+=1)
-				 	 {
-				 	 	S4((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 <= J1-4)) {
-			{
-				for(c1=0;c1 <= N-5;c1+=1)
-				 {
-				 	for(c2=c1;c2 <= c1+3;c2+=1)
-				 	 {
-				 	 	S_2((c1),(c2));
-				 	 }
-				 	for(c2=c1+4;c2 <= N-1;c2+=1)
-				 	 {
-				 	 	S_1((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 <= J1-4)) {
-			{
-				for(c1=N-4;c1 <= N-1;c1+=1)
-				 {
-				 	for(c2=c1;c2 <= N-1;c2+=1)
-				 	 {
-				 	 	S_2((c1),(c2));
-				 	 }
-				 }
-			}
-		}
 	}
 	#undef S0
 	#undef S_1
 	#undef S_2
-	#undef S3
-	#undef S4
 	
 	//Memory Free
 }

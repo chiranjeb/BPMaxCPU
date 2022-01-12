@@ -105,7 +105,7 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_inner_reductions(long, long, long, long, long, long, long, float****, float**, float**);
+void bpmax_inner_reductions(long, long, long, long, long, long, long, float****, float**, int*, float**);
 void bpmax_outer_reductions(long, long, long, long, long, long, long, float****, float**, float**);
 void bpmax_single_strand_s1(long, int*, float**);
 void bpmax_single_strand_s2(long, int*, float**);
@@ -203,7 +203,7 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 		}
 	}
 	#define S0(i1,j1,i2,j2,i4) FTable(i2,j1+i2,j2,i4) = 0
-	#define S_1(i1,j1,i2,i3,i4) bpmax_inner_reductions(M,N,i3,j1+i3,T1,T2,T3,FTable,S2[0],FTable_inner_reductions[i3][j1+i3])
+	#define S_1(i1,j1,i2,i3,i4) bpmax_inner_reductions(M,N,i3,j1+i3,T1,T2,T3,FTable,S2[0],seq2,FTable_inner_reductions[i3][j1+i3])
 	#define S_2(i1,j1,i2,i3,i4) bpmax_outer_reductions(M,N,i2,j1+i2,T1,T2,T3,FTable,S1[0],FTable_outer_reductions[i2][j1+i2])
 	#define S3(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i1])
 	#define S4(i,i1,i2,i3,i4) bpmax_single_strand_s2(N,seq2,S2[i1])
