@@ -462,4 +462,18 @@ void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool
 }
 
 
-
+void Dump2D(int M, float **Tab, const char *message)
+{
+       printf("-----------------------------------------------------------------------\n");
+       printf("%s\n", message);
+       printf("-----------------------------------------------------------------------\n");
+       for ( int i = 0; i < M; i++)
+       {
+            for (int j = 0; j < M; j++ )
+            {
+               if ( i <= j) printf("%10e ", Tab[i][j]);
+               else        printf( "%10e ", 0.0);
+            }
+            printf("\n");
+     }
+}

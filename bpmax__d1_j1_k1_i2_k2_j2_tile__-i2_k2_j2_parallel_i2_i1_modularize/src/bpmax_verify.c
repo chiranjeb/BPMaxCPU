@@ -402,6 +402,9 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 		 }
 	}
 	#undef S0
+
+	Dump2D(M, S1, "S1- verify version");
+    Dump2D(N, S2, "S2- verify version");
 	
 	//Memory Free
 	free(_lin_S1);

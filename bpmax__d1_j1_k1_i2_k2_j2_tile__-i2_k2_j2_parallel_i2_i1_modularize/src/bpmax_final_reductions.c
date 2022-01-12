@@ -108,21 +108,24 @@ inline double __min_double(double x, double y){
 
 //Memory Macros
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
+#define seq1(i) seq1[i]
+#define seq2(i) seq2[i]
 #define S1(i,j) S1[i][j]
-#define Outer_Max_Res(i,j) Outer_Max_Res[i][j]
+#define S2(i,j) S2[i][j]
+#define _FTable(i,j) _FTable[i][j]
 
-void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable, float** S1, float** Outer_Max_Res){
+void bpmax_final_reductions(long M, long N, long I1, long J1, long T1, long T2, long T3, float**** FTable, int* seq1, int* seq2, float** S1, float** S2, float** _FTable){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && T1 >= 1 && T2 >= 1 && T3 >= 1 && M >= J1+1 && I1 >= 0 && J1 >= I1+1))) {
+	if (!((M >= 8 && N >= 8 && T1 >= 1 && T2 >= 1 && T3 >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i,j) Outer_Max_Res(i,j) = 0
+	#define S0(i,j) _FTable(i,j) = 0
 	{
 		//Domain
-		//{i,j|M>=3 && N>=3 && T1>=1 && T2>=1 && T3>=1 && M>=J1+1 && I1>=0 && J1>=I1+1 && i>=0 && j>=i && N>=j+1}
+		//{i,j|M>=8 && N>=8 && T1>=1 && T2>=1 && T3>=1 && I1>=0 && J1>=I1 && M>=J1+1 && i>=0 && j>=i && N>=j+1}
 		int c1,c2;
 		for(c1=0;c1 <= N-1;c1+=1)
 		 {
@@ -139,8 +142,11 @@ void bpmax_k1_reductions(long M, long N, long I1, long J1, long T1, long T2, lon
 
 //Memory Macros
 #undef FTable
+#undef seq1
+#undef seq2
 #undef S1
-#undef Outer_Max_Res
+#undef S2
+#undef _FTable
 
 
 //Common Macro undefs

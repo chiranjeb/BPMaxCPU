@@ -6,6 +6,7 @@ float e_intra_score(int,int);
 float e_inter_score(int,int);
 unsigned char toNum(char c);
 void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool verbose);
+void Dump2D(int M, float **Tab, const char *message);
 
 
 class Alloc {

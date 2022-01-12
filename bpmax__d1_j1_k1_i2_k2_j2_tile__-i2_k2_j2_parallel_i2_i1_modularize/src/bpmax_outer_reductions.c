@@ -106,11 +106,11 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
+#define FTable_4D(i1,j1,i2,j2) FTable_4D[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
-#define _FTable(i2,j2) _FTable[i2][j2]
+#define FTable_2D(i2,j2) FTable_2D[i2][j2]
 
-void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable, float** S1, float** _FTable){
+void bpmax_outer_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable_4D, float** S1, float** FTable_2D){
 	///Parameter checking
 	if (!((M >= 3 && N >= 3 && M >= J1+1 && I1 >= 0 && J1 >= I1+1 && ts2_l1 > 0 && ts3_l1 > 0 && ts4_l1 > 0))) {
 		printf("The value of parameters are not valid.\n");
@@ -118,14 +118,14 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 	}
 	//Memory Allocation
 	
-	#define S0(i,j,i2,i3) _FTable(j,i2) = __max_float(_FTable(j,i2),__max_float(_FTable(j,i2),_FTable(j,i2)))
-	#define S_1(i,j,i2,i3) _FTable(j,i2) = __max_float(0,__max_float(_FTable(j,i2),_FTable(j,i2)))
-	#define S5(i,j,i2,i3) _FTable(j,i3) = 1.401298464324817E-45
-	#define S6(i,j,i2,i3) _FTable(j,i3) = 1.401298464324817E-45
-	#define S7(i,j,i2,i3) _FTable(j,i3) = 1.401298464324817E-45
-	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable(I1,i0,i1,i2))+(FTable(i0+1,J1,i2+1,i3)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }
-	#define S3(i0,i1,i2,i3) {float __temp__ = (S1(I1,i0))+(FTable(i0+1,J1,i1,i3)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }
-	#define S4(i0,i1,i2,i3) {float __temp__ = (FTable(I1,i0,i1,i3))+(S1(i0+1,J1)); _FTable(i1,i3) = __max_float(_FTable(i1,i3),__temp__); }
+	#define S0(i,j,i2,i3)  //FTable_2D(j,i2) = __max_float(FTable_2D(j,i2),__max_float(FTable_2D(j,i2),FTable_2D(j,i2)))
+	#define S_1(i,j,i2,i3) //FTable_2D(j,i2) = __max_float(0,__max_float(FTable_2D(j,i2),FTable_2D(j,i2)))
+	#define S5(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
+	#define S6(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
+	#define S7(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
+	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable_4D(I1,i0,i1,i2))+(FTable_4D(i0+1,J1,i2+1,i3)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
+	#define S3(i0,i1,i2,i3) {float __temp__ = (S1(I1,i0))+(FTable_4D(i0+1,J1,i1,i3)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
+	#define S4(i0,i1,i2,i3) {float __temp__ = (FTable_4D(I1,i0,i1,i3))+(S1(i0+1,J1)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
 	{
 		//Domain
 		//{i,j,i2,i3|i3==0 && i==M && J1>=I1+1 && i2>=j+1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && j>=0 && N>=i2+1}
@@ -312,9 +312,9 @@ void bpmax_k1_k2_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 }
 
 //Memory Macros
-#undef FTable
+#undef FTable_4D
 #undef S1
-#undef _FTable
+#undef FTable_2D
 
 
 //Common Macro undefs
