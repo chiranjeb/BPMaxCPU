@@ -203,11 +203,11 @@ void bpmax(long M, long N, long T1, long T2, long T3, int* seq1, int* seq2, floa
 		}
 	}
 	#define S0(i1,j1,i2,j2,i4) FTable(i2,j1+i2,j2,i4) = 0
-	#define S_1(i1,j1,i2,i3,i4) bpmax_inner_reductions(M,N,i3,j1+i3,T1,T2,T3,FTable,S2[0],seq2,FTable_inner_reductions[i3][j1+i3])
-	#define S_2(i1,j1,i2,i3,i4) bpmax_outer_reductions(M,N,i2,j1+i2,T1,T2,T3,FTable,S1[0],FTable_outer_reductions[i2][j1+i2])
+	#define S_1(i1,j1,i2,i3,i4) bpmax_inner_reductions(M,N,i3,j1+i3,T1,T2,T3,FTable,S2[0],seq2,FTable[i3][j1+i3])
+	#define S_2(i1,j1,i2,i3,i4) bpmax_outer_reductions(M,N,i2,j1+i2,T1,T2,T3,FTable,S1[0],FTable[i2][j1+i2])
 	#define S3(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i1])
 	#define S4(i,i1,i2,i3,i4) bpmax_single_strand_s2(N,seq2,S2[i1])
-	#define S5(i1,j1,i2,i3,i4) bpmax_elementwise_ops(M,N,i2,j1+i2,seq1,seq2,S1[0],S2[0],FTable,FTable_elementwise_ops[i2][j1+i2])
+	#define S5(i1,j1,i2,i3,i4) bpmax_elementwise_ops(M,N,i2,j1+i2,seq1,seq2,S1[0],S2[0],FTable,FTable[i2][j1+i2])
 	{
 		//Domain
 		//{i1,j1,i2,j2,i4|M+i1==0 && M>=8 && N>=8 && T1>=1 && T2>=1 && T3>=1 && i2>=0 && j1>=0 && M>=j1+i2+1 && j2>=0 && i4>=j2 && N>=i4+1}
