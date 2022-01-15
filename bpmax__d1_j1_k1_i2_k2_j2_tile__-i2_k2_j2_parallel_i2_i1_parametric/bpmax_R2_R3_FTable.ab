@@ -1,0 +1,22 @@
+float e_intra_score (int,int) ;
+
+affine bpmax_inner_reductions{M, N, I1, J1| M>=3 && N>=8 && 0<=I1<=J1<=M-1}
+//affine bpmax_inner_reductions{M, N, I1, J1| M>=3 && N>=3  &&  0<=I1<=J1<=M-1}
+	input
+	  float FTable_4D {i,j,i2,j2| 0<=i<=j<=M-1 && 0<=i2<=j2<=N-1};
+	  float S2 {i,j| 0<=i<=j<=N-1  } ; 
+	  int seq2 {i| 0 <= i < N} ;
+	  
+	output
+	  float FTable_2D {i, j| 0<=i<=j<=N-1};
+	let
+	
+	FTable_2D[i2,j2] = case
+		{ | i2 >= j2 } : FTable_4D[I1, J1, i2, j2];
+		{ | i2 < j2  } : max ( max(FTable_4D[I1, J1, i2, j2], 
+			                  case  {|j2-i2  > 3}: FTable_4D[I1, J1, i2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
+			 	                    {|j2-i2  <=3}: 0; esac), 
+            		      	  reduce(max, [k2],  {|i2<=k2<j2} : FTable_4D[I1, J1, i2, k2] + S2[k2+1, j2]),
+            			      reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable_4D[I1, J1, k2+1, j2]));
+		esac;
+.
