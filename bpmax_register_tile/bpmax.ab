@@ -1,0 +1,199 @@
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+
+
+affine bpmax_single_strand_s1 {M|M>=3}
+input
+    int seq1 {i| 0 <= i < M };
+output
+	float S1 {i,j| 0 <= i <= j < M};
+	let
+		S1[i,j] = case
+		{ | j-i<= 3}: 0 ;
+		{ | j-i > 3}: max(S1[i+1,j-1] + e_intra_score (seq1[i],seq1[j]),
+					   reduce(+, [k], {|k<j}:S1[i,k]+S1[k+1,j]));
+	esac;
+.
+
+affine bpmax_single_strand_s2 {N|N>=3}
+input
+    int seq2 {i| 0 <= i < N };
+output
+	float S2 {i,j| 0 <= i <= j < N};
+	let
+	S2[i,j] = case
+		{ | j-i<= 3}: 0 ;
+		{ | j-i > 3}: max (S2[i+1,j-1] + e_intra_score (seq2[N-i-1],seq2[N-j-1]),
+					  reduce(+, [k], {| k<j}:S2[i,k]+S2[k+1,j]));
+	esac;
+.
+
+
+
+affine bpmax_elementwise_ops
+{
+	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1	
+}
+
+input
+	int seq1 {i| 0 <= i < M} ;
+	int seq2 {i| 0 <= i < N} ;
+	float S1 {i,j| 0 <= i <= j < M };
+	float S2 {i,j| 0 <= i <= j < N };
+output
+	float FTable_C  { i2, j2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  
+let
+	 FTable_C[i2, j2, i3, j3] = 0;	
+.
+
+affine transform_2D_to_4D_like_A_for_register_tile
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float S2     { i,  j  | 0<=i<=j<N };
+output
+	float S2_A   { i3, j3 |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  
+let
+	 S2_A[i3, j3] = 0;	
+.
+
+
+affine transform_2D_to_4D_like_B_for_register_tile
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float S2     { i,  j  | 0<=i<=j<N };
+output
+	float S2_B   { i3, j3 |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  
+let
+	 S2_B[i3, j3] = 0;	
+.
+ 
+affine bpmax_outer_reductions
+{
+	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1	
+}
+input
+	float FTable_A { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_C { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float S1       { i,  j                  |  0<=i<=j<=M-1 };
+output
+   	float FTable { i2, j2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	  FTable[i2, j2, i3, j3] = 0 ; // This will be replaced by the outer 
+.
+
+ 
+
+affine bpmax_inner_reductions
+{
+	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1	
+}
+input
+	//float FTable_A { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_C { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float S2_A     { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    && 0<=j3<=N_tile-1 };
+	float S2_B     { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    && 0<=j3<=N_tile-1 };
+	int seq2       { i                      |   0<= i<=N-1 };
+output
+	float FTable  { i2, j2          |  0<=i2<=j2<=N-1};
+	float FTable_A { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+
+let
+	FTable[i2, j2]=0; // do not initialize
+.
+
+affine bpmax 
+{
+	M, N, N_sec, N_tile, MR, NR | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1	
+}
+input
+	int seq1 {i| 0 <= i < M} ;
+	int seq2 {i| 0 <= i < N} ;
+output
+	float FTable {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
+		
+local
+	float S1                 { k,  i,  j              | 0<=k<1             &&  0<=i<=j<=M-1 };
+	float S2                 { k,  i,  j              | 0<=k<1             &&  0<=i<=j<=N-1 };
+	float FTable_elementwise { i1, j1, i2, j2         | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N-1};
+	float S2_A               { i2, j2, i3, j3         | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	float S2_B               { i2, j2, i3, j3         | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	float FTable_A           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_C           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_outer       { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  i1<j1           && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	
+let
+	// Compute single strand table - S1
+	use {ei | ei>=0 && 1>ei }  bpmax_single_strand_s1[M] ((ei, i->i)@seq1) returns  (S1);
+	
+	// Compute single strand table - S2
+	use {ei | ei>=0 && 1>ei }  bpmax_single_strand_s2[N] ((ei, i->i)@seq2) returns  (S2);
+	
+	// Transform S2 --> S2_A for register tiling
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 && ei2 <= ej2} 
+    		transform_2D_to_4D_like_A_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]  
+    			(
+    				(ei2, ej2, i2, j2 -> 0, i2, j2)@S2
+    			)
+	  			returns (S2_A);
+	  			
+	// Transform S2 --> S2_B for register tiling
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 && ei2 <= ej2} 
+    	  transform_2D_to_4D_like_B_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]  
+    			(
+    				(ei2, ej2, i2, j2 -> 0, i2, j2)@S2
+    			)
+	  			returns (S2_B);
+	
+	// Initialize FTable. Internally, it will compute a 4D and transform and return a 6D
+	use {ei1,ej1| 0<=ei1<=ej1<=M-1 } 
+	    bpmax_elementwise_ops[M, N, N_sec, N_tile, MR, NR, ei1, ej1] 
+	    (
+	    	(ei, ej, i->i)@seq1, 
+	     	(ei, ej, i->i)@seq2, 
+	     	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1, 
+	     	(ei1, ej1, i1, j1 -> 0, i1, j1)@S2
+	     )
+	    returns (FTable_C);
+	    		
+	
+	// Do outer reductions
+    use {ei1,ej1| ei1>=0 && M>=ej1+1 && ej1>ei1 } 
+	    bpmax_outer_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1] 
+	    (
+	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_A, 
+	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_B, 
+	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_C, 
+	    	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1
+	    ) 
+	    returns (FTable_outer);
+	    
+    // Do inner reductions
+	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
+	    bpmax_inner_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1]
+	    (
+	        FTable_C, 
+	        (ei1, ej1, i2, j2, i3, j3 -> i2, j2, i3, j3)@S2_A,
+	    	(ei1, ej1, i2, j2, i3, j3 -> i2, j2, i3, j3)@S2_B,
+	    	(ei, ej, i->i)@seq2
+	    )
+	    returns (FTable, FTable_A, FTable_B);
+.
+
+
