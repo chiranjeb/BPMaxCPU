@@ -1,25 +1,74 @@
 float e_intra_score (int,int) ;
 float e_inter_score (int,int) ;
+int e_compute_external(int, int);
+int e_compute_external2(int, int);
+int e_cal_offset(int, int);
 
-affine bpmax_elementwise_ops{M, N, I1, J1| M>=8 && N>=8 && 0<=I1<=J1<=M-1}
+
+
+
+affine bpmax_elementwise_ops_4D 
+{   M, N, N_sec, N_tile, I1, J1, I2, J2, i3_offset, j3_offset | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && 0<=I1<=J1<=M-1 && 0<=I2<=J2<=N_sec-1 && 0 <= i3_offset <= N_tile-1 && 0 <= j3_offset <= N_tile-1
+}
+input
+   int seq1 {i| 0 <= i < M} ;
+   int seq2 {i| 0 <= i < N} ;
+   float S1 {i, j| 0 <= i <= j < M };  
+   float S2 {i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+    
+   //float S2 {i3, j3| 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+   float FTable_6D { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+ 
+output
+   float FTable_s  { i, j | i3_offset<=i<=N_tile && j3_offset<=j<=N_tile-1 };
+let
+	FTable_s[i3, j3] =  case 
+	                      {| i3>=N_tile } : 0;
+						  {| i3 <N_tile } : case
+			            			  { | I1 == J1 && I2 == J2} : case 
+			            			  								{ |i3 == j3} : e_inter_score(seq1[I1], seq2[0]);//replace seq2[N- I2 * N_tile - i3_offset-1] 
+			            	             						    { |i3 < j3 } : S1[I1, J1] + S2[I2, J2, i3, j3];
+			            	             						    { |i3 > j3 } : 0;
+			            	        							  esac;
+			            			  { | I1  < J1 && I2 <  J2 } || 
+			            			  { | I1 == J1 && I2 <  J2 } || 
+			            			  { | I1  < J1 && I2 == J2} : 		
+			                   				max(   case 
+			                   						{|J1-I1 >  3}: FTable_6D[I1+1, J1-1, I2, J2, i3, j3] + e_intra_score(seq1[I1], seq1[J1]);
+				       			    				{|J1-I1 <= 3}: 0; 
+				       			    			   esac, 
+				       			    			  S1[I1, J1]  + S2[I2, J2, i3, j3]);	
+				       		esac;
+				       	esac;
+.
+
+
+affine bpmax_elementwise_ops
+{
+	M, N, N_sec, N_tile, I1, J1 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && 0<=I1<=J1<=M-1
+}
 
 input
-	int seq1 {i| 0 <= i < M} ;
-	int seq2 {i| 0 <= i < N} ;
-	float S1 {i,j| 0 <= i <= j < M };
-	float S2 {i,j| 0 <= i <= j < N };
-	float FTable_4D  {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
-	
+   float FTable_6D { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+   int seq1 {i| 0 <= i < M} ;
+   int seq2 {i| 0 <= i < N} ;
+   float S1                            {i,j| 0 <= i <= j < M };
+   float S2 {i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+   
 output
-	float FTable_2D  {i,j| 0<=i<=j<=N-1};
-	  
+   float FTable_4D { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+   
+
 let
-	 FTable_2D[i2, j2] = case
-		{ | I1<= J1  && j2< i2} : S1[I1, J1];
-		{ | J1 < I1  && i2<=j2} : S2[i2, j2];
-		{ | I1 == J1 && i2 == j2} : e_inter_score(seq1[I1], seq2[N-i2-1]); 
-		{ | I1<J1 && i2<j2} || {|I1 ==J1 && i2<j2} || {|I1<J1 && i2==j2} : 			
-		        max(case {|J1-I1 >  3}: FTable_4D[I1+1, J1-1, i2, j2] + e_intra_score(seq1[I1], seq1[J1]);
-				       {|J1-I1 <= 3}: 0; esac, S1[I1, J1] + S2[i2, j2]);
-		esac;
+	// Initialize the FTable		
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 && ei2 <= ej2} bpmax_elementwise_ops_4D[M, N, N_sec, N_tile, I1, J1, ei2, ej2, 0, 0]  
+    	 ((ei2, ej2, i->i)@seq1, 
+	      (ei2, ej2, i->i)@seq2,
+	      (ei2, ej2, i, j -> i, j)@S1,
+	      (ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S2,
+	      (ei2, ej2, i1, j1, i2, j2, i3, j3 -> i1, j1, i2, j2, i3, j3)@FTable_6D) 
+    returns (FTable_4D);
+    
 .

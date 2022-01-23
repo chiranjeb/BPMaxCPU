@@ -1,0 +1,62 @@
+affine bpmax_inner_reductions_finalize 
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+}
+input
+    int seq2 { i|0<=i<=N-1}; 
+	float A  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float B  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float C  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+
+output
+	float FTable_C_section { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+
+let
+  FTable_C_section[i3,j3] = max (  case { | j3 == 0 && i3  < N_tile-1} : 
+  	                           C[I2, J2-1, i3, N_tile-1 ] /* + e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/ ;
+		                   { | j3 == 0 && i3 == N_tile-1} : 
+		                   	   case  {|j3-i3  > 3}: C[ I2+1, J2-1, 0, N_tile-1  ] /* + e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;
+			 	               {|j3-i3  <=3}: 0; esac;
+		                   { | j3 >  0 && i3 == N_tile-1} : 
+		                       C[ I2+1, J2, 0,  j3-1 ] /*+ e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;   
+		                   { | j3 >  0 && i3 < N_tile-1 } : 
+		                       C[ I2, J2,   i3+1, j3-1 ] /*+ e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;
+		                 esac
+		               ,   
+		              max ( A[I2, J2, i3, N_tile-1] + C[I2+1, J2, 0, j3], 
+		                    case {| i3 < N_tile-1  } :    reduce(max, [k3], {|i3<=k3<N_tile-1} : A[I2, J2, i3, k3] + C[I2, J2, k3+1, j3]);
+		    			         {| i3 == N_tile-1 } : 0; esac,
+		                    case {| j3 > 0 } : reduce(min, [k3], {|0<=k3<=j3-1} : C[I2, J2, i3, k3] + B[I2, J2, k3+1, j3]);
+		    			         {| j3 ==0 } : 0; esac
+		    			  )
+		    	   );
+.	
+
+
+affine bpmax_inner_reductions_diagonal_tile 
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+   int        seq2 { i|0<=i<=N-1}; 
+   float S2   { i2, j2| 0<=i2<=N_tile-1 && 0<=j2<=N_tile-1 };
+   
+output
+   float FTable_C_section { i2, j2| 0<=i2<=N_tile-1 && 0<=j2<=N_tile-1 };
+let
+	FTable_C_section[i2,j2] = 
+		case
+			{ | i2 >= j2 } : 
+					FTable_C_section[i2, j2];
+			{ | i2 < j2  } : 
+					max (  
+						   max (FTable_C_section[i2, j2], 
+			              		case  {|j2-i2  > 3}: FTable_C_section[i2+1, j2-1] /* + todo:e_intra_score(seq2[N-i2-1], seq2[N-j2-1])*/;
+			 	                	  {|j2-i2  <=3}: 0; esac
+			 	               ), 
+            		       reduce(max, [k2],  {|i2<=k2<j2} : FTable_C_section[i2, k2] + S2[k2+1, j2]),
+            			   reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable_C_section[k2+1, j2]));
+        esac;
+.		       

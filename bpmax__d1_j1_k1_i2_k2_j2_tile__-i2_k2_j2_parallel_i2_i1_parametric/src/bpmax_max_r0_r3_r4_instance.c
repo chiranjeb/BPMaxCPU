@@ -13,7 +13,6 @@
 #include <immintrin.h>
 #include <malloc.h>
 
-#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -105,35 +104,32 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_elementwise_ops_4D(long, long, long, long, long, long, long, long, long, long, int*, int*, float**, float****, float******, float**);
+void bpmax_matrix_max_plus_collections(long, long, long, long, long, long, long, long, long, long, float******, float******, float****);
 
 
 //Memory Macros
-#define FTable_6D(i1,j1,i2,j2,i3,j3) FTable_6D[i1][j1][i2][j2][i3][j3]
-#define seq1(i) seq1[i]
-#define seq2(i) seq2[i]
-#define S1(i,j) S1[i][j]
-#define S2(i2,j2,i3,j3) S2[i2][j2][i3][j3]
-#define FTable_4D(i2,j2,i3,j3) FTable_4D[i2][j2][i3][j3]
+#define FTable_6D_1(i2,j2,i3,j3,i4,j4) FTable_6D_1[i2][j2][i3][j3][i4][j4]
+#define FTable_6D_2(i2,j2,i3,j3,i4,j4) FTable_6D_2[i2][j2][i3][j3][i4][j4]
+#define FTable_6D(i2,j2,i3,j3,i4,j4) FTable_6D[i2][j2][i3][j3][i4][j4]
 
-void bpmax_elementwise_ops(long M, long N, long N_sec, long N_tile, long I1, long J1, float****** FTable_6D, int* seq1, int* seq2, float** S1, float**** S2, float**** FTable_4D){
+void bpmax_max_r0_r3_r4_instance(long M, long N, long N_sec, long N_tile, long N_tile_div_MR, long N_tile_div_NR, long MR, long NR, float****** FTable_6D_1, float****** FTable_6D_2, float****** FTable_6D){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && N_tile_div_MR >= 1 && N_tile_div_NR >= 1 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(ei2,ej2) bpmax_elementwise_ops_4D(M,N,N_sec,N_tile,I1,J1,ei2,ej2,0,0,seq1,seq2,S1,S2,FTable_6D,FTable_4D[ei2][ej2])
+	#define S0(i,j,i2,i3,i4,i5) bpmax_matrix_max_plus_collections(M,N,N_sec,N_tile,N_tile_div_MR,N_tile_div_NR,MR,NR,i,j,FTable_6D_1,FTable_6D_2,FTable_6D[i][j])
 	{
 		//Domain
-		//{ei2,ej2|ei2>=0 && ej2>=ei2 && N_sec>=ej2+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,i2,i3,i4,i5|i5==0 && i4==0 && i3==0 && i2==0 && i>=0 && j>=i && N_sec>=j+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && N_tile_div_MR>=1 && N_tile_div_NR>=1 && MR>=1 && NR>=1}
 		int c1,c2;
 		for(c1=0;c1 <= N_sec-1;c1+=1)
 		 {
 		 	for(c2=c1;c2 <= N_sec-1;c2+=1)
 		 	 {
-		 	 	S0((c1),(c2));
+		 	 	S0((c1),(c2),(0),(0),(0),(0));
 		 	 }
 		 }
 	}
@@ -143,12 +139,9 @@ void bpmax_elementwise_ops(long M, long N, long N_sec, long N_tile, long I1, lon
 }
 
 //Memory Macros
+#undef FTable_6D_1
+#undef FTable_6D_2
 #undef FTable_6D
-#undef seq1
-#undef seq2
-#undef S1
-#undef S2
-#undef FTable_4D
 
 
 //Common Macro undefs

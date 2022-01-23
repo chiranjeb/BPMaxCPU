@@ -106,7 +106,7 @@ inline double __min_double(double x, double y){
 
 //SubSystem Function Declarations
 void bpmax_single_strand_s1(long, int*, float**);
-void bpmax_outer_reductions(long, long, long, long, long, long, long, long, float******, float******, float******, float**, float****);
+void bpmax_outer_reductions(long, long, long, long, long, long, long, long, long, float****, float****, float**, float****);
 void bpmax_single_strand_s2(long, int*, float**);
 void transform_2D_to_4D_like_A_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
 void transform_2D_to_4D_like_B_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
@@ -125,7 +125,7 @@ void bpmax_inner_reductions(long, long, long, long, long, long, long, long, floa
 #define FTable_A(i1,j1,i2,j2,i3,j3) FTable_A[i1][j1][i2][j2][i3][j3]
 #define FTable_B(i1,j1,i2,j2,i3,j3) FTable_B[i1][j1][i2][j2][i3][j3]
 #define FTable_C(i1,j1,i2,j2,i3,j3) FTable_C[i1][j1][i2][j2][i3][j3]
-#define FTable_outer(i1,j1,i2,j2,i3,j3) FTable_outer[i1][j1][i2][j2][i3][j3]
+#define FTable_outer(i1,j1,k1,i2,j2,i3,j3) FTable_outer[i1][j1][k1][i2][j2][i3][j3]
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 
 void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1, int* seq2, float**** FTable){
@@ -135,7 +135,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		exit(-1);
 	}
 	//Memory Allocation
-	int mz1, mz2, mz3, mz4, mz5, mz6;
+	int mz1, mz2, mz3, mz4, mz5, mz6, mz7;
 	
 	float* _lin_S1 = (float*)malloc(sizeof(float)*((M) * (M)));
 	mallocCheck(_lin_S1, ((M) * (M)), float);
@@ -281,31 +281,35 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		}
 	}
 	
-	float* _lin_FTable_outer = (float*)malloc(sizeof(float)*((M-1) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
-	mallocCheck(_lin_FTable_outer, ((M-1) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), float);
-	float****** FTable_outer = (float******)malloc(sizeof(float*****)*(M-1));
-	mallocCheck(FTable_outer, (M-1), float*****);
+	float* _lin_FTable_outer = (float*)malloc(sizeof(float)*((M-1) * (M) * (M-1) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
+	mallocCheck(_lin_FTable_outer, ((M-1) * (M) * (M-1) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), float);
+	float******* FTable_outer = (float*******)malloc(sizeof(float******)*(M-1));
+	mallocCheck(FTable_outer, (M-1), float******);
 	for (mz1=0;mz1 < M-1; mz1++) {
-		FTable_outer[mz1] = (float*****)malloc(sizeof(float****)*(M));
-		mallocCheck(FTable_outer[mz1], (M), float****);
+		FTable_outer[mz1] = (float******)malloc(sizeof(float*****)*(M));
+		mallocCheck(FTable_outer[mz1], (M), float*****);
 		for (mz2=0;mz2 < M; mz2++) {
-			FTable_outer[mz1][mz2] = (float****)malloc(sizeof(float***)*(N_sec));
-			mallocCheck(FTable_outer[mz1][mz2], (N_sec), float***);
-			for (mz3=0;mz3 < N_sec; mz3++) {
-				FTable_outer[mz1][mz2][mz3] = (float***)malloc(sizeof(float**)*(N_sec));
-				mallocCheck(FTable_outer[mz1][mz2][mz3], (N_sec), float**);
+			FTable_outer[mz1][mz2] = (float*****)malloc(sizeof(float****)*(M-1));
+			mallocCheck(FTable_outer[mz1][mz2], (M-1), float****);
+			for (mz3=0;mz3 < M-1; mz3++) {
+				FTable_outer[mz1][mz2][mz3] = (float****)malloc(sizeof(float***)*(N_sec));
+				mallocCheck(FTable_outer[mz1][mz2][mz3], (N_sec), float***);
 				for (mz4=0;mz4 < N_sec; mz4++) {
-					FTable_outer[mz1][mz2][mz3][mz4] = (float**)malloc(sizeof(float*)*(N_tile));
-					mallocCheck(FTable_outer[mz1][mz2][mz3][mz4], (N_tile), float*);
-					for (mz5=0;mz5 < N_tile; mz5++) {
-						FTable_outer[mz1][mz2][mz3][mz4][mz5] = &_lin_FTable_outer[(mz1*((M) * (N_sec) * (N_sec) * (N_tile) * (N_tile))) + (mz2*((N_sec) * (N_sec) * (N_tile) * (N_tile))) + (mz3*((N_sec) * (N_tile) * (N_tile))) + (mz4*((N_tile) * (N_tile))) + (mz5*(N_tile))];
+					FTable_outer[mz1][mz2][mz3][mz4] = (float***)malloc(sizeof(float**)*(N_sec));
+					mallocCheck(FTable_outer[mz1][mz2][mz3][mz4], (N_sec), float**);
+					for (mz5=0;mz5 < N_sec; mz5++) {
+						FTable_outer[mz1][mz2][mz3][mz4][mz5] = (float**)malloc(sizeof(float*)*(N_tile));
+						mallocCheck(FTable_outer[mz1][mz2][mz3][mz4][mz5], (N_tile), float*);
+						for (mz6=0;mz6 < N_tile; mz6++) {
+							FTable_outer[mz1][mz2][mz3][mz4][mz5][mz6] = &_lin_FTable_outer[(mz1*((M) * (M-1) * (N_sec) * (N_sec) * (N_tile) * (N_tile))) + (mz2*((M-1) * (N_sec) * (N_sec) * (N_tile) * (N_tile))) + (mz3*((N_sec) * (N_sec) * (N_tile) * (N_tile))) + (mz4*((N_sec) * (N_tile) * (N_tile))) + (mz5*((N_tile) * (N_tile))) + (mz6*(N_tile))];
+						}
 					}
 				}
 			}
 		}
 	}
 	#define S0(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i1])
-	#define S_1(i,j,i2,i3,i4) bpmax_outer_reductions(M,N,N_sec,N_tile,MR,NR,i2,j+i2,FTable_A,FTable_B,FTable_C,S1[0],FTable_outer[i2][j+i2])
+	#define S_1(i,j,k,i3,i4) bpmax_outer_reductions(M,N,N_sec,N_tile,MR,NR,k,j+k,i3,FTable_A[k][i3],FTable_B[i3+1][j+k],S1[0],FTable_outer[k][j+k][i3])
 	#define S_2(i,i1,i2,i3,i4) bpmax_single_strand_s2(N,seq2,S2[i1])
 	#define S3(i,j,i2,i3,i4) transform_2D_to_4D_like_A_for_register_tile(M,N,N_sec,N_tile,MR,NR,j,i2,S2[0],S2_A[j][i2])
 	#define S4(i,j,i2,i3,i4) transform_2D_to_4D_like_B_for_register_tile(M,N,N_sec,N_tile,MR,NR,j,i2,S2[0],S2_B[j][i2])
@@ -314,7 +318,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 	{
 		//Domain
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==0 && i==0 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
-		//{i,j,i2,i3,i4|i4==0 && i3==1 && i==2 && i2>=0 && M>=j+i2+1 && j>=1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
+		//{i,j,k,i3,i4|i4==0 && i==2 && k>=0 && j>=1 && M>=j+k+1 && i3>=k && j+k>=i3+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==0 && i==0 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
 		//{i,j,i2,i3,i4|i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
 		//{i,j,i2,i3,i4|i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1}
@@ -347,7 +351,11 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		 {
 		 	for(c3=0;c3 <= -c2+M-1;c3+=1)
 		 	 {
-		 	 	S_1((2),(c2),(c3),(1),(0));
+		 	 	#pragma omp parallel for 
+		 	 	for(c4=c3;c4 <= c2+c3-1;c4+=1)
+		 	 	 {
+		 	 	 	S_1((2),(c2),(c3),(c4),(0));
+		 	 	 }
 		 	 }
 		 	#pragma omp parallel for 
 		 	for(c4=0;c4 <= -c2+M-1;c4+=1)
@@ -452,8 +460,11 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 	free(_lin_FTable_outer);
 	for (mz1=0;mz1 < M-1; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
-			for (mz3=0;mz3 < N_sec; mz3++) {
+			for (mz3=0;mz3 < M-1; mz3++) {
 				for (mz4=0;mz4 < N_sec; mz4++) {
+					for (mz5=0;mz5 < N_sec; mz5++) {
+						free(FTable_outer[mz1][mz2][mz3][mz4][mz5]);
+					}
 					free(FTable_outer[mz1][mz2][mz3][mz4]);
 				}
 				free(FTable_outer[mz1][mz2][mz3]);

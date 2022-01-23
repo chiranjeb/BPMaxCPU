@@ -106,13 +106,13 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define FTable_A(i2,j2,i3,j3) FTable_A[i2][j2][i3][j3]
-#define FTable_B(i2,j2,i3,j3) FTable_B[i2][j2][i3][j3]
+#define FTable_A(i3,j3) FTable_A[i3][j3]
+#define FTable_B(i3,j3) FTable_B[i3][j3]
 #define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_r0_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, float**** FTable_A, float**** FTable_B, float** FTable_C_section){
+void bpmax_r0_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, long K2, float** FTable_A, float** FTable_B, float** FTable_C_section){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -121,7 +121,7 @@ void bpmax_r0_section(long M, long N, long N_sec, long N_tile, long MR, long NR,
 	#define S0(i3,j3) FTable_C_section(i3,j3) = 0
 	{
 		//Domain
-		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {

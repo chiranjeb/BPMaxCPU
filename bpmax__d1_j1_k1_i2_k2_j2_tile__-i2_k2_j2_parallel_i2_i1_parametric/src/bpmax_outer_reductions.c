@@ -103,203 +103,68 @@ inline double __min_double(double x, double y){
 
 
 
+//SubSystem Function Declarations
+void bpmax_max_r0_r3_r4_instance(long, long, long, long, long, long, long, float**, float******, float****);
 
 
 //Memory Macros
-#define FTable_4D(i1,j1,i2,j2) FTable_4D[i1][j1][i2][j2]
 #define S1(i,j) S1[i][j]
-#define FTable_2D(i2,j2) FTable_2D[i2][j2]
+#define FTable_6D(i1,j1,i2,j2,i3,j3) FTable_6D[i1][j1][i2][j2][i3][j3]
+#define FTable_4D_dummy(k,i2,j2,i3,j3) FTable_4D_dummy[k][i2][j2][i3][j3]
+#define FTable_4D(i2,j2,i3,j3) FTable_4D[i2][j2][i3][j3]
 
-void bpmax_outer_reductions(long M, long N, long I1, long J1, long ts2_l1, long ts3_l1, long ts4_l1, float**** FTable_4D, float** S1, float** FTable_2D){
+void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long I1, long J1, long i3_offset, long j3_offset, float** S1, float****** FTable_6D, float**** FTable_4D){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3 && M >= J1+1 && I1 >= 0 && J1 >= I1+1 && ts2_l1 > 0 && ts3_l1 > 0 && ts4_l1 > 0))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
+	int mz1, mz2, mz3, mz4, mz5;
 	
-	#define S0(i,j,i2,i3)  //FTable_2D(j,i2) = __max_float(FTable_2D(j,i2),__max_float(FTable_2D(j,i2),FTable_2D(j,i2)))
-	#define S_1(i,j,i2,i3) //FTable_2D(j,i2) = __max_float(0,__max_float(FTable_2D(j,i2),FTable_2D(j,i2)))
-	#define S5(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
-	#define S6(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
-	#define S7(i,j,i2,i3)  //FTable_2D(j,i3) = 1.401298464324817E-45
-	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable_4D(I1,i0,i1,i2))+(FTable_4D(i0+1,J1,i2+1,i3)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
-	#define S3(i0,i1,i2,i3) {float __temp__ = (S1(I1,i0))+(FTable_4D(i0+1,J1,i1,i3)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
-	#define S4(i0,i1,i2,i3) {float __temp__ = (FTable_4D(I1,i0,i1,i3))+(S1(i0+1,J1)); FTable_2D(i1,i3) = __max_float(FTable_2D(i1,i3),__temp__); }
+	float* _lin_FTable_4D_dummy = (float*)malloc(sizeof(float)*((J1) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)));
+	mallocCheck(_lin_FTable_4D_dummy, ((J1) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)), float);
+	float***** FTable_4D_dummy = (float*****)malloc(sizeof(float****)*(J1));
+	mallocCheck(FTable_4D_dummy, (J1), float****);
+	for (mz1=0;mz1 < J1; mz1++) {
+		FTable_4D_dummy[mz1] = (float****)malloc(sizeof(float***)*(N_sec));
+		mallocCheck(FTable_4D_dummy[mz1], (N_sec), float***);
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			FTable_4D_dummy[mz1][mz2] = (float***)malloc(sizeof(float**)*(N_sec));
+			mallocCheck(FTable_4D_dummy[mz1][mz2], (N_sec), float**);
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				FTable_4D_dummy[mz1][mz2][mz3] = (float**)malloc(sizeof(float*)*(N_tile+1));
+				mallocCheck(FTable_4D_dummy[mz1][mz2][mz3], (N_tile+1), float*);
+				for (mz4=0;mz4 < N_tile+1; mz4++) {
+					FTable_4D_dummy[mz1][mz2][mz3][mz4] = &_lin_FTable_4D_dummy[(mz1*((N_sec) * (N_sec) * (N_tile+1) * (N_tile))) + (mz2*((N_sec) * (N_tile+1) * (N_tile))) + (mz3*((N_tile+1) * (N_tile))) + (mz4*(N_tile))];
+				}
+			}
+		}
+	}
+	#define S0(i2,j2,i3,j3) FTable_4D(i2,j2,i3,j3) = 0
+	#define S_1(i,i1,i2,i3) bpmax_max_r0_r3_r4_instance(M,N,N_sec,N_tile,I1,J1,i1,S1,FTable_6D,FTable_4D_dummy[i1])
 	{
 		//Domain
-		//{i,j,i2,i3|i3==0 && i==M && J1>=I1+1 && i2>=j+1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && j>=0 && N>=i2+1}
-		//{i,j,i2,i3|i3==0 && i2==j && i==M && J1>=I1+1 && I1>=0 && M>=3 && N>=3 && M>=J1+1 && j>=0 && ts2_l1>=1 && N>=j+1 && ts4_l1>=1 && ts3_l1>=1}
-		//{i,j,i2,i3|i2==0 && i==-1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && ts2_l1>=1 && ts3_l1>=1 && ts4_l1>=1 && j>=0 && i3>=j+1 && N>=i3+1}
-		//{i,j,i2,i3|i2==0 && i==-1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && ts2_l1>=1 && ts3_l1>=1 && ts4_l1>=1 && N>=i3+1 && i3>=j && j>=0}
-		//{i,j,i2,i3|i2==0 && i==-1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && ts2_l1>=1 && ts3_l1>=1 && ts4_l1>=1 && j>=0 && N>=i3+1 && i3>=j}
-		//{i0,i1,i2,i3|i0>=I1 && J1>=i0+1 && i2>=i1 && i3>=i2+1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && M>=i0+1 && i1>=0 && N>=i2+1 && i0>=-1 && N>=i3+1 && i2>=-1 && i3>=i1+1}
-		//{i0,i1,i2,i3|i2==i1 && i0>=I1 && J1>=i0+1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && i0>=-1 && M>=i0+1 && i3>=i1 && N>=i3+1 && i1>=0}
-		//{i0,i1,i2,i3|i2==i1 && i0>=I1 && J1>=i0+1 && M>=3 && N>=3 && M>=J1+1 && I1>=0 && J1>=I1+1 && M>=i0+1 && i1>=0 && N>=i3+1 && i3>=i1 && i0>=-1}
-		int ti2_l1,ti3_l1,ti4_l1,c1,c2,c3,c4;
-		for(c1=-1;c1 <= -1;c1+=1)
+		//{i2,j2,i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3 && j3>=0 && N_tile>=j3+1}
+		//{i,i1,i2,i3|i3==0 && i2==0 && i==-1 && i1>=I1 && J1>=i1+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && I1>=0 && J1>=I1 && M>=J1+1}
+		int c1,c2,c3,c4;
+		if ((I1 <= J1-1)) {
+			{
+				for(c2=I1;c2 <= J1-1;c2+=1)
+				 {
+				 	S_1((-1),(c2),(0),(0));
+				 }
+			}
+		}
+		for(c1=0;c1 <= N_sec-1;c1+=1)
 		 {
-#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
-		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
+		 	for(c2=c1;c2 <= N_sec-1;c2+=1)
 		 	 {
-		 	 	for(ti3_l1=(ceild((-ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= 0;ti3_l1+=ts3_l1)
+		 	 	for(c3=0;c3 <= N_tile;c3+=1)
 		 	 	 {
-		 	 	 	for(ti4_l1=(ceild((min(N-1,ti2_l1) + -ts4_l1+1),(ts4_l1))) * (ts4_l1);ti4_l1 <= N-1;ti4_l1+=ts4_l1)
+		 	 	 	for(c4=0;c4 <= N_tile-1;c4+=1)
 		 	 	 	 {
-		 	 	 	 	{
-		 	 	 	 		for(c2=max(ti2_l1,0);c2 <= min(ti2_l1+ts2_l1-1,N-2);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,0);c3 <= min(ti3_l1+ts3_l1-1,0);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,c2);c4 <= min(ti4_l1+ts4_l1-1,c2);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S6((-1),(c2),(0),(c2));
-		 	 	 	 		 	 	 	S7((-1),(c2),(0),(c2));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 	for(c4=max(ti4_l1,c2+1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S5((-1),(c2),(0),(c4));
-		 	 	 	 		 	 	 	S6((-1),(c2),(0),(c4));
-		 	 	 	 		 	 	 	S7((-1),(c2),(0),(c4));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 		for(c2=max(ti2_l1,N-1);c2 <= min(ti2_l1+ts2_l1-1,N-1);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,0);c3 <= min(ti3_l1+ts3_l1-1,0);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S6((-1),(N-1),(0),(N-1));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 	for(c3=max(ti3_l1,0);c3 <= min(ti3_l1+ts3_l1-1,0);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S7((-1),(N-1),(0),(N-1));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 	}
-		 	 	 	 }
-		 	 	 }
-		 	 }
-		 }
-		for(c1=I1;c1 <= J1-1;c1+=1)
-		 {
-#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
-		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
-		 	 {
-		 	 	for(ti3_l1=(ceild((min(N-2,ti2_l1) + -ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= N-1;ti3_l1+=ts3_l1)
-		 	 	 {
-		 	 	 	for(ti4_l1=(ceild((min(N-2,min(ti2_l1,ti3_l1+1)) + -ts4_l1+1),(ts4_l1))) * (ts4_l1);ti4_l1 <= N-1;ti4_l1+=ts4_l1)
-		 	 	 	 {
-		 	 	 	 	{
-		 	 	 	 		for(c2=max(ti2_l1,0);c2 <= min(ti2_l1+ts2_l1-1,N-3);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,c2);c3 <= min(ti3_l1+ts3_l1-1,c2);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,c2);c4 <= min(ti4_l1+ts4_l1-1,c2);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S3((c1),(c2),(c2),(c2));
-		 	 	 	 		 	 	 	S4((c1),(c2),(c2),(c2));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 	for(c4=max(ti4_l1,c2+1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S2((c1),(c2),(c2),(c4));
-		 	 	 	 		 	 	 	S3((c1),(c2),(c2),(c4));
-		 	 	 	 		 	 	 	S4((c1),(c2),(c2),(c4));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 	for(c3=max(ti3_l1,c2+1);c3 <= min(ti3_l1+ts3_l1-1,N-2);c3+=1)
-		 	 	 	 		 	 {
-						            #pragma ivdep
-                                    #pragma vector always
-                                    #pragma simd
-		 	 	 	 		 	 	for(c4=max(ti4_l1,c3+1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S2((c1),(c2),(c3),(c4));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 		for(c2=max(ti2_l1,N-2);c2 <= min(ti2_l1+ts2_l1-1,N-2);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,N-2);c3 <= min(ti3_l1+ts3_l1-1,N-2);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-2);c4 <= min(ti4_l1+ts4_l1-1,N-2);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S3((c1),(N-2),(N-2),(N-2));
-		 	 	 	 		 	 	 	S4((c1),(N-2),(N-2),(N-2));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S2((c1),(N-2),(N-2),(N-1));
-		 	 	 	 		 	 	 	S3((c1),(N-2),(N-2),(N-1));
-		 	 	 	 		 	 	 	S4((c1),(N-2),(N-2),(N-1));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 		for(c2=max(ti2_l1,N-1);c2 <= min(ti2_l1+ts2_l1-1,N-1);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,N-1);c3 <= min(ti3_l1+ts3_l1-1,N-1);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S3((c1),(N-1),(N-1),(N-1));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 	for(c3=max(ti3_l1,N-1);c3 <= min(ti3_l1+ts3_l1-1,N-1);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,N-1);c4 <= min(ti4_l1+ts4_l1-1,N-1);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S4((c1),(N-1),(N-1),(N-1));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 	}
-		 	 	 	 }
-		 	 	 }
-		 	 }
-		 }
-		for(c1=M;c1 <= M;c1+=1)
-		 {
-#pragma omp parallel for private(c2,c3,c4, ti2_l1, ti3_l1, ti4_l1) schedule(dynamic)
-		 	for(ti2_l1=(ceild((-ts2_l1+1),(ts2_l1))) * (ts2_l1);ti2_l1 <= N-1;ti2_l1+=ts2_l1)
-		 	 {
-		 	 	for(ti3_l1=(ceild((min(ti2_l1,N-1) + -ts3_l1+1),(ts3_l1))) * (ts3_l1);ti3_l1 <= N-1;ti3_l1+=ts3_l1)
-		 	 	 {
-		 	 	 	for(ti4_l1=(ceild((-ts4_l1+1),(ts4_l1))) * (ts4_l1);ti4_l1 <= 0;ti4_l1+=ts4_l1)
-		 	 	 	 {
-		 	 	 	 	{
-		 	 	 	 		for(c2=max(ti2_l1,0);c2 <= min(ti2_l1+ts2_l1-1,N-2);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,c2);c3 <= min(ti3_l1+ts3_l1-1,c2);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,0);c4 <= min(ti4_l1+ts4_l1-1,0);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S_1((M),(c2),(c2),(0));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 	for(c3=max(ti3_l1,c2+1);c3 <= min(ti3_l1+ts3_l1-1,N-1);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,0);c4 <= min(ti4_l1+ts4_l1-1,0);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S0((M),(c2),(c3),(0));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 		for(c2=max(ti2_l1,N-1);c2 <= min(ti2_l1+ts2_l1-1,N-1);c2+=1)
-		 	 	 	 		 {
-		 	 	 	 		 	for(c3=max(ti3_l1,N-1);c3 <= min(ti3_l1+ts3_l1-1,N-1);c3+=1)
-		 	 	 	 		 	 {
-		 	 	 	 		 	 	for(c4=max(ti4_l1,0);c4 <= min(ti4_l1+ts4_l1-1,0);c4+=1)
-		 	 	 	 		 	 	 {
-		 	 	 	 		 	 	 	S_1((M),(N-1),(N-1),(0));
-		 	 	 	 		 	 	 }
-		 	 	 	 		 	 }
-		 	 	 	 		 }
-		 	 	 	 	}
+		 	 	 	 	S0((c1),(c2),(c3),(c4));
 		 	 	 	 }
 		 	 	 }
 		 	 }
@@ -307,20 +172,26 @@ void bpmax_outer_reductions(long M, long N, long I1, long J1, long ts2_l1, long 
 	}
 	#undef S0
 	#undef S_1
-	#undef S5
-	#undef S6
-	#undef S7
-	#undef S2
-	#undef S3
-	#undef S4
 	
 	//Memory Free
+	free(_lin_FTable_4D_dummy);
+	for (mz1=0;mz1 < J1; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				free(FTable_4D_dummy[mz1][mz2][mz3]);
+			}
+			free(FTable_4D_dummy[mz1][mz2]);
+		}
+		free(FTable_4D_dummy[mz1]);
+	}
+	free(FTable_4D_dummy);
 }
 
 //Memory Macros
-#undef FTable_4D
 #undef S1
-#undef FTable_2D
+#undef FTable_6D
+#undef FTable_4D_dummy
+#undef FTable_4D
 
 
 //Common Macro undefs

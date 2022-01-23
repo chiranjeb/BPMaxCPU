@@ -34,53 +34,34 @@ affine bpmax_finalize
 	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
-    int   seq2 { i|0<=i<=N-1}; 
+    int seq2 { i|0<=i<=N-1}; 
 	float A  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	float B  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	float C  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	
+
 output
-	float C_2 { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float C_section { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
 let
-  C_2[i3,j3] = max (  case { | j3 == 0 && i3  < N_tile-1} : 
-  	                           C[I2, J2-1, i3, N_tile-1 ] /* + e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/ ;
-		                   { | j3 == 0 && i3 == N_tile-1} : 
-		                   	   case  {|j3-i3  > 3}: C[ I2+1, J2-1, 0, N_tile-1  ] /* + e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;
-			 	               {|j3-i3  <=3}: 0; esac;
-		                   { | j3 >  0 && i3 == N_tile-1} : 
-		                       C[ I2+1, J2,   0,    j3-1 ] /*+ e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;   
-		                   { | j3 >  0 && i3 < N_tile-1 } : 
-		                       C[ I2, J2,   i3+1, j3-1 ] /*+ e_intra_score(seq2[N-i3-1], seq2[N-j3-1])*/;
-		                 esac
-		               ,   
-		              max ( A[I2, J2, i3, N_tile-1] + C[I2+1, J2, 0, j3], 
-		                    case {| i3 < N_tile-1  } :    reduce(max, [k3], {|i3<=k3<N_tile-1} : A[I2, J2, i3, k3] + C[I2, J2, k3+1, j3]);
-		    			         {| i3 == N_tile-1 } : 0; esac,
-		                    case {| j3 > 0 } : reduce(min, [k3], {|0<=k3<=j3-1} : C[I2, J2, i3, k3] + B[I2, J2, k3+1, j3]);
-		    			         {| j3 ==0 } : 0; esac
-		    			  )
-		    	   );
-.	
+  C_section[i3,j3] = 0;
+.
 
-
-affine bpmax_max_matrix_max_plus_section 
+affine matrix_max_plus_section 
 {
-	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	M, N, N_sec, N_tile, MR, NR, I2, J2, K2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 < J2
 }
 input
-	  float A  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float B  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float B       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 output
-   float C_section { i3, j3| 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+    float C_section { i3, j3  | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
 let
 	C_section[i3,j3] = 0;
 .		           		
 
 
-
-affine bpmax_inner_diagonal_tile 
+affine bpmax_inner_reductions_diagonal_tile 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
 	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
@@ -92,19 +73,7 @@ input
 output
    float FTable_C_section { i2, j2| 0<=i2<=N_tile-1 && 0<=j2<=N_tile-1 };
 let
-	FTable_C_section[i2,j2] = 
-		case
-			{ | i2 >= j2 } : 
-					FTable_C_section[i2, j2];
-			{ | i2 < j2  } : 
-					max (  
-						   max (FTable_C_section[i2, j2], 
-			              		case  {|j2-i2  > 3}: FTable_C_section[i2+1, j2-1] /* + todo:e_intra_score(seq2[N-i2-1], seq2[N-j2-1])*/;
-			 	                	  {|j2-i2  <=3}: 0; esac
-			 	               ), 
-            		       reduce(max, [k2],  {|i2<=k2<j2} : FTable_C_section[i2, k2] + S2[k2+1, j2]),
-            			   reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable_C_section[k2+1, j2]));
-        esac;
+	FTable_C_section[i2,j2] = 0;
 .		           		
 
 
@@ -114,21 +83,21 @@ affine bpmax_inner_reductions
 	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1
 }
 input
-	  int seq2 {i| 0 <= i < N} ;
+	  int seq2       { i               | 0 <= i < N} ;
 	  float S2       { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	  float S2_A     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	  float S2_B     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 output
 	  float FTable_A { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	  float FTable_B { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
 
 local
-	  float FTable_C_section   { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 == j2 };
-	  float FTable_C_section_r1 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2  };
-	  float FTable_C_section_r2 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 };
-	  float FTable_C_section_3 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 };
+	  float FTable_C_section    { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 == j2 };
+	  float FTable_C_section_r1 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2  && i2 <= k2 < j2};
+	  float FTable_C_section_r2 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 <= k2 < j2};
+	  float FTable_C_section_3  { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 };
 
 let
    	///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +109,7 @@ let
     
    	// Compute the diagonal tiles
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 == ej2 } 
-   	bpmax_inner_diagonal_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+   	bpmax_inner_reductions_diagonal_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
    	(
    		(ei2, ej2, i -> i)@seq2,
    		S2
@@ -154,23 +123,21 @@ let
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // Step 2.1 : Do it first with the Bs
-    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
-    bpmax_max_matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
+    matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, ei2, ej2, ek2]
     ( 
-    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S2_A, 
-    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable_B
-	)returns (FTable_C_section_r1);
+    	(ei2, ej2, ek2, i3, j3 -> ei2,   ek2, i3, j3)@S2_A, 
+    	(ei2, ej2, ek2, i3, j3 -> ek2+1, ej2, i3, j3)@FTable_B
+	)returns (FTable_C_section_r1); // replace it with FTable_C
 	   
 	// Step 2.2 : Then do it with the As
-   use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
-    bpmax_max_matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
+   matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, ei2, ej2, ek2]
     (
-    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable_A, 
-    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S2_B
-	)returns (FTable_C_section_r2);
-    	
-
-
+    	(ei2, ej2, ek2, i3, j3 -> ei2,   ek2, i3, j3)@FTable_A, 
+    	(ei2, ej2, ek2, i3, j3 -> ek2+1, ej2, i3, j3)@S2_B
+	)returns (FTable_C_section_r2); // replace it with FTable_C
+	
     
     // Final Step : Finalize the section and transform it such that it is ready for the register tile.
 	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
@@ -188,8 +155,7 @@ let
     transform_section_like_A_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
     (
     	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable_C
-    )
-    returns (FTable_A);
+    )returns (FTable_A);
  	   
 	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 } 
 	transform_section_like_B_for_register_tile[M, N, N_sec, N_tile, MR, NR,  ei2, ej2]

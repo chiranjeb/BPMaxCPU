@@ -1,6 +1,6 @@
 prog = ReadAlphabets("bpmax_R1_R2_FTable.ab");
 inner_reduction_system = "bpmax_inner_reductions";
-
+inner_finalize_system = "bpmax_finalize";
 #AShow(prog, subSystem);
 CheckProgram(prog);
 
@@ -18,12 +18,12 @@ CheckProgram(prog);
 
 outDir = "./src";
 
-setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   N_sec-i,  j,     0 )");
-setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j     ->   N_sec-i,  j,     0 )");
-setSpaceTimeMap(prog, inner_reduction_system,  r2_instance_label,       "(i, j     ->   N_sec-i,  j,     0 )");
-setSpaceTimeMap(prog, inner_reduction_system,  inner_red_final_label,   "(i, j     ->   N_sec-i,  j,     1 )");
-setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_A,  "(i, j     ->   N_sec-i,  j,     2 )");
-setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j     ->   N_sec-i,  j,     3 )");
+setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   -i,  -1,    j,    j )");
+setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j, k  ->   -i,  -1,    k,    j )");
+setSpaceTimeMap(prog, inner_reduction_system,  r2_instance_label,       "(i, j, k  ->   -i,  -1,    k,    j+N_sec )");
+setSpaceTimeMap(prog, inner_reduction_system,  inner_red_final_label,   "(i, j     ->   -i,  -1,    j,    j )");
+setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_A,  "(i, j     ->   -i,   j,    1,    j )");
+setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j     ->   -i,   j,    2,    j )");
 
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 0, 
@@ -85,7 +85,17 @@ setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r2_instan
 
 
 
+setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j     ->   -i,   j,    2,    j )");
 
+AShow(prog, inner_finalize_system);
+NormalizeReduction(prog, inner_finalize_system, "C_section");
+AShow(prog, inner_finalize_system);
+setSpaceTimeMap(prog, inner_reduction_system, "NR_C_section",  "(i,j,k ->  -i,   k,  j)", 
+                                                               "(i,j   ->   i,   0,  j)");
+setSpaceTimeMap(prog, inner_reduction_system,  "NR_C_section_1",  "(i, j, k  ->   -i,  j,  k)",
+                                                                  "(i, j     ->   -i,  0,  j)" );
+setSpaceTimeMap(prog, inner_reduction_system,  "C_section",       "(i, j     ->   -i,  j,  j)" );                                                              
+                                                                  
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_red_final_label, 0, 0, 
       											"(i -> -1,   -1,     -1 )",

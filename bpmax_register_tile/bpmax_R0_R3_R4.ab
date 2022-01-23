@@ -1,3 +1,22 @@
+
+affine matrix_max_plus_section
+{
+	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1, I2, J2, K2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1 && I2<=K2<=J2
+}
+input
+	float FTable_A { i3, j3 |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B { i3, j3 |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+
+output
+    float FTable_C { i3, j3 | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+
+let
+	FTable_C[i3, j3] = 0; 
+.
+
+
+
 affine bpmax_r3_section
 {
 	M, N, N_sec, N_tile, I1, J1, K1, I2, J2 | 
@@ -47,7 +66,7 @@ let
 	FTable_C_section[i3, j3] = 0; 
 .
 
-affine bpmax_max_r0_r3_r4_instance
+affine bpmax_outer_reductions
 {   
 	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1 | 
 	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 
@@ -61,18 +80,19 @@ output
    	float FTable_4D { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
    	
 local
-   	float FTable_C_section_1 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-   	float FTable_C_section_2 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-   	float FTable_C_section_3 { i2, j2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	float FTable_C_section_1 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2<=k2<=j2};
+   	float FTable_C_section_2 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	//float FTable_C_section_3 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
 let
-   use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
-    		bpmax_r0_section[M, N, N_sec, N_tile, MR, NR, I1, J1, K1, ei2, ej2]  
+   use { ei2, ej2, k2 | 0<=ei2<=ej2<=N_sec-1 && ei2<=k2<=ej2} 
+    		matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, I1, J1, K1, ei2, ej2, k2]  
     		(
-    				(ei2, ej2, i2, j2, i3, j3  -> i2, j2, i3, j3)@FTable_A, 
-	    			(ei2, ej2, i2, j2, i3, j3  -> i2, j2, i3, j3)@FTable_B
+    				(ei2, ej2, k2, i3, j3  -> ei2, k2, i3, j3)@FTable_A, 
+	    			(ei2, ej2, k2, i3, j3  -> k2, ej2, i3, j3)@FTable_B
 	    	)
 	  		returns (FTable_C_section_1);
+	  		
 	  		
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
     	bpmax_r3_section[M, N, N_sec, N_tile, I1, J1, K1, ei2, ej2]  
@@ -89,39 +109,5 @@ let
     		FTable_A,
     		(ei2, ej2, i, j -> i, j)@S1
 	    )
-	  	returns (FTable_C_section_3);
-	  	
-	 
+	  	returns (FTable_4D);
 .
-
-
-
-affine bpmax_outer_reductions
-{
-	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
-	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=M-1	&& 0<=J1<=M-1	&& I1 < J1	
-}
-input
-	float FTable_A { i1, j1, i2, j2, i3, j3 |  0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_B { i1, j1, i2, j2, i3, j3 |  0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_C { i1, j1, i2, j2, i3, j3 |  0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float S1       { i,  j                  |  0<=i<=j<=M-1 };
-output
-   	float FTable_outer_reductions { i2, j2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-local
-	float FTable_4D_dummy { k, i2, j2, i3, j3| I1<=k<J1 && 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
-let
-   use { ek | I1<=ek<J1 } 
-	  bpmax_max_r0_r3_r4_instance[M, N, N_sec, N_tile, MR, NR, I1, J1 , ek] 
-	  	( 
-	    	(ek, i2, j2, i3, j3  ->   I1,   ek,  i2, j2, i3, j3)@FTable_A, 
-	    	(ek, i2, j2, i3, j3  ->   ek+1, J1,  i2, j2, i3, j3)@FTable_B, 
-	    	(ek, i2, j2, i3, j3  ->   I1,   J1,  i2, j2, i3, j3)@FTable_C, 
-	    	(ek, i1, j1 -> i1, j1)@S1
-	    )
-     returns (FTable_4D_dummy);
-     
-     FTable_outer_reductions [ i2, j2, i3, j3] = 0;
-.
-
-

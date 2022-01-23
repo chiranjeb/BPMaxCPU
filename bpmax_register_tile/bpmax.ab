@@ -79,21 +79,26 @@ let
 .
  
 affine bpmax_outer_reductions
-{
-	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
-	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1	
+{   
+	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 
 }
 input
-	float FTable_A { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_B { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_C { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float S1       { i,  j                  |  0<=i<=j<=M-1 };
+	float FTable_A { i2, j2, i3, j3 |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B { i2, j2, i3, j3 |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float S1       { i,  j          |  0<=i<=j<=M-1 };
 output
-   	float FTable { i2, j2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-let
-	  FTable[i2, j2, i3, j3] = 0 ; // This will be replaced by the outer 
-.
+   	float FTable_4D { i2, j2, i3, j3|  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	
+local
+   	float FTable_C_section_1 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2<=k2<=j2};
+   	float FTable_C_section_2 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	//float FTable_C_section_3 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
+let
+	FTable_4D [i2, j2, i3, j3] = 0;
+.
+    
  
 
 affine bpmax_inner_reductions
@@ -108,7 +113,7 @@ input
 	float S2_B     { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    && 0<=j3<=N_tile-1 };
 	int seq2       { i                      |   0<= i<=N-1 };
 output
-	float FTable  { i2, j2          |  0<=i2<=j2<=N-1};
+	float FTable   { i2, j2                 |   0<=i2<=j2<=N-1};
 	float FTable_A { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_B { i2, j2, i3, j3         |   0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
@@ -136,7 +141,7 @@ local
 	float FTable_A           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_B           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_C           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_outer       { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  i1<j1           && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_outer       { i1, j1, k1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  i1<j1  && i1<=k1<j1 && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	
 let
 	// Compute single strand table - S1
@@ -173,16 +178,14 @@ let
 	    returns (FTable_C);
 	    		
 	
-	// Do outer reductions
-    use {ei1,ej1| ei1>=0 && M>=ej1+1 && ej1>ei1 } 
-	    bpmax_outer_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1] 
+	 use {ei1,ej1, ek1 | 0<=ei1<=ej1<=M-1 && ei1<ej1 && ei1<=ek1<ej1 } 
+	    bpmax_outer_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1, ek1] 
 	    (
-	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_A, 
-	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_B, 
-	    	(ei1, ej1, i1, j1, i2, j2, i3, j3  -> i1, j1, i2, j2, i3, j3)@FTable_C, 
-	    	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1
+	    	(ei1, ej1, ek1, i2, j2, i3, j3  -> ei1,   ek1, i2, j2, i3, j3)@FTable_A, 
+	    	(ei1, ej1, ek1, i2, j2, i3, j3  -> ek1+1, ej1, i2, j2, i3, j3)@FTable_B, 
+	    	(ei1, ej1, ek1, i1, j1          -> 0, i1, j1)@S1
 	    ) 
-	    returns (FTable_outer);
+	    returns (FTable_outer); // Manually replace it by FTable_C
 	    
     // Do inner reductions
 	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
