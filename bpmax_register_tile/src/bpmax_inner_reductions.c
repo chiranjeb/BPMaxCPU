@@ -105,8 +105,8 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_finalize(long, long, long, long, long, long, long, long, int*, float****, float****, float****, float**);
-void bpmax_inner_diagonal_tile(long, long, long, long, long, long, long, long, int*, float**, float**);
+void bpmax_inner_reductions_finalize(long, long, long, long, long, long, long, long, int*, float****, float****, float****, float**);
+void bpmax_inner_reductions_diagonal_tile(long, long, long, long, long, long, long, long, int*, float**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
 void transform_section_like_A_for_register_tile(long, long, long, long, long, long, long, long, float****, float**);
 void transform_section_like_B_for_register_tile(long, long, long, long, long, long, long, long, float****, float**);
@@ -205,8 +205,8 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 			}
 		}
 	}
-	#define S0(i,j,i2,i3) bpmax_finalize(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2,S2_A,S2_B,FTable_C,FTable_C_section_3[-i][i2])
-	#define S1(i,j,i2,i3) bpmax_inner_diagonal_tile(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2,S2[-i][i2],FTable_C_section[-i][i2])
+	#define S0(i,j,i2,i3) bpmax_inner_reductions_finalize(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2,S2_A,S2_B,FTable_C,FTable_C_section_3[-i][i2])
+	#define S1(i,j,i2,i3) bpmax_inner_reductions_diagonal_tile(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2,S2[-i][i2],FTable_C_section[-i][i2])
 	#define S_2(i,j,k,i3) matrix_max_plus_section(M,N,N_sec,N_tile,MR,NR,-i,i3,k,S2_A[-i][k],FTable_B[k+1][i3],FTable_C_section_r1[-i][i3][k])
 	#define S3(i,j,k,i3) matrix_max_plus_section(M,N,N_sec,N_tile,MR,NR,-i,i3-N_sec,k,FTable_A[-i][k],S2_B[k+1][i3-N_sec],FTable_C_section_r2[-i][i3-N_sec][k])
 	#define S4(i,j,i2,i3) transform_section_like_A_for_register_tile(M,N,N_sec,N_tile,MR,NR,-i,j,FTable_C,FTable_A[-i][j])

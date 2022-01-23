@@ -28,7 +28,7 @@ let
 .
 
 
-affine bpmax_finalize 
+affine bpmax_inner_reductions_finalize 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
 	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
@@ -141,7 +141,7 @@ let
     
     // Final Step : Finalize the section and transform it such that it is ready for the register tile.
 	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
-    bpmax_finalize[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+    bpmax_inner_reductions_finalize[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
     (
     	(ei2, ej2, i -> i)@seq2,
     	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S2_A, 

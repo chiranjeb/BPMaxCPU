@@ -82,19 +82,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, r2_insta
       											"(i1,j1 ->  1, -i1,  j1-6  )",
       											"(i1,j1 ->  N,  -1,    -1  )");
 setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r2_instance_label, 1, 0, "FTable_C_section_r2");
-
-
-
-setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j     ->   -i,   j,    2,    j )");
-
-AShow(prog, inner_finalize_system);
-NormalizeReduction(prog, inner_finalize_system, "C_section");
-AShow(prog, inner_finalize_system);
-setSpaceTimeMap(prog, inner_reduction_system, "NR_C_section",  "(i,j,k ->  -i,   k,  j)", 
-                                                               "(i,j   ->   i,   0,  j)");
-setSpaceTimeMap(prog, inner_reduction_system,  "NR_C_section_1",  "(i, j, k  ->   -i,  j,  k)",
-                                                                  "(i, j     ->   -i,  0,  j)" );
-setSpaceTimeMap(prog, inner_reduction_system,  "C_section",       "(i, j     ->   -i,  j,  j)" );                                                              
+                                                             
                                                                   
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_red_final_label, 0, 0, 
@@ -149,8 +137,6 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, FTable_r
 setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_B, 1, 0, "FTable_A");
  
 
-#options = createTiledCGOptionForScheduledC();
-#setDefaultDTilerConfiguration(prog, subSystem, 0, 2, "sequential");
 generateScheduledCode(prog, inner_reduction_system, outDir);
                              
                                              

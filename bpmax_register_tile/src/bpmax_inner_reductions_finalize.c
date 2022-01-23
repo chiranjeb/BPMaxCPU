@@ -110,11 +110,11 @@ inline double __min_double(double x, double y){
 #define A(i2,j2,i3,j3) A[i2][j2][i3][j3]
 #define B(i2,j2,i3,j3) B[i2][j2][i3][j3]
 #define C(i2,j2,i3,j3) C[i2][j2][i3][j3]
-#define NR_C_section(i3,j3) NR_C_section[i3][j3]
-#define NR_C_section_1(i3,j3) NR_C_section_1[i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define NR_FTable_C_section(i3,j3) NR_FTable_C_section[i3][j3]
+#define NR_FTable_C_section_1(i3,j3) NR_FTable_C_section_1[i3][j3]
+#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_inner_reductions_finalize(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, int* seq2, float**** A, float**** B, float**** C, float** C_section){
+void bpmax_inner_reductions_finalize(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, int* seq2, float**** A, float**** B, float**** C, float** FTable_C_section){
 	///Parameter checking
 	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2+1 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
@@ -123,29 +123,29 @@ void bpmax_inner_reductions_finalize(long M, long N, long N_sec, long N_tile, lo
 	//Memory Allocation
 	int mz1, mz2;
 	
-	float* _lin_NR_C_section = (float*)malloc(sizeof(float)*((N_tile-1) * (N_tile)));
-	mallocCheck(_lin_NR_C_section, ((N_tile-1) * (N_tile)), float);
-	float** NR_C_section = (float**)malloc(sizeof(float*)*(N_tile-1));
-	mallocCheck(NR_C_section, (N_tile-1), float*);
+	float* _lin_NR_FTable_C_section = (float*)malloc(sizeof(float)*((N_tile-1) * (N_tile)));
+	mallocCheck(_lin_NR_FTable_C_section, ((N_tile-1) * (N_tile)), float);
+	float** NR_FTable_C_section = (float**)malloc(sizeof(float*)*(N_tile-1));
+	mallocCheck(NR_FTable_C_section, (N_tile-1), float*);
 	for (mz1=0;mz1 < N_tile-1; mz1++) {
-		NR_C_section[mz1] = &_lin_NR_C_section[(mz1*(N_tile))];
+		NR_FTable_C_section[mz1] = &_lin_NR_FTable_C_section[(mz1*(N_tile))];
 	}
 	
-	float* _lin_NR_C_section_1 = (float*)malloc(sizeof(float)*((N_tile) * (N_tile)));
-	mallocCheck(_lin_NR_C_section_1, ((N_tile) * (N_tile)), float);
-	float** NR_C_section_1 = (float**)malloc(sizeof(float*)*(N_tile));
-	mallocCheck(NR_C_section_1, (N_tile), float*);
+	float* _lin_NR_FTable_C_section_1 = (float*)malloc(sizeof(float)*((N_tile) * (N_tile)));
+	mallocCheck(_lin_NR_FTable_C_section_1, ((N_tile) * (N_tile)), float);
+	float** NR_FTable_C_section_1 = (float**)malloc(sizeof(float*)*(N_tile));
+	mallocCheck(NR_FTable_C_section_1, (N_tile), float*);
 	for (mz1=0;mz1 < N_tile; mz1++) {
-		NR_C_section_1[mz1] = &_lin_NR_C_section_1[(mz1*(N_tile))];
+		NR_FTable_C_section_1[mz1] = &_lin_NR_FTable_C_section_1[(mz1*(N_tile))];
 	}
-	#define S0(i,j,i2) C_section(-i,j) = __max_float(C(I2,J2-1,-i,N_tile-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(NR_C_section(-i,j),0)))
-	#define S1(i,j,i2) C_section(-i,j) = __max_float(0,__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(0,0)))
-	#define S2(i,j,i2) C_section(-i,j) = __max_float(C(I2+1,J2,0,j-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(0,NR_C_section_1(-i,j))))
-	#define S3(i,j,i2) C_section(-i,j) = __max_float(C(I2,J2,-i+1,j-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(NR_C_section(-i,j),NR_C_section_1(-i,j))))
-	#define S6(i,j,i2) NR_C_section(-i,j) = 1.401298464324817E-45
-	#define S7(i,j,i2) NR_C_section_1(-i,j) = 3.4028234663852886E38
-	#define S4(i0,i1,i2) {float __temp__ = (A(I2,J2,-i0,i1))+(C(I2,J2,i1+1,i2)); NR_C_section(-i0,i2) = __max_float(NR_C_section(-i0,i2),__temp__); }
-	#define S5(i0,i1,i2) {float __temp__ = (C(I2,J2,-i0,i1))+(B(I2,J2,i1+1,i2)); NR_C_section_1(-i0,i2) = __min_float(NR_C_section_1(-i0,i2),__temp__); }
+	#define S0(i,j,i2) FTable_C_section(-i,j) = __max_float(C(I2,J2-1,-i,N_tile-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(NR_FTable_C_section(-i,j),0)))
+	#define S1(i,j,i2) FTable_C_section(-i,j) = __max_float(0,__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(0,0)))
+	#define S2(i,j,i2) FTable_C_section(-i,j) = __max_float(C(I2+1,J2,0,j-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(0,NR_FTable_C_section_1(-i,j))))
+	#define S3(i,j,i2) FTable_C_section(-i,j) = __max_float(C(I2,J2,-i+1,j-1),__max_float((A(I2,J2,-i,N_tile-1))+(C(I2+1,J2,0,j)),__max_float(NR_FTable_C_section(-i,j),NR_FTable_C_section_1(-i,j))))
+	#define S6(i,j,i2) NR_FTable_C_section(-i,j) = 1.401298464324817E-45
+	#define S7(i,j,i2) NR_FTable_C_section_1(-i,j) = 3.4028234663852886E38
+	#define S4(i0,i1,i2) {float __temp__ = (A(I2,J2,-i0,i1))+(C(I2,J2,i1+1,i2)); NR_FTable_C_section(-i0,i2) = __max_float(NR_FTable_C_section(-i0,i2),__temp__); }
+	#define S5(i0,i1,i2) {float __temp__ = (C(I2,J2,-i0,i1))+(B(I2,J2,i1+1,i2)); NR_FTable_C_section_1(-i0,i2) = __min_float(NR_FTable_C_section_1(-i0,i2),__temp__); }
 	{
 		//Domain
 		//{i,j,i2|i2==1 && j==0 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && N_tile+i>=2 && 0>=i}
@@ -341,11 +341,11 @@ void bpmax_inner_reductions_finalize(long M, long N, long N_sec, long N_tile, lo
 	#undef S5
 	
 	//Memory Free
-	free(_lin_NR_C_section);
-	free(NR_C_section);
+	free(_lin_NR_FTable_C_section);
+	free(NR_FTable_C_section);
 	
-	free(_lin_NR_C_section_1);
-	free(NR_C_section_1);
+	free(_lin_NR_FTable_C_section_1);
+	free(NR_FTable_C_section_1);
 }
 
 //Memory Macros
@@ -353,9 +353,9 @@ void bpmax_inner_reductions_finalize(long M, long N, long N_sec, long N_tile, lo
 #undef A
 #undef B
 #undef C
-#undef NR_C_section
-#undef NR_C_section_1
-#undef C_section
+#undef NR_FTable_C_section
+#undef NR_FTable_C_section_1
+#undef FTable_C_section
 
 
 //Common Macro undefs
