@@ -48,24 +48,6 @@ let
 .
 
 
-
-affine bpmax_r0_section
-{
-	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1, I2, J2 | 
-	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
-}
-input
-	//float FTable_A { i1, j1, i2, j2, i3, j3 |  0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_A { i2, j2, i3, j3 |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_B { i2, j2, i3, j3 |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	//float FTable_C { i3, j3         |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-output
-   float FTable_C_section { i3, j3| 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-
-let
-	FTable_C_section[i3, j3] = 0; 
-.
-
 affine bpmax_outer_reductions
 {   
 	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1 | 

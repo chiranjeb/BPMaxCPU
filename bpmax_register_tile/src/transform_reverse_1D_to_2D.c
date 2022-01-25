@@ -104,111 +104,38 @@ inline double __min_double(double x, double y){
 
 
 
-//SubSystem Function Declarations
-void transform_2D_to_4D(long, long, long, long, long, long, long, long, float**, float**);
 
 
 //Memory Macros
-#define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
-#define S1(i,j) S1[i][j]
-#define S2(i,j) S2[i][j]
-#define FTable_4D(i1,j1,i2,j2) FTable_4D[i1][j1][i2][j2]
-#define FTable_2D(i,j) FTable_2D[i][j]
-#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
+#define seq2_t(j) seq2_t[j]
 
-void bpmax_elementwise_ops(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, int* seq1, int* seq2, float** S1, float** S2, float**** FTable_4D, float**** FTable_C){
+void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, int* seq2, int* seq2_t){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((N >= 96 && N_sec >= 1 && N_tile >= 96 && I2 >= 0 && N_sec >= I2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	int mz1, mz2;
 	
-	float* _lin_FTable_2D = (float*)malloc(sizeof(float)*((N) * (N)));
-	mallocCheck(_lin_FTable_2D, ((N) * (N)), float);
-	float** FTable_2D = (float**)malloc(sizeof(float*)*(N));
-	mallocCheck(FTable_2D, (N), float*);
-	for (mz1=0;mz1 < N; mz1++) {
-		FTable_2D[mz1] = &_lin_FTable_2D[(mz1*(N))];
-	}
-	#define S0(i,j,i2,i3) FTable_2D(j,i2) = e_inter_score(seq1(I1),seq2(-j+N-1))
-	#define S_1(i,j,i2,i3) FTable_2D(j,i2) = __max_float((FTable_4D(I1+1,J1-1,j,i2))+(e_intra_score(seq1(I1),seq1(J1))),(S1(I1,J1))+(S2(j,i2)))
-	#define S_2(i,j,i2,i3) FTable_2D(j,i2) = __max_float(0,(S1(I1,J1))+(S2(j,i2)))
-	#define S3(i,j,i2,i3) transform_2D_to_4D(M,N,N_sec,N_tile,MR,NR,j,i2,FTable_2D,FTable_C[j][i2])
+	#define S0(j) seq2_t(j) = 0
 	{
 		//Domain
-		//{i,j,i2,i3|i3==0 && i2==j && i==0 && J1==I1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && M>=I1+1 && j>=0 && N>=j+1}
-		//{i,j,i2,i3|i3==0 && i==0 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1+4 && M>=J1+1 && i2>=j && J1+i2>=I1+j+1 && M>=I1+1 && J1>=0 && N>=i2+1 && j>=0}
-		//{i,j,i2,i3|i3==0 && i==0 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && I1>=J1-3 && i2>=j && J1+i2>=I1+j+1 && j>=0 && N>=i2+1}
-		//{i,j,i2,i3|i3==0 && i==1 && j>=0 && i2>=j && N_sec>=i2+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		int c2,c3;
-		if ((I1 <= J1-4)) {
-			{
-				for(c2=0;c2 <= N-1;c2+=1)
-				 {
-				 	for(c3=c2;c3 <= N-1;c3+=1)
-				 	 {
-				 	 	S_1((0),(c2),(c3),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 == J1)) {
-			{
-				for(c2=0;c2 <= N-2;c2+=1)
-				 {
-				 	S0((0),(c2),(c2),(0));
-				 	for(c3=c2+1;c3 <= N-1;c3+=1)
-				 	 {
-				 	 	S_2((0),(c2),(c3),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 >= J1-3 && I1 <= J1-1)) {
-			{
-				for(c2=0;c2 <= N-1;c2+=1)
-				 {
-				 	for(c3=c2;c3 <= N-1;c3+=1)
-				 	 {
-				 	 	S_2((0),(c2),(c3),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 == J1)) {
-			{
-				S0((0),(N-1),(N-1),(0));
-			}
-		}
-		for(c2=0;c2 <= N_sec-1;c2+=1)
+		//{j|N>=96 && N_sec>=1 && N_tile>=96 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
+		int c1;
+		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
-		 	for(c3=c2;c3 <= N_sec-1;c3+=1)
-		 	 {
-		 	 	S3((1),(c2),(c3),(0));
-		 	 }
+		 	S0((c1));
 		 }
 	}
 	#undef S0
-	#undef S_1
-	#undef S_2
-	#undef S3
 	
 	//Memory Free
-	free(_lin_FTable_2D);
-	free(FTable_2D);
 }
 
 //Memory Macros
-#undef seq1
 #undef seq2
-#undef S1
-#undef S2
-#undef FTable_4D
-#undef FTable_2D
-#undef FTable_C
+#undef seq2_t
 
 
 //Common Macro undefs

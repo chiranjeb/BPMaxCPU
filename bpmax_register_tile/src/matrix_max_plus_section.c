@@ -13,7 +13,6 @@
 #include <immintrin.h>
 #include <malloc.h>
 
-#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -107,22 +106,22 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define A(i3,j3) A[i3][j3]
-#define B(i3,j3) B[i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define FTable_A(i3,j3) FTable_A[i3][j3]
+#define FTable_B(i3,j3) FTable_B[i3][j3]
+#define FTable_C(i3,j3) FTable_C[i3][j3]
 
-void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
+void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, long K2, float** FTable_A, float** FTable_B, float** FTable_C){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2+1))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) C_section(i3,j3) = 0
+	#define S0(i3,j3) FTable_C(i3,j3) = 0
 	{
 		//Domain
-		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
@@ -138,9 +137,9 @@ void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, l
 }
 
 //Memory Macros
-#undef A
-#undef B
-#undef C_section
+#undef FTable_A
+#undef FTable_B
+#undef FTable_C
 
 
 //Common Macro undefs

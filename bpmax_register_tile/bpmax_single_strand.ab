@@ -20,6 +20,9 @@ affine bpmax_single_strand_s2 {N|N>=3}
 input
     int seq2 {i| 0 <= i < N };
 output
+    float S2_A               { i2, j2, i3, j3         | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	float S2_B               { i2, j2, i3, j3         | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+local
 	float S2 {i,j| 0 <= i <= j < N};
 	let
 	S2[i,j] = case
@@ -27,4 +30,21 @@ output
 		{ | j-i > 3}: max (S2[i+1,j-1] + e_intra_score (seq2[N-i-1],seq2[N-j-1]),
 					  reduce(max, [k], {| k<j}:S2[i,k]+S2[k+1,j]));
 	esac;
+	
+	// Transform S2 --> S2_A for register tiling
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 && ei2 <= ej2} 
+    transform_2D_to_4D_like_A_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]  
+    (
+    	(ei2, ej2, i2, j2 -> 0, i2, j2)@S2
+    )
+	returns (S2_A);
+	
+	  			
+	// Transform S2 --> S2_B for register tiling
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 && ei2 <= ej2} 
+    transform_2D_to_4D_like_B_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]  
+    (
+    	(ei2, ej2, i2, j2 -> 0, i2, j2)@S2
+    )
+	returns (S2_B);
 .

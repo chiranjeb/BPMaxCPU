@@ -30,14 +30,19 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_di
       											"(i -> -1,   -1,     -1)",
       											"(i ->  1,    i,     -1)",
       											"(i ->  N,   -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 0, "seq2");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 0, "seq2_t");
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 1, 
       											"(i1,j1 -> -1,   -1,    -1  )",
       											"(i1,j1 ->  1,  -i1,  j1-7  )",
       											"(i1,j1 ->  N,  -1,     -1  )");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 1, "S2");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 1, "S2_A");
 
+setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 2, 
+      											"(i1,j1 -> -1,   -1,    -1  )",
+      											"(i1,j1 ->  1,  -i1,  j1-7  )",
+      											"(i1,j1 ->  N,  -1,     -1  )");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 0, 2, "S2_B");
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_diagonal_label, 1, 0, 
       											"(i1,j1 -> -1,   -1,     -1 )",
@@ -89,7 +94,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_re
       											"(i -> -1,   -1,     -1 )",
       											"(i ->  1,    i,     -1)",
       											"(i ->  N,   -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_red_final_label, 0, 0, "seq2");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, inner_red_final_label, 0, 0, "seq2_t");
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, inner_red_final_label, 0, 1, 
       											"(i, j -> -1,   -1,     -1)",
       											"(i, j ->  1,    i,      j)",
