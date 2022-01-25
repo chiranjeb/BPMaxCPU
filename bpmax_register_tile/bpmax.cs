@@ -20,6 +20,7 @@ AShow(prog, rootSystem);
 PrintAST(prog, rootSystem);
 equation_s1 = "UseEquation_S1";
 equation_s2 = "UseEquation_S2";
+equation_seq2_t = "UseEquation_seq2_t";
 equation_s2_A = "UseEquation_S2_A";
 equation_s2_B = "UseEquation_S2_B";
 initialize_FTable = "UseEquation_FTable_C";
@@ -34,6 +35,7 @@ inner_reduction_label="UseEquation_FTable";
                                                 
 setSpaceTimeMap(prog, rootSystem, equation_s1,                "( i                ->  0,      i,   0,  0,     0)");
 setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i                ->  0,      i,   0,  0,     0)");
+setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i                ->  0,      i,   0,  0,     0)");
 setSpaceTimeMap(prog, rootSystem, equation_s2_A,              "( i, j             ->  0,      i,   j,  0,     0)");
 setSpaceTimeMap(prog, rootSystem, equation_s2_B,              "( i, j             ->  0,      i,   j,  0,     0)");
 setSpaceTimeMap(prog, rootSystem, initialize_FTable,          "( i, j             ->  1,      i,   j,  0,     0)");
@@ -98,7 +100,22 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_s2_B, 1, 0,
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_s2_B, 1, 0, "S2_B");
 
 
-################################ FTable_C  ##############################
+
+
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_seq2_t, 0, 0, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_seq2_t, 0, 0, "seq2");
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_seq2_t, 1, 0, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_seq2_t, 1, 0, "seq2_t");
+
+
+
+################################ bpmax_elementwise_ops : FTable_C  ##############################
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 0, 
       											"(i -> -1,   -1,     -1,  -1, 0)",
       											"(i ->  1,    i,     -1,  -1, 0)",
@@ -109,7 +126,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0
       											"(i -> -1,   -1,     -1,  -1, 0)",
       											"(i ->  1,    i,     -1,  -1, 0)",
       											"(i ->  M,   -1,     -1,  -1, 0)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 1, "seq2");                             
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 1, "seq2_t");                             
 
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 2, 
       											"(i -> -1,   -1,     -1,  -1, 0)",
