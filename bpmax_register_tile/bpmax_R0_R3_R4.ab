@@ -68,7 +68,7 @@ local
 
 let
    use { ei2, ej2, k2 | 0<=ei2<=ej2<=N_sec-1 && ei2<=k2<=ej2} 
-    		matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, I1, J1, K1, ei2, ej2, k2]  
+   matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, I1, J1, K1, ei2, ej2, k2]  
     		(
     				(ei2, ej2, k2, i3, j3  -> ei2, k2, i3, j3)@FTable_A, 
 	    			(ei2, ej2, k2, i3, j3  -> k2, ej2, i3, j3)@FTable_B
@@ -81,7 +81,7 @@ let
     	(
     		 	(ei2, ej2, i, j -> i, j)@S1,
 	    		FTable_B
-	     )
+	    )
 	  	returns (FTable_C_section_2);
 	  		
 

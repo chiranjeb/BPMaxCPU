@@ -143,5 +143,7 @@ setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_
  
 
 generateScheduledCode(prog, inner_reduction_system, outDir);
+generateMakefile(prog, inner_reduction_system, outDir+"/mk_inner_reductions");
+
                              
                                              

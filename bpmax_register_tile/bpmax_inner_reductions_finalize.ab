@@ -60,10 +60,9 @@ let
 	FTable_C_section[i2,j2] = 
 		case
 			{ | i2 >= j2 } : FTable_C_section[i2, j2];
-			{ | i2 < j2  } : 
-					max ( FTable_C_section[i2, j2], 
-			              		case  {|j2-i2  > 3}: FTable_C_section[i2+1, j2-1]  + e_intra_score(seq2_t[I2, i2], seq2_t[J2, j2]);
-			 	                	  {|j2-i2  <=3}: 0; esac, 
+			{ | i2 < j2  } : max ( FTable_C_section[i2, j2], 
+			              	 case  {|j2-i2  > 3}: FTable_C_section[i2+1, j2-1]  + e_intra_score(seq2_t[I2, i2], seq2_t[J2, j2]);
+			 	                   {|j2-i2  <=3}: 0; esac, 
             		       reduce(max, [k2],  {|i2<=k2<j2} : FTable_C_section[i2, k2] + B[k2+1, j2]),
             			   reduce(max, [k2],  {|i2<=k2<j2} : A[i2, k2]     +  FTable_C_section[k2+1, j2]));
         esac;

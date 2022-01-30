@@ -109,7 +109,7 @@ void transform_2D_to_4D_like_A_for_register_tile(long, long, long, long, long, l
 void transform_2D_to_4D_like_B_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
 void bpmax_single_strand_s1(long, int*, float**);
 void bpmax_single_strand_s2(long, int*, float**);
-void bpmax_elementwise_ops(long, long, long, long, long, long, long, long, int*, int*, float**, float**, float****);
+void bpmax_elementwise_ops(long, long, long, long, long, long, long, long, int*, int*, float**, float**, float****, float****);
 void transform_reverse_1D_to_2D(long, long, long, long, int*, int*);
 void bpmax_outer_reductions(long, long, long, long, long, long, long, long, long, float****, float****, float**, float****);
 void bpmax_inner_reductions(long, long, long, long, long, long, long, long, float****, float****, float****, int**, float**, float****, float****);
@@ -322,7 +322,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 	#define S_1(i,j,i2,i3,i4) transform_2D_to_4D_like_B_for_register_tile(M,N,N_sec,N_tile,MR,NR,j,i2,S2[0],S2_B[j][i2])
 	#define S_2(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i1])
 	#define S3(i,i1,i2,i3,i4) bpmax_single_strand_s2(N,seq2,S2[i1])
-	#define S4(i,j,i2,i3,i4) bpmax_elementwise_ops(M,N,N_sec,N_tile,MR,NR,j,i2,seq1,seq2,S1[0],S2[0],FTable_C[j][i2])
+	#define S4(i,j,i2,i3,i4) bpmax_elementwise_ops(M,N,N_sec,N_tile,MR,NR,j,i2,seq1,seq2,S1[0],S2[0],FTable,FTable_C[j][i2])
 	#define S5(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i1,seq2,seq2_t[i1])
 	#define S6(i,j,k,i3,i4) bpmax_outer_reductions(M,N,N_sec,N_tile,MR,NR,k,j+k,i3,FTable_A[k][i3],FTable_B[i3+1][j+k],S1[0],FTable_outer[k][j+k][i3])
 	#define S7(i,j,i2,i3,i4) bpmax_inner_reductions(M,N,N_sec,N_tile,MR,NR,i3,j+i3,FTable_C[i3][j+i3],S2_A,S2_B,seq2_t,FTable[i3][j+i3],FTable_A[i3][j+i3],FTable_B[i3][j+i3])

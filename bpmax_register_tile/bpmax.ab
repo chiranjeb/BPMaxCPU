@@ -42,6 +42,7 @@ input
 	int seq2 {i| 0 <= i < N} ;
 	float S1 {i,j| 0 <= i <= j < M };
 	float S2 {i,j| 0 <= i <= j < N };
+    float FTable {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
 output
 	float FTable_C  { i2, j2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	  
@@ -190,7 +191,8 @@ let
 	    	(ei, ej, i->i)@seq1, 
 	     	(ei, ej, i->i)@seq2, 
 	     	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1, 
-	     	(ei1, ej1, i1, j1 -> 0, i1, j1)@S2
+	     	(ei1, ej1, i1, j1 -> 0, i1, j1)@S2,
+	     	(ei1, ej1, i1, j1, i2, j2 -> i1, j1, i2, j2)@FTable
 	     )
 	    returns (FTable_C);
 	    		

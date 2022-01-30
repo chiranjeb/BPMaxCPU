@@ -15,7 +15,7 @@ use_FTable_C = "UseEquation_FTable_C";
 
 
 
-setSpaceTimeMap(prog, rootSystem, "FTable_2D",    "(i, j    ->  0, i,  j, 0)");
+setSpaceTimeMap(prog, rootSystem, "FTable_I1_J1",    "(i, j    ->  0, i,  j, 0)");
 setSpaceTimeMap(prog, rootSystem, use_FTable_C,  "( i, j    ->  1, i,  j, 0)");
 
                                                   
@@ -23,17 +23,17 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, use_FTable_C, 0, 0,
       											"(i, j -> -1,   -1,     -1,  -1 )",
       											"(i, j ->  1,    i,     -1,  -1 )",
       											"(i, j ->  M,   -1,     -1,  -1 )");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, use_FTable_C, 0, 0, "FTable_2D");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, use_FTable_C, 0, 0, "FTable_I1_J1");
 
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, use_FTable_C, 1, 0, 
       											"(i,j -> -1,    -1,     -1,   -1)",
       											"(i,j ->  1,     i,      j,  j-3)",
       											"(i,j ->  M+M,  -1,     -1,   -1)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, use_FTable_C, 1, 0, "FTable_4D");      
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, use_FTable_C, 1, 0, "FTable_C");      
 
                                                                           
 
-#setParallel(prog, rootSystem, "", "3");
+setParallel(prog, rootSystem, "", "1");
 generateScheduledCode(prog, rootSystem, outDir);
 
                              

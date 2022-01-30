@@ -142,6 +142,12 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 3, "S2");
 
 
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 4, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 0, 4, "S2");
+
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 1, 0, 
       											"(i1,j1 -> -1,   -1,     -1,  -1,      0)",
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-3,    0)",
