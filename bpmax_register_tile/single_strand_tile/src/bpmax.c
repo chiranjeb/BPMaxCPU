@@ -105,8 +105,9 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_single_strand_s2_tile(long, long, long, long, long, long, int**, float****, float****, float****);
 void transform_reverse_1D_to_2D(long, long, long, long, int*, int*);
+void bpmax_inner_triangle_transform_4D_2_2D(long, long, long, long, long, long, float****, float**);
+void bpmax_single_strand_s2_tile(long, long, long, long, long, long, int**, float****, float****, float****);
 
 
 //Memory Macros
@@ -193,21 +194,25 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2,
 	for (mz1=0;mz1 < N_sec; mz1++) {
 		seq2_t[mz1] = &_lin_seq2_t[(mz1*(N_tile))];
 	}
-	#define S0(i,i1,i2,i3,i4) bpmax_single_strand_s2_tile(M,N,N_sec,N_tile,MR,NR,seq2_t,S2_A[i2],S2_B[i2],S2_C[i2])
-	#define S1(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,seq2,seq2_t[i2])
+	#define S0(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,seq2,seq2_t[i2])
+	#define S1(i,i1,i2,i3,i4) bpmax_inner_triangle_transform_4D_2_2D(M,N,N_sec,N_tile,MR,NR,S2_C[0],S2[i2])
+	#define S_2(i,i1,i2,i3,i4) bpmax_single_strand_s2_tile(M,N,N_sec,N_tile,MR,NR,seq2_t,S2_A[i2],S2_B[i2],S2_C[i2])
 	{
 		//Domain
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==0 && i==0 && i2>=0 && N_sec>=i2+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		int c3;
 		for(c3=0;c3 <= N_sec-1;c3+=1)
 		 {
-		 	S1((0),(0),(c3),(0),(0));
+		 	S0((0),(0),(c3),(0),(0));
 		 }
-		S0((0),(2),(0),(0),(0));
+		S_2((0),(2),(0),(0),(0));
+		S1((1),(2),(0),(0),(0));
 	}
 	#undef S0
 	#undef S1
+	#undef S_2
 	
 	//Memory Free
 	free(_lin_S2_A);

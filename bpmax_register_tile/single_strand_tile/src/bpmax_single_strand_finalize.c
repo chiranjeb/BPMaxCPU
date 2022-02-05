@@ -129,7 +129,7 @@ void bpmax_single_strand_finalize(long M, long N, long N_sec, long N_tile, long 
 	mallocCheck(NR_S_C_I2_J2_2, (N_tile), float);
 	#define S0(i,j,i2,i3) S_C_I2_J2(-i,i2) = C(I2+1,J2,0,i2)
 	#define S1(i,j,i2,i3) S_C_I2_J2(-i,i2) = __max_float(0,S_C_I2_J2(-i,i2))
-	#define S2(i,j,i2,i3) S_C_I2_J2(-i,i2) = __max_float((C(I2,J2-1,-i,N_tile-1))+(e_intra_score(seq2_t(I2,-i),seq2_t(J2,i2))),S_C_I2_J2(-i,i2))
+	#define S2(i,j,i2,i3) S_C_I2_J2(-i,i2) = __max_float((C(I2,J2-1,-i+1,N_tile-1))+(e_intra_score(seq2_t(I2,-i),seq2_t(J2,i2))),S_C_I2_J2(-i,i2))
 	#define S3(i,j,i2,i3) S_C_I2_J2(-i,i2) = __max_float((C(I2,J2,-i+1,i2-1))+(e_intra_score(seq2_t(I2,-i),seq2_t(J2,i2))),S_C_I2_J2(-i,i2))
 	#define S4(i,j,i2,i3) S_C_I2_J2(-i,i2) = S_C_I2_J2(-i,i2)
 	#define S5(i,j,i2,i3) S_C_I2_J2(-i,i2) = __max_float(S_C_I2_J2(-i,i2),__max_float(NR_S_C_I2_J2_1(i2),NR_S_C_I2_J2_2(i2)))

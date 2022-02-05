@@ -34,6 +34,20 @@ let
    S_C[i2, j2, i3, j3] = 0;
 .
 
+
+affine bpmax_inner_triangle_transform_4D_2_2D 
+{
+	M, N, N_sec, N_tile, MR, NR | 
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
+}
+input
+	float S_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1 };
+output
+	float S2  { i,  j           | 0<=i<=j<=N-1 };
+let
+    S2[i, j] = 0;
+.
+
 affine bpmax 
 {
 	M, N, N_sec, N_tile, MR, NR | 
@@ -66,7 +80,13 @@ let
 		returns (S2_A, S2_B, S2_C);
 	
   
-
+	use { ei | ei>=0 && 1>ei} 
+		bpmax_inner_triangle_transform_4D_2_2D[M, N, N_sec, N_tile, MR, NR]  
+    	(
+        	(ei, i1, j1, i2, j2 -> 0, i1, j1, i2, j2)@S2_C
+    	)
+		returns (S2);
+	
 .
 
 

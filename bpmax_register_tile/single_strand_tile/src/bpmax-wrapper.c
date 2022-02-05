@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
 	
 	
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}

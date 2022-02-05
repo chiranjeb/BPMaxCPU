@@ -14,11 +14,18 @@ AShow(prog, rootSystem);
 PrintAST(prog, rootSystem);
 equation_s2 = "UseEquation_S2_A";
 equation_seq2_t = "UseEquation_seq2_t";
+equation_s2_output_2d = "UseEquation_S2";
+
+
 
 
 
 setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i                ->  0,      0,   i,  0,     0)");
 setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i                ->  0,      2,   i,  0,     0)");
+setSpaceTimeMap(prog, rootSystem, equation_s2_output_2d,      "( i                ->  1,      2,   i,  0,     0)");
+
+
+
 
                                                                           
 ################################   Transformed seq2   #################################################
@@ -56,6 +63,20 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_s2, 1, 2,
       											"(i ->  1,    i,     -1,  -1, 0)",
       											"(i ->  M,   -1,     -1,  -1, 0)");
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_s2, 1, 2, "S2_C");
+
+
+################################   S2  #################################################
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_s2_output_2d, 0, 0, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_s2_output_2d, 0, 0, "S2_C");
+
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_s2_output_2d, 1, 0, 
+      											"(i -> -1,   -1,     -1,  -1, 0)",
+      											"(i ->  1,    i,     -1,  -1, 0)",
+      											"(i ->  M,   -1,     -1,  -1, 0)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_s2_output_2d, 1, 0, "S2");
 
 
 
