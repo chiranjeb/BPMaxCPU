@@ -19,11 +19,11 @@ s_tile_format_A = "UseEquation_S_A";
 s_tile_format_B = "UseEquation_S_B";
 
 
-setSpaceTimeMap(prog, bpmax_single_strand_system,  s_reduction_diagonal_label,  "(i, j     ->   -i,  -1,    j,    j )");
-setSpaceTimeMap(prog, bpmax_single_strand_system,  mm_max_plus_instance_label,  "(i, j, k  ->   -i,  -1,    k,    j )");
-setSpaceTimeMap(prog, bpmax_single_strand_system,  s_reduction_final_label,     "(i, j     ->   -i,  -1,    j,    j )");
-setSpaceTimeMap(prog, bpmax_single_strand_system,  s_tile_format_A,             "(i, j     ->   -i,   j,    1,    j )");
-setSpaceTimeMap(prog, bpmax_single_strand_system,  s_tile_format_B,             "(i, j     ->   -i,   j,    2,    j )");
+setSpaceTimeMap(prog, bpmax_single_strand_system,  s_reduction_diagonal_label,  "(i, j     ->   -i,  j,  0,  j   )");
+setSpaceTimeMap(prog, bpmax_single_strand_system,  mm_max_plus_instance_label,  "(i, j, k  ->   -i,  k,  3,  j   )");
+setSpaceTimeMap(prog, bpmax_single_strand_system,  s_reduction_final_label,     "(i, j     ->   -i,  j,  0,  j   )");
+setSpaceTimeMap(prog, bpmax_single_strand_system,  s_tile_format_B,             "(i, j     ->   -i,  j,  1,  j   )");
+setSpaceTimeMap(prog, bpmax_single_strand_system,  s_tile_format_A,             "(i, j     ->   -i,  j,  2,  j   )");
 
 
 setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_reduction_diagonal_label, 0, 0, 
@@ -78,18 +78,6 @@ setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_red
                                                              
                                                                   
  
-setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 0, 0, 
-      											"(i -> -1,   -1,     -1 )",
-      											"(i ->  1,    i,     -1 )",
-      											"(i ->  N,   -1,     -1 )");
-setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 0, 0, "S_C");
-setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 1, 0, 
-      											"(i1,j1 -> -1,  -1,    -1   )",
-      											"(i1,j1 ->  1, -i1,   j1-6  )",
-      											"(i1,j1 ->  N,  -1,    -1   )");
-setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 1, 0, "S_A");
-  
-  
 setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_B, 0, 0, 
       											"(i -> -1,   -1,     -1)",
       											"(i ->  1,    i,     -1)",
@@ -101,6 +89,18 @@ setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_ti
       											"(i1,j1 ->  N,  -1,     -1)");
 setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_B, 1, 0, "S_A");
  
+
+setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 0, 0, 
+      											"(i -> -1,   -1,     -1 )",
+      											"(i ->  1,    i,     -1 )",
+      											"(i ->  N,   -1,     -1 )");
+setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 0, 0, "S_C");
+setSpaceTimeMapForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 1, 0, 
+      											"(i1,j1 -> -1,  -1,    -1   )",
+      											"(i1,j1 ->  1, -i1,   j1-6  )",
+      											"(i1,j1 ->  N,  -1,    -1   )");
+setMemorySpaceForUseEquationOptimization(prog, bpmax_single_strand_system, s_tile_format_A, 1, 0, "S_A");
+
 
 generateScheduledCode(prog, bpmax_single_strand_system, outDir);
 generateMakefile(prog, bpmax_single_strand_system, outDir+"/mk_s_reductions");

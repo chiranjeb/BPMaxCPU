@@ -269,6 +269,7 @@ void bpmax_single_strand_diagonal_tile(long M, long N, long N_sec, long N_tile, 
 	#undef S1
 	#undef S3
 	#undef S2
+        #if 0 
         printf ("I2:%d, J2:%d\n", I2, J2);
         for ( int i = 0; i < N_sec; ++i)
          {
@@ -276,6 +277,7 @@ void bpmax_single_strand_diagonal_tile(long M, long N, long N_sec, long N_tile, 
              printf ("%7.2f ", S_C_I2_J2[i][j]);
              printf ("\n");
          }
+         #endif
 	
 	//Memory Free
 	free(_lin_NR_S_C_I2_J2);

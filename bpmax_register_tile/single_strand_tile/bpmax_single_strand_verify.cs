@@ -7,6 +7,7 @@ CheckProgram(prog);
 AShow(prog, rootSystem);
 
 generateVerificationCode(prog, rootSystem, outDir);
+
 #generateMakefile(prog, rootSystem, outDir);
 
                              

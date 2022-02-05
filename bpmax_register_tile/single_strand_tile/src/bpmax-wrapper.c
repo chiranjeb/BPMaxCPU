@@ -323,6 +323,7 @@ int main(int argc, char** argv) {
 				printf("TEST for S2 PASSED\n");
 			}else{
 				printf("TEST for S2 FAILED. #Errors: %d\n", _errors_);
+				return EXIT_FAILURE;
 			}
 		}
     #endif

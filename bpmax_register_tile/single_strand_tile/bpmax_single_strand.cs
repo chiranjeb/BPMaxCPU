@@ -17,15 +17,9 @@ equation_seq2_t = "UseEquation_seq2_t";
 equation_s2_output_2d = "UseEquation_S2";
 
 
-
-
-
-setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i                ->  0,      0,   i,  0,     0)");
-setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i                ->  0,      2,   i,  0,     0)");
-setSpaceTimeMap(prog, rootSystem, equation_s2_output_2d,      "( i                ->  1,      2,   i,  0,     0)");
-
-
-
+setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i         ->  0,      0,   i,  0,     0)");
+setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i         ->  0,      2,   i,  0,     0)");
+setSpaceTimeMap(prog, rootSystem, equation_s2_output_2d,      "( i         ->  1,      2,   i,  0,     0)");
 
                                                                           
 ################################   Transformed seq2   #################################################

@@ -146,11 +146,11 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 		}
 	}
 	
-	float* _lin_S_C_2 = (float*)malloc(sizeof(float)*((N_sec-1) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)));
-	mallocCheck(_lin_S_C_2, ((N_sec-1) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)), float);
-	float***** S_C_2 = (float*****)malloc(sizeof(float****)*(N_sec-1));
-	mallocCheck(S_C_2, (N_sec-1), float****);
-	for (mz1=0;mz1 < N_sec-1; mz1++) {
+	float* _lin_S_C_2 = (float*)malloc(sizeof(float)*((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)));
+	mallocCheck(_lin_S_C_2, ((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)), float);
+	float***** S_C_2 = (float*****)malloc(sizeof(float****)*(N_sec-2));
+	mallocCheck(S_C_2, (N_sec-2), float****);
+	for (mz1=0;mz1 < N_sec-2; mz1++) {
 		S_C_2[mz1] = (float****)malloc(sizeof(float***)*(N_sec));
 		mallocCheck(S_C_2[mz1], (N_sec), float***);
 		for (mz2=0;mz2 < N_sec; mz2++) {
@@ -181,51 +181,47 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 			}
 		}
 	}
-	#define S0(i,j,i2,i3) bpmax_single_strand_diagonal_tile(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2_t,S_C[-i][i2])
-	#define S1(i,j,k,i3) matrix_max_plus_section(M,N,N_sec,N_tile,MR,NR,-i,i3,k,S_A[-i][k],S_B[k+1][i3],S_C[-i][i3])
-	#define S2(i,j,i2,i3) bpmax_single_strand_finalize(M,N,N_sec,N_tile,MR,NR,-i,i2,seq2_t,S_C,S_C[-i][i2])
+
+	#define S0(i,j,i2,i3) bpmax_single_strand_diagonal_tile(M,N,N_sec,N_tile,MR,NR,-i,j,seq2_t,S_C[-i][j])
+	#define S1(i,j,k,i3) matrix_max_plus_section(M,N,N_sec,N_tile,MR,NR,-i,i3,j,S_A[-i][j],S_B[j][i3],S_C[-i][i3])
+	#define S2(i,j,i2,i3) bpmax_single_strand_finalize(M,N,N_sec,N_tile,MR,NR,-i,j,seq2_t,S_C,S_C[-i][j])
 	#define S3(i,j,i2,i3) transform_section_like_A_for_register_tile(M,N,N_sec,N_tile,MR,NR,-i,j,S_C[-i][j],S_A[-i][j])
 	#define S4(i,j,i2,i3) transform_section_like_B_for_register_tile(M,N,N_sec,N_tile,MR,NR,-i,j,S_C[-i][j],S_B[-i][j])
 	{
 		//Domain
-		//{i,j,i2,i3|i+i3==0 && i+i2==0 && j==-1 && 0>=i && N_sec+i>=1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,k,i3|j==-1 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+k>=0 && i3>=k+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,i2,i3|i3==i2 && j==-1 && 0>=i && i+i2>=1 && N_sec>=i2+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,i2,i3|i3==j && i2==1 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,j,i2,i3|i+i3==0 && i2==0 && i+j==0 && 0>=i && N_sec+i>=1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,j,k,i3|k==3 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,j,i2,i3|i3==j && i2==0 && 0>=i && i+j>=1 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		//{i,j,i2,i3|i3==j && i2==2 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		int c1,c2,c3,c4;
-		S0((-N_sec+1),(-1),(N_sec-1),(N_sec-1));
-		S3((-N_sec+1),(N_sec-1),(1),(N_sec-1));
-		S4((-N_sec+1),(N_sec-1),(2),(N_sec-1));
-		S0((-N_sec+2),(-1),(N_sec-2),(N_sec-2));
-		S1((-N_sec+2),(-1),(N_sec-2),(N_sec-1));
-		S2((-N_sec+2),(-1),(N_sec-1),(N_sec-1));
-		for(c2=N_sec-2;c2 <= N_sec-1;c2+=1)
-		 {
-		 	S3((-N_sec+2),(c2),(1),(c2));
-		 	S4((-N_sec+2),(c2),(2),(c2));
-		 }
+		//{i,j,i2,i3|i3==j && i2==1 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		int c1,c2,c4;
+		S0((-N_sec+1),(N_sec-1),(0),(N_sec-1));
+		S4((-N_sec+1),(N_sec-1),(1),(N_sec-1));
+		S3((-N_sec+1),(N_sec-1),(2),(N_sec-1));
+		S0((-N_sec+2),(N_sec-2),(0),(N_sec-2));
+		S4((-N_sec+2),(N_sec-2),(1),(N_sec-2));
+		S3((-N_sec+2),(N_sec-2),(2),(N_sec-2));
+		S2((-N_sec+2),(N_sec-1),(0),(N_sec-1));
+		S4((-N_sec+2),(N_sec-1),(1),(N_sec-1));
+		S3((-N_sec+2),(N_sec-1),(2),(N_sec-1));
 		for(c1=-N_sec+3;c1 <= 0;c1+=1)
 		 {
-		 	S0((c1),(-1),(-c1),(-c1));
-		 	for(c4=-c1+1;c4 <= N_sec-1;c4+=1)
+		 	S0((c1),(-c1),(0),(-c1));
+		 	S4((c1),(-c1),(1),(-c1));
+		 	S3((c1),(-c1),(2),(-c1));
+		 	for(c2=-c1+1;c2 <= N_sec-2;c2+=1)
 		 	 {
-		 	 	S1((c1),(-1),(-c1),(c4));
-		 	 }
-		 	for(c3=-c1+1;c3 <= N_sec-2;c3+=1)
-		 	 {
-		 	 	S2((c1),(-1),(c3),(c3));
-		 	 	for(c4=c3+1;c4 <= N_sec-1;c4+=1)
+		 	 	S2((c1),(c2),(0),(c2));
+		 	 	S4((c1),(c2),(1),(c2));
+		 	 	S3((c1),(c2),(2),(c2));
+		 	 	for(c4=c2+1;c4 <= N_sec-1;c4+=1)
 		 	 	 {
-		 	 	 	S1((c1),(-1),(c3),(c4));
+		 	 	 	S1((c1),(c2),(3),(c4));
 		 	 	 }
 		 	 }
-		 	S2((c1),(-1),(N_sec-1),(N_sec-1));
-		 	for(c2=-c1;c2 <= N_sec-1;c2+=1)
-		 	 {
-		 	 	S3((c1),(c2),(1),(c2));
-		 	 	S4((c1),(c2),(2),(c2));
-		 	 }
+		 	S2((c1),(N_sec-1),(0),(N_sec-1));
+		 	S4((c1),(N_sec-1),(1),(N_sec-1));
+		 	S3((c1),(N_sec-1),(2),(N_sec-1));
 		 }
 	}
 	#undef S0
@@ -246,7 +242,7 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 	free(S_C_1);
 	
 	free(_lin_S_C_2);
-	for (mz1=0;mz1 < N_sec-1; mz1++) {
+	for (mz1=0;mz1 < N_sec-2; mz1++) {
 		for (mz2=0;mz2 < N_sec; mz2++) {
 			for (mz3=0;mz3 < N_sec-1; mz3++) {
 				free(S_C_2[mz1][mz2][mz3]);

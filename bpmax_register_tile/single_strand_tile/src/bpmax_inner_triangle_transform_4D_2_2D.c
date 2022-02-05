@@ -105,62 +105,44 @@ inline double __min_double(double x, double y){
 
 
 
-//Local Function Declarations
-float reduce_matrix_max_plus_section_C_section_1(long, long, long, long, long, long, long, long, long, int, int, float**, float**);
 
 //Memory Macros
-#define A(i3,j3) A[i3][j3]
-#define B(i3,j3) B[i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define S_C(i2,j2,i3,j3) S_C[i2][j2][i3][j3]
+#define S2(i,j) S2[i][j]
 
-void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
+void bpmax_inner_triangle_transform_4D_2_2D(long M, long N, long N_sec, long N_tile, long MR, long NR, float**** S_C, float** S2){
 	///Parameter checking
-	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2+1))) {
+	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-        //printf("\nmatrix_max_plus_section:I2:%ld, J2:%ld, K2:%ld\n", I2, J2, K2); 
+	//Memory Allocation
 	
-	#define S0(i3,j3) C_section(i3,j3) = max( C_section(i3,j3), reduce_matrix_max_plus_section_C_section_1(M,N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B))
 	{
-		//Domain
-		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && M>=3 && N>=8 && i3>=0 && j3>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2 && J2>=K2+1 && J2>=I2 && N_sec>=2}
-		int c1,c2;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
-		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2));
-		 	 }
-		 }
+       for ( int i1 = 0; i1  < N_sec; i1++ )
+       {
+           for ( int i2 = 0; i2 < N_tile; i2++)
+           {
+             for (int j1 = 0; j1 < N_sec; j1++)
+              {
+                  for( int j2 = 0; j2 < N_tile; j2++)
+                  {
+                      S2[i1*N_tile+i2][j1*N_tile+j2] =  S_C[i1][j1][i2][j2];
+                  }
+              }
+           }
+       }
 	}
 	#undef S0
+
+	Dump2D(N, S2, "Final Transformed array");
 	
-        Dump2D (N_tile, A, "A");        
-        Dump2D (N_tile, B, "B");     	
-        //printf("\n================Done==================\n"); 
 	//Memory Free
-}
-float reduce_matrix_max_plus_section_C_section_1(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, int i3p, int j3p, float** A, float** B){
-	float reduceVar = -FLT_MAX;
-	#define S1(i3,j3,k) {float __temp__ = (A(i3,k))+(B(k,j3)); reduceVar = __max_float(reduceVar,__temp__); }
-	{
-		//Domain
-		//{i3,j3,k|N_tile>=j3p+1 && N_tile>=4 && M>=3 && N>=8 && i3p>=0 && j3p>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3p+1 && N_sec>=J2+1 && K2>=I2 && J2>=K2+1 && J2>=I2 && N_sec>=2 && k>=0 && N_tile>=k+2 && N_tile>=j3+1 && j3>=0 && N_tile>=i3+1 && i3>=0 && i3p==i3 && j3p==j3}
-		int c3;
-		for(c3=0;c3 <= N_tile-1;c3+=1)
-		 {
-		 	S1((i3p),(j3p),(c3));
-		 }
-	}
-	#undef S1
-	return reduceVar;
 }
 
 //Memory Macros
-#undef A
-#undef B
-#undef C_section
+#undef S_C
+#undef S2
 
 
 //Common Macro undefs

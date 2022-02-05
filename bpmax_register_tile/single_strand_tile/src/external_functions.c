@@ -464,6 +464,7 @@ void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool
 
 void Dump2D(int M, float **Tab, const char *message)
 {
+#if DEBUG
        printf("-----------------------------------------------------------------------\n");
        printf("%s\n", message);
        printf("-----------------------------------------------------------------------\n");
@@ -476,11 +477,13 @@ void Dump2D(int M, float **Tab, const char *message)
             }
             printf("\n");
      }
+#endif
 }
 
 
 void Dump4D(int N_sec, int N_i_tile, int N_j_tile,  float ****Tab, const char *message)
 {
+#if DEBUG
        printf("-----------------------------------------------------------------------\n");
        printf("%s\n", message);
        printf("-----------------------------------------------------------------------\n");
@@ -500,4 +503,5 @@ void Dump4D(int N_sec, int N_i_tile, int N_j_tile,  float ****Tab, const char *m
            }
            printf("------------------------------------------------------------------------------------------\n");
        }
+#endif
 }
