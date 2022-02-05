@@ -1,0 +1,44 @@
+script bpmax_single_strand_point.cs {
+    pass ReadAlphabets:ReadAlphabets {
+    }
+    pass CheckProgram:CheckProgram {
+    }
+    pass CheckProgram:CheckProgram {
+    }
+    pass NormalizeReduction:NormalizeReduction {
+    }
+    pass NormalizeReduction:NormalizeReduction {
+    }
+    pass Normalize:Normalize {
+    }
+    pass AShow:AShow {
+    }
+    pass setMemoryMap:SetMemoryMap {
+    }
+    pass setMemoryMap:SetMemoryMap {
+    }
+    pass setMemoryMap:SetMemoryMap {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass generateScheduledCode:GenerateScheduledCode {
+    }
+    pass generateMakefile:GenerateMakefile {
+    }
+    pass AShow:AShow {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass setSpaceTimeMap:SetSpaceTimeMap {
+    }
+    pass generateScheduledCode:GenerateScheduledCode {
+    }
+    pass generateMakefile:GenerateMakefile {
+    }
+}
