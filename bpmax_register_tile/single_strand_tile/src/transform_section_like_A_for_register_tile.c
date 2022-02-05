@@ -112,7 +112,7 @@ inline double __min_double(double x, double y){
 
 void transform_section_like_A_for_register_tile(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, float** C, float** A){
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 4 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 3 && N >= 16 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -121,7 +121,7 @@ void transform_section_like_A_for_register_tile(long M, long N, long N_sec, long
 	#define S0(i3,j3) A(i3,j3) = C(i3,j3)
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=3 && N>=16 && N_sec>=4 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1}
+		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=3 && N>=16 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1}
 		int c1,c2;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
