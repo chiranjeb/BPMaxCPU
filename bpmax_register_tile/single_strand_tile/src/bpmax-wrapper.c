@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
 	
 	
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 4 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((M >= 3 && N >= 16 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -236,9 +236,7 @@ int main(int argc, char** argv) {
 		 	S0((c1));
 		 }
 		#undef S0
-		
 	}
-
 	
 	//Timing
 	struct timeval time;
@@ -272,7 +270,7 @@ int main(int argc, char** argv) {
 			gettimeofday(&time, NULL);
 			elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 		#endif
-    	bpmax_verify(M, N, N_sec, N_tile, MR, NR, seq2, S2[0]);
+    	bpmax_verify(M, N, N_sec, N_tile, MR, NR, seq2, S2_verify[0]);
     	#ifdef TIMING
     		gettimeofday(&time, NULL);
 			elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
