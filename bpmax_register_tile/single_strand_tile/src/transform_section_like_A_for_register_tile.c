@@ -117,6 +117,7 @@ void transform_section_like_A_for_register_tile(long M, long N, long N_sec, long
 		exit(-1);
 	}
 	//Memory Allocation
+    printf("\ntransform_section_like_A_for_register_tile:I2:%ld, J2:%ld, \n", I2, J2); 
 	
 	#define S0(i3,j3) A(i3,j3) = C(i3,j3)
 	{
@@ -133,6 +134,8 @@ void transform_section_like_A_for_register_tile(long M, long N, long N_sec, long
 	}
 	#undef S0
 	
+    Dump2D (N_tile, A, "A");	
+    Dump2D (N_tile, C, "C");	
 	//Memory Free
 }
 

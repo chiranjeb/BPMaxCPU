@@ -119,9 +119,9 @@ void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, l
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-	//Memory Allocation
+    printf("\nmatrix_max_plus_section:I2:%ld, J2:%ld, K2:%ld\n", I2, J2, K2); 
 	
-	#define S0(i3,j3) C_section(i3,j3) = reduce_matrix_max_plus_section_C_section_1(M,N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B)
+	#define S0(i3,j3) C_section(i3,j3) = max( C_section(i3,j3), reduce_matrix_max_plus_section_C_section_1(M,N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B))
 	{
 		//Domain
 		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && M>=3 && N>=8 && i3>=0 && j3>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2 && J2>=K2+1 && J2>=I2 && N_sec>=2}
@@ -136,6 +136,9 @@ void matrix_max_plus_section(long M, long N, long N_sec, long N_tile, long MR, l
 	}
 	#undef S0
 	
+        Dump2D (N_tile, A, "A");        
+        Dump2D (N_tile, B, "B");     	
+        printf("\n================Done==================\n"); 
 	//Memory Free
 }
 float reduce_matrix_max_plus_section_C_section_1(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, int i3p, int j3p, float** A, float** B){

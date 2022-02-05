@@ -308,7 +308,7 @@ int main(int argc, char** argv) {
 		//Compare outputs for verification
 		{
 			//Error Counter
-			int _errors_ = 0;
+			volatile int _errors_ = 0;
 			#define S0(k,i,j) if (fabsf(1.0f - var_S2_verify(k,i,j)/var_S2(k,i,j)) > EPSILON) _errors_++;
 			int c2,c3;
 			for(c2=0;c2 <= N-1;c2+=1)
