@@ -60,10 +60,10 @@ setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_s2, 1, 2, "S
 
 
 CheckProgram(prog);
-#setParallel(prog, rootSystem, "", "3");
-#generateScheduledCode(prog, rootSystem, outDir);
+setParallel(prog, rootSystem, "", "3");
+generateScheduledCode(prog, rootSystem, outDir);
 #generateMakefile(prog, rootSystem, outDir);
-generateWrapper(prog, rootSystem, outDir);
+#generateWrapper(prog, rootSystem, outDir);
 
 
                              

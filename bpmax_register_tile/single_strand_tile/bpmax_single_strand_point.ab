@@ -5,7 +5,7 @@ float e_inter_score (int,int) ;
 affine bpmax_single_strand_diagonal_tile 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
    int   seq2_t          { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
@@ -25,7 +25,7 @@ let
 affine bpmax_single_strand_finalize 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
 	int    seq2_t     { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 

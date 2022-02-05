@@ -5,7 +5,7 @@ float e_inter_score (int,int) ;
 affine transform_section_like_A_for_register_tile 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	//float C  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
@@ -20,7 +20,7 @@ let
 affine transform_section_like_B_for_register_tile 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	float C  { i3, j3  |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
@@ -34,7 +34,7 @@ let
 affine matrix_max_plus_section 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2, K2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 < J2
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 < J2
 }
 input
 	float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
@@ -48,7 +48,7 @@ let
 affine bpmax_single_strand_diagonal_tile 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
    int   seq2_t          { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
@@ -62,7 +62,7 @@ let
 affine bpmax_single_strand_finalize 
 {
 	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
 	int    seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
@@ -78,7 +78,7 @@ let
 affine bpmax_single_strand_s2_tile 
 {
 	M, N, N_sec, N_tile, MR, NR | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
+	M >= 3 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
 }
 input
 	  int   seq2_t   { i,  j      | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 

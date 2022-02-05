@@ -112,7 +112,7 @@ float eval_S2(long, long, long, long, long, long, int, int);
 
 void bpmax_verify(long M, long N, long N_sec, long N_tile, long MR, long NR, int* _local_seq2, float** _local_S2){
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 4 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -134,7 +134,7 @@ void bpmax_verify(long M, long N, long N_sec, long N_tile, long MR, long NR, int
 	#define S0(i,j) eval_S2(M,N,N_sec,N_tile,MR,NR,i,j)
 	{
 		//Domain
-		//{i,j|i>=0 && j>=i && N>=j+1 && M>=3 && N>=16 && N_sec>=4 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,j|i>=0 && j>=i && N>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		int c1,c2;
 		for(c1=0;c1 <= N-1;c1+=1)
 		 {
@@ -156,7 +156,7 @@ float reduce_bpmax_verify_S2_1(long M, long N, long N_sec, long N_tile, long MR,
 	#define S0(i,j,k) {float __temp__ = (eval_S2(M,N,N_sec,N_tile,MR,NR,i,k))+(eval_S2(M,N,N_sec,N_tile,MR,NR,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|M>=3 && N>=16 && N_sec>=4 && N_tile>=4 && MR>=1 && NR>=1 && N>=jp+1 && ip>=0 && jp>=ip+4 && jp>=0 && N>=ip+1 && j>=i+4 && j>=0 && N>=i+1 && k>=-1 && N>=j+1 && N>=k+1 && j>=k+1 && i>=0 && k>=i && ip==i && jp==j}
+		//{i,j,k|M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && N>=jp+1 && ip>=0 && jp>=ip+4 && jp>=0 && N>=ip+1 && j>=i+4 && j>=0 && N>=i+1 && k>=-1 && N>=j+1 && N>=k+1 && j>=k+1 && i>=0 && k>=i && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {

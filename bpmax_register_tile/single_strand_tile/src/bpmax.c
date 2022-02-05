@@ -119,7 +119,7 @@ void transform_reverse_1D_to_2D(long, long, long, long, int*, int*);
 
 void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2, float*** S2){
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -197,8 +197,8 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2,
 	#define S1(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,seq2,seq2_t[i2])
 	{
 		//Domain
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=3 && N>=16 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==0 && i==0 && i2>=0 && N_sec>=i2+1 && M>=3 && N>=16 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==0 && i==0 && i2>=0 && N_sec>=i2+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		int c3;
 		for(c3=0;c3 <= N_sec-1;c3+=1)
 		 {
