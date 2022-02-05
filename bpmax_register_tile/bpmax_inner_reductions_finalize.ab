@@ -21,7 +21,7 @@ let
 
   FTable_C_pointwise_diag[i3,j3] = 
        case 
-         { | i3 == N_tile } : C[I2+1, J2, i3, j3];
+         { | i3 == N_tile } : C[I2+1, J2, 0, j3];
          { | i3 < N_tile  }: 
         	  max( case { | I2 == J2-1 &&  i3 - j3  > N_tile -4 }: 0;
         	   	   { | I2 == J2-1 &&  i3 - j3  <= N_tile -4  } || { | I2 < J2-1 }:
@@ -38,8 +38,8 @@ let
          { | i3 == N_tile } : 0;
          { | i3 < N_tile  }: 
         	   max( FTable_C_pointwise_diag [i3, j3], 
-        	   	    reduce(max, [k3], {|i3<=k3<=N_tile-1} : A[I2, J2, i3, k3] + C[I2, J2, k3+1, j3]),
-		             case {| j3 > 0 } : reduce(min, [k3], {|0<=k3<=j3-1} : C[I2, J2, i3, k3] + B[I2, J2, k3+1, j3]);
+        	   	    reduce(max, [k3], {|i3<=k3<=N_tile-1} : A[I2, I2, i3, k3] + C[I2, J2, k3+1, j3]),
+		             case {| j3 > 0 } : reduce(min, [k3], {|0<=k3<=j3-1} : C[I2, J2, i3, k3] + B[J2, J2, k3+1, j3]);
 		    			  {| j3 == 0 } : 0; esac);
 		    esac;
 .	

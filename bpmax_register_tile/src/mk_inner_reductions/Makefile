@@ -1,0 +1,44 @@
+CFLAGS= -O3  -std=c99  -I/usr/include/malloc/
+LIBRARIES=-lm
+CC?=gcc
+OBJS = bpmax_inner_reductions.o bpmax_inner_reductions_diagonal_tile.o matrix_max_plus_section.o bpmax_inner_reductions_finalize.o transform_section_like_A_for_register_tile.o transform_section_like_B_for_register_tile.o 
+all: plain check
+
+debug: CFLAGS =-DDEBUG -g -Wall -Wextra -std=c99 -I/usr/include/malloc/
+debug: all
+		
+plain: $(OBJS)
+	$(CC) bpmax_inner_reductions-wrapper.c -o bpmax_inner_reductions $(OBJS) $(CFLAGS) $(LIBRARIES)
+
+check: $(OBJS)
+	$(CC) bpmax_inner_reductions-wrapper.c -o bpmax_inner_reductions.check $(OBJS) $(CFLAGS) $(LIBRARIES) -DCHECKING
+
+verify: $(OBJS) bpmax_inner_reductions_verify.o
+	$(CC) bpmax_inner_reductions-wrapper.c -o bpmax_inner_reductions.verify $(OBJS) bpmax_inner_reductions_verify.o $(CFLAGS) $(LIBRARIES) -DVERIFY
+
+verify-rand: $(OBJS) bpmax_inner_reductions_verify.o
+	$(CC) bpmax_inner_reductions-wrapper.c -o bpmax_inner_reductions.verify-rand $(OBJS) bpmax_inner_reductions_verify.o $(CFLAGS) $(LIBRARIES) -DVERIFY -DRANDOM
+
+bpmax_inner_reductions.o : bpmax_inner_reductions.c
+	$(CC) bpmax_inner_reductions.c -o bpmax_inner_reductions.o $(CFLAGS) $(LIBRARIES) -c
+
+bpmax_inner_reductions_diagonal_tile.o : bpmax_inner_reductions_diagonal_tile.c
+	$(CC) bpmax_inner_reductions_diagonal_tile.c -o bpmax_inner_reductions_diagonal_tile.o $(CFLAGS) $(LIBRARIES) -c
+
+matrix_max_plus_section.o : matrix_max_plus_section.c
+	$(CC) matrix_max_plus_section.c -o matrix_max_plus_section.o $(CFLAGS) $(LIBRARIES) -c
+
+bpmax_inner_reductions_finalize.o : bpmax_inner_reductions_finalize.c
+	$(CC) bpmax_inner_reductions_finalize.c -o bpmax_inner_reductions_finalize.o $(CFLAGS) $(LIBRARIES) -c
+
+transform_section_like_A_for_register_tile.o : transform_section_like_A_for_register_tile.c
+	$(CC) transform_section_like_A_for_register_tile.c -o transform_section_like_A_for_register_tile.o $(CFLAGS) $(LIBRARIES) -c
+
+transform_section_like_B_for_register_tile.o : transform_section_like_B_for_register_tile.c
+	$(CC) transform_section_like_B_for_register_tile.c -o transform_section_like_B_for_register_tile.o $(CFLAGS) $(LIBRARIES) -c
+
+bpmax_inner_reductions_verify.o : bpmax_inner_reductions_verify.c
+	$(CC) bpmax_inner_reductions_verify.c -o bpmax_inner_reductions_verify.o $(CFLAGS) $(LIBRARIES) -c
+
+clean:
+	rm -f *.o bpmax_inner_reductions bpmax_inner_reductions.check bpmax_inner_reductions.verify bpmax_inner_reductions.verify-rand

@@ -112,7 +112,7 @@ inline double __min_double(double x, double y){
 
 void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, int* seq2, int* seq2_t){
 	///Parameter checking
-	if (!((N >= 96 && N_sec >= 1 && N_tile >= 96 && I2 >= 0 && N_sec >= I2+1))) {
+	if (!((N >= 16 && N_sec >= 4 && N_tile >= 4 && I2 >= 0 && N_sec >= I2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -121,7 +121,7 @@ void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, int* s
 	#define S0(j) seq2_t(j) = 0
 	{
 		//Domain
-		//{j|N>=96 && N_sec>=1 && N_tile>=96 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
+		//{j|N>=16 && N_sec>=4 && N_tile>=4 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
 		int c1;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {

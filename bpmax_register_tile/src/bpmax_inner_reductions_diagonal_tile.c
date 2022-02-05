@@ -108,175 +108,40 @@ inline double __min_double(double x, double y){
 
 //Memory Macros
 #define seq2_t(i,j) seq2_t[i][j]
-#define A(i2,j2) A[i2][j2]
-#define B(i2,j2) B[i2][j2]
-#define NR_FTable_C_section(i2,j2) NR_FTable_C_section[i2][j2]
-#define NR_FTable_C_section_1(i2,j2) NR_FTable_C_section_1[i2][j2]
+#define S2_A(i2,j2) S2_A[i2][j2]
+#define S2_B(i2,j2) S2_B[i2][j2]
 #define FTable_C_section(i2,j2) FTable_C_section[i2][j2]
 
-void bpmax_inner_reductions_diagonal_tile(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, int** seq2_t, float** A, float** B, float** FTable_C_section){
+void bpmax_inner_reductions_diagonal_tile(long M, long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, int** seq2_t, float** S2_A, float** S2_B, float** FTable_C_section){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 4 && N_tile >= 96 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	int mz1, mz2;
 	
-	float* _lin_NR_FTable_C_section = (float*)malloc(sizeof(float)*((N_tile-1) * (N_tile)));
-	mallocCheck(_lin_NR_FTable_C_section, ((N_tile-1) * (N_tile)), float);
-	float** NR_FTable_C_section = (float**)malloc(sizeof(float*)*(N_tile-1));
-	mallocCheck(NR_FTable_C_section, (N_tile-1), float*);
-	for (mz1=0;mz1 < N_tile-1; mz1++) {
-		NR_FTable_C_section[mz1] = &_lin_NR_FTable_C_section[(mz1*(N_tile))];
-	}
-	
-	float* _lin_NR_FTable_C_section_1 = (float*)malloc(sizeof(float)*((N_tile-1) * (N_tile)));
-	mallocCheck(_lin_NR_FTable_C_section_1, ((N_tile-1) * (N_tile)), float);
-	float** NR_FTable_C_section_1 = (float**)malloc(sizeof(float*)*(N_tile-1));
-	mallocCheck(NR_FTable_C_section_1, (N_tile-1), float*);
-	for (mz1=0;mz1 < N_tile-1; mz1++) {
-		NR_FTable_C_section_1[mz1] = &_lin_NR_FTable_C_section_1[(mz1*(N_tile))];
-	}
-	#define S0(i,j,i2) FTable_C_section(-i,j) = FTable_C_section(-i,j)
-	#define S1(i,j,i2) FTable_C_section(-i,j) = __max_float(FTable_C_section(-i,j),__max_float((FTable_C_section(-i+1,j-1))+(e_intra_score(seq2_t(I2,-i),seq2_t(J2,j))),__max_float(NR_FTable_C_section(-i,j),NR_FTable_C_section_1(-i,j))))
-	#define S2(i,j,i2) FTable_C_section(-i,j) = __max_float(FTable_C_section(-i,j),__max_float(0,__max_float(NR_FTable_C_section(-i,j),NR_FTable_C_section_1(-i,j))))
-	#define S5(i,j,i2) NR_FTable_C_section(-i,j) = 1.401298464324817E-45
-	#define S6(i,j,i2) NR_FTable_C_section_1(-i,j) = 1.401298464324817E-45
-	#define S3(i0,i1,i2) {float __temp__ = (FTable_C_section(-i0,i1))+(B(i1+1,i2)); NR_FTable_C_section(-i0,i2) = __max_float(NR_FTable_C_section(-i0,i2),__temp__); }
-	#define S4(i0,i1,i2) {float __temp__ = (A(-i0,i1))+(FTable_C_section(i1+1,i2)); NR_FTable_C_section_1(-i0,i2) = __max_float(NR_FTable_C_section_1(-i0,i2),__temp__); }
+	#define S0(i2,j2) FTable_C_section(i2,j2) = 0
 	{
 		//Domain
-		//{i,j,i2|i2==j+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i+j && 0>=i && N_tile+i>=1 && j>=0 && N_tile>=j+1}
-		//{i,j,i2|i2==j+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i+j>=4 && 0>=i && N_tile+i>=2 && j>=1 && N_tile>=j+1 && J2>=0 && N_sec>=I2+1}
-		//{i,j,i2|i2==j+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i+j-3 && i+j>=1 && 0>=i && N_tile+i>=1 && j>=0 && N_tile>=j+1}
-		//{i,j,i2|i2==j && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i && i+j>=1 && N_tile>=j+1}
-		//{i,j,i2|i2==j && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i && i+j>=1 && N_tile>=j+1}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=1 && i1>=0 && N_tile>=i1+2 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=1 && i1>=0 && N_tile>=i1+2 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
-		int c1,c2,c3;
-		for(c2=0;c2 <= N_tile-1;c2+=1)
+		//{i2,j2|M>=16 && N>=96 && N_sec>=4 && N_tile>=96 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i2>=0 && N_tile>=i2 && j2>=0 && N_tile>=j2+1}
+		int c1,c2;
+		for(c1=0;c1 <= N_tile;c1+=1)
 		 {
-		 	S0((-N_tile+1),(c2),(c2+1));
-		 }
-		for(c2=0;c2 <= N_tile-2;c2+=1)
-		 {
-		 	S0((-N_tile+2),(c2),(c2+1));
-		 }
-		S3((-N_tile+2),(N_tile-2),(N_tile-1));
-		S4((-N_tile+2),(N_tile-2),(N_tile-1));
-		S5((-N_tile+2),(N_tile-1),(N_tile-1));
-		S6((-N_tile+2),(N_tile-1),(N_tile-1));
-		S2((-N_tile+2),(N_tile-1),(N_tile));
-		for(c1=-N_tile+3;c1 <= -N_tile+4;c1+=1)
-		 {
-		 	for(c2=0;c2 <= -c1;c2+=1)
+		 	for(c2=0;c2 <= N_tile-1;c2+=1)
 		 	 {
-		 	 	S0((c1),(c2),(c2+1));
+		 	 	S0((c1),(c2));
 		 	 }
-		 	for(c3=-c1+1;c3 <= N_tile-1;c3+=1)
-		 	 {
-		 	 	S3((c1),(-c1),(c3));
-		 	 	S4((c1),(-c1),(c3));
-		 	 }
-		 	for(c2=-c1+1;c2 <= N_tile-2;c2+=1)
-		 	 {
-		 	 	S5((c1),(c2),(c2));
-		 	 	S6((c1),(c2),(c2));
-		 	 	S2((c1),(c2),(c2+1));
-		 	 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
-		 	 	 {
-		 	 	 	S3((c1),(c2),(c3));
-		 	 	 	S4((c1),(c2),(c3));
-		 	 	 }
-		 	 }
-		 	S5((c1),(N_tile-1),(N_tile-1));
-		 	S6((c1),(N_tile-1),(N_tile-1));
-		 	S2((c1),(N_tile-1),(N_tile));
-		 }
-		for(c2=0;c2 <= N_tile-5;c2+=1)
-		 {
-		 	S0((-N_tile+5),(c2),(c2+1));
-		 }
-		for(c3=N_tile-4;c3 <= N_tile-1;c3+=1)
-		 {
-		 	S3((-N_tile+5),(N_tile-5),(c3));
-		 	S4((-N_tile+5),(N_tile-5),(c3));
-		 }
-		for(c2=N_tile-4;c2 <= N_tile-2;c2+=1)
-		 {
-		 	S5((-N_tile+5),(c2),(c2));
-		 	S6((-N_tile+5),(c2),(c2));
-		 	S2((-N_tile+5),(c2),(c2+1));
-		 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
-		 	 {
-		 	 	S3((-N_tile+5),(c2),(c3));
-		 	 	S4((-N_tile+5),(c2),(c3));
-		 	 }
-		 }
-		S5((-N_tile+5),(N_tile-1),(N_tile-1));
-		S6((-N_tile+5),(N_tile-1),(N_tile-1));
-		S1((-N_tile+5),(N_tile-1),(N_tile));
-		for(c1=-N_tile+6;c1 <= 0;c1+=1)
-		 {
-		 	for(c2=0;c2 <= -c1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2),(c2+1));
-		 	 }
-		 	for(c3=-c1+1;c3 <= N_tile-1;c3+=1)
-		 	 {
-		 	 	S3((c1),(-c1),(c3));
-		 	 	S4((c1),(-c1),(c3));
-		 	 }
-		 	for(c2=-c1+1;c2 <= -c1+3;c2+=1)
-		 	 {
-		 	 	S5((c1),(c2),(c2));
-		 	 	S6((c1),(c2),(c2));
-		 	 	S2((c1),(c2),(c2+1));
-		 	 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
-		 	 	 {
-		 	 	 	S3((c1),(c2),(c3));
-		 	 	 	S4((c1),(c2),(c3));
-		 	 	 }
-		 	 }
-		 	for(c2=-c1+4;c2 <= N_tile-2;c2+=1)
-		 	 {
-		 	 	S5((c1),(c2),(c2));
-		 	 	S6((c1),(c2),(c2));
-		 	 	S1((c1),(c2),(c2+1));
-		 	 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
-		 	 	 {
-		 	 	 	S3((c1),(c2),(c3));
-		 	 	 	S4((c1),(c2),(c3));
-		 	 	 }
-		 	 }
-		 	S5((c1),(N_tile-1),(N_tile-1));
-		 	S6((c1),(N_tile-1),(N_tile-1));
-		 	S1((c1),(N_tile-1),(N_tile));
 		 }
 	}
 	#undef S0
-	#undef S1
-	#undef S2
-	#undef S5
-	#undef S6
-	#undef S3
-	#undef S4
 	
 	//Memory Free
-	free(_lin_NR_FTable_C_section);
-	free(NR_FTable_C_section);
-	
-	free(_lin_NR_FTable_C_section_1);
-	free(NR_FTable_C_section_1);
 }
 
 //Memory Macros
 #undef seq2_t
-#undef A
-#undef B
-#undef NR_FTable_C_section
-#undef NR_FTable_C_section_1
+#undef S2_A
+#undef S2_B
 #undef FTable_C_section
 
 

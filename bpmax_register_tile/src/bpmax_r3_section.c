@@ -13,6 +13,7 @@
 #include <immintrin.h>
 #include <malloc.h>
 
+#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))

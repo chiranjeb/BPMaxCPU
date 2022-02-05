@@ -116,7 +116,7 @@ inline double __min_double(double x, double y){
 
 void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, float**** FTable_A, float**** FTable_B, float** S1, float**** FTable_4D){
 	///Parameter checking
-	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
+	if (!((M >= 3 && N >= 16 && N_sec >= 4 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -161,7 +161,7 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	#define S0(i2,j2,i3,j3) FTable_4D(i2,j2,i3,j3) = 0
 	{
 		//Domain
-		//{i2,j2,i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i2,j2,i3,j3|M>=3 && N>=16 && N_sec>=4 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2,c3,c4;
 		for(c1=0;c1 <= N_sec-1;c1+=1)
 		 {

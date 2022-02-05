@@ -120,44 +120,43 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	}
 	//Memory Allocation
 	
-	#define S0(i,j) S1(j,i+j) = 0
-	#define S_1(i,j) S1(j,i+j) = __max_float((S1(j+1,i+j-1))+(e_intra_score(seq1(j),seq1(i+j))),reduce_bpmax_single_strand_s1_S1_1(M,j,i+j,S1))
+	#define S0(i,j) S1(i,j) = 0
+	#define S_1(i,j) S1(i,j) = __max_float((S1(i+1,j-1))+(e_intra_score(seq1(i),seq1(j))),reduce_bpmax_single_strand_s1_S1_1(M,i,j,S1))
 	{
 		//Domain
-		//{i,j|0>=i-3 && M>=3 && M>=i+j+1 && i>=0 && j>=0}
-		//{i,j|i>=4 && M>=3 && j>=0 && M>=j+1 && M>=i+j+1 && i+j>=0}
+		//{i,j|i>=j-3 && M>=3 && M>=j+1 && i>=0 && j>=i}
+		//{i,j|j>=i+4 && M>=3 && i>=0 && M>=i+1 && M>=j+1 && j>=0}
 		int c1,c2;
-		for(c1=0;c1 <= min(3,M-1);c1+=1)
+		for(c1=0;c1 <= M-5;c1+=1)
 		 {
-		 	#pragma omp parallel for 
-		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
+		 	for(c2=c1;c2 <= c1+3;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
 		 	 }
-		 }
-		for(c1=4;c1 <= M-1;c1+=1)
-		 {
-		 	#pragma omp parallel for 
-		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
+		 	for(c2=c1+4;c2 <= M-1;c2+=1)
 		 	 {
 		 	 	S_1((c1),(c2));
 		 	 }
 		 }
+		for(c1=max(0,M-4);c1 <= M-1;c1+=1)
+		 {
+		 	for(c2=c1;c2 <= M-1;c2+=1)
+		 	 {
+		 	 	S0((c1),(c2));
+		 	 }
+		 }
 	}
-
-	Dump2D(M, S1, "Computed S1:\n");
-
 	#undef S0
 	#undef S_1
 	
 	//Memory Free
 }
 float reduce_bpmax_single_strand_s1_S1_1(long M, int ip, int jp, float** S1){
-	float reduceVar = -FLT_MAX;
-	#define S2(i,j,k) {float __temp__ = (S1(i,k))+(S1(k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
+	float reduceVar = 0;
+	#define S2(i,j,k) reduceVar = (reduceVar)+((S1(i,k))+(S1(k+1,j)))
 	{
 		//Domain
-		//{i,j,k|M>=jp+1 && M>=3 && ip>=0 && jp>=ip+4 && jp>=0 && M>=ip+1 && j>=k+1 && j>=i+4 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && M>=i+1 && j>=0 && ip==i && jp==j}
+		//{i,j,k|M>=jp+1 && M>=3 && ip>=0 && jp>=ip+4 && M>=ip+1 && jp>=0 && j>=k+1 && j>=i+4 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=0 && M>=i+1 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {

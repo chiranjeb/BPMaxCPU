@@ -477,3 +477,25 @@ void Dump2D(int M, float **Tab, const char *message)
             printf("\n");
      }
 }
+
+
+void Dump4D(int N_sec, int N_tile, float ****Tab, const char *message)
+{
+       printf("-----------------------------------------------------------------------\n");
+       printf("%s\n", message);
+       printf("-----------------------------------------------------------------------\n");
+       for ( int i1 = 0; i1  < N_sec; i1++ )
+       {
+           for ( int i2 = 0; i2 < N_tile; i2++)
+           {
+             for (int j1 = 0; j1 < N_sec; j1++)
+              {
+                  for( int j2 = 0; j2 < N_tile; j2++)
+                  {
+                      printf("%10e ", Tab[i1][j1][i2][j2]);
+                  }
+              }
+              printf("\n");
+           }
+       }
+}

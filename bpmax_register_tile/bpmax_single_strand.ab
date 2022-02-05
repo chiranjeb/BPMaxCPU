@@ -20,9 +20,124 @@ input
     int seq2 {i| 0 <= i < N };
 output
 	float S2 {i,j| 0 <= i <= j < N};
-	let
+let
 	S2[i,j] = case
 		{ | j-i<= 3}: 0 ;
 		{ | j-i > 3}: max (S2[i+1,j-1] + e_intra_score (seq2[N-i-1],seq2[N-j-1]), reduce(max, [k], {| k<j}:S2[i,k]+S2[k+1,j]));
 	esac;
+.
+
+
+
+affine bpmax_single_strand_diagonal_tile 
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+   int   seq2_t        { i, j    | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
+output
+   float S_I2_J2       { i2, j2| 0<=i2<=N_tile-1 && 0<=j2<=N_tile-1 };
+let
+	S_I2_J2[i3,j3] = case
+		{ | j3-i3 <= 3}: 0 ;
+		{ | j3-i3 > 3}: max (S_I2_J2[i3+1,j3-1] + e_intra_score (seq2_t[I2, i],seq2_t[J2, j]), reduce(max, [k], {| i3<=k3<j3}:S_I2_J2[i3,k3]+S_I2_J2[k3+1,j3]));
+	esac;
+.		 
+
+
+affine bpmax_single_strand_finalize 
+{
+	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
+	M >= 16 &&  N >= 96 &&  N_sec >= 1 && N_tile >= 96 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+}
+input
+	int    seq2_t   { i,  j           |   0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  A        { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float  B        { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float  C        { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
+
+
+output
+	float S_C_I2_J2 { i3, j3  |  0<=i3<=N_tile  && 0<=j3<=N_tile-1 };
+
+local
+	float S_C_pointwise_diag { i3, j3  |  0<=i3<=N_tile  && 0<=j3<=N_tile-1 };
+
+let
+
+  S_C_pointwise_diag[i3,j3] = 
+       case 
+         { | i3 == N_tile } : C[I2+1, J2, 0, j3];
+         { | i3 < N_tile  }:   max( case { | I2 == J2-1 &&  i3 - j3  >  N_tile -4  }   : 0;
+        	   	  						 { | I2 == J2-1 &&  i3 - j3  <= N_tile -4  } || 
+        	   	  						 { | I2 < J2-1 } : case 
+        	   	          				      { |j3 == 0 } :    C[ I2, J2-1, i3,   N_tile-1 ]  + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]) ;
+		                  					  { |j3 >  0 } :    C[ I2, J2,   i3+1, j3-1 ]      + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]); esac;
+		        					  esac,  S_C_I2_J2[i3, j3]);
+		  esac;
+
+
+  S_C_I2_J2[i3,j3] = 
+       case 
+         { | i3 == N_tile } : FTable_C_pointwise_diag;
+         { | i3 < N_tile  }: max( C[I2, J2, i3, j3], 
+        	   	    reduce(max, [k3], {|i3<=k3<=N_tile-1} : C[I2, J2, i3, k3] + C[I2, J2, k3+1, j3]),
+		             case {| j3 > 0 } : reduce(min, [k3], {|0<=k3<=j3-1} : C[I2, J2, i3, k3] + C[I2, J2, k3+1, j3]);
+		    			  {| j3 == 0 } : 0; esac);
+	   esac;
+.
+
+
+
+
+affine bpmax_single_strand_s2_tile {N|N>=3}
+input
+    int seq2 {i| 0 <= i < N };
+output
+	float S2 {i,j| 0 <= i <= j < N};
+let
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+   	//
+    // Step 1: Compute only the diagonals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 == ej2 } 
+   	bpmax_single_strand_diagonal_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+   	(
+   		(ei2, ej2, i, j -> i, j)@seq2_t
+   	) returns (S_C);
+	
+    // Step 2: Majority of the computation : Perform matrix max plus for A and B
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
+   matrix_max_plus_section[M, N, N_sec, N_tile, MR, NR, ei2, ej2, ek2]
+   ( 
+       (ei2, ej2, i, j -> i, j)@seq2_t,
+       (ei2, ej2, ek2, i3, j3 -> ei2,   ek2, i3, j3)@S_A, 
+       (ei2, ej2, ek2, i3, j3 -> ek2+1, ej2, i3, j3)@S_B
+   )returns (FTable_C_section_r1);
+	   
+    // Final Step : Finalize the section and transform it such that it is ready for the register tile.
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
+    bpmax_single_strand_finalize[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+    (
+    	(ei2, ej2, i,  j -> i, j)@seq2_t,
+    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S_A, 
+    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S_B
+	)returns (FTable_C_section_3); // replace it with FTable_C
+	
+    
+	/// Finally transform the memory for register tiling  
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 } 
+    transform_section_like_A_for_register_tile[M, N, N_sec, N_tile, MR, NR, ei2, ej2]
+    (
+    	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@S_C
+    )returns (S_A);
+ 	   
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 } 
+	transform_section_like_B_for_register_tile[M, N, N_sec, N_tile, MR, NR,  ei2, ej2]
+    (
+    	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@S_C
+    ) returns (S_B);
+   
 .

@@ -107,48 +107,60 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
-#define S2_A(i2,j2,i3,j3) S2_A[i2][j2][i3][j3]
-#define S2_B(i2,j2,i3,j3) S2_B[i2][j2][i3][j3]
-#define seq2_t(i,j) seq2_t[i][j]
-#define FTable(i2,j2) FTable[i2][j2]
-#define FTable_A(i2,j2,i3,j3) FTable_A[i2][j2][i3][j3]
-#define FTable_B(i2,j2,i3,j3) FTable_B[i2][j2][i3][j3]
+#define seq1(i) seq1[i]
+#define S1(i,j) S1[i][j]
+#define FTable_section(i3,j3) FTable_section[i3][j3]
+#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, float**** FTable_C, float**** S2_A, float**** S2_B, int** seq2_t, float** FTable, float**** FTable_A, float**** FTable_B){
+void bpmax_outer_south_west(long M, long N, long N_sec, long N_tile, long I1, long J1, long K1, long I2, long J2, int* seq1, float** S1, float** FTable_section, float** FTable_C_section){
 	///Parameter checking
-	if (!((M >= 3 && N >= 16 && N_sec >= 4 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((M >= 16 && N >= 96 && N_sec >= 1 && N_tile >= 96 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i2,j2) FTable(i2,j2) = 0
+	#define S0(i3,j3) FTable_C_section(i3,j3) = FTable_section(i3,j3)
+	#define S_1(i3,j3) FTable_C_section(i3,j3) = __max_float((FTable_section(i3,j3))+(e_intra_score(seq1(I1),seq1(J1))),FTable_section(i3,j3))
 	{
 		//Domain
-		//{i2,j2|M>=3 && N>=16 && N_sec>=4 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2 && N>=j2+1}
+		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && I1>=J1-3 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i3,j3|M>=16 && N>=96 && N_sec>=1 && N_tile>=96 && I1>=0 && J1>=I1+4 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=I1+1 && J1>=0}
 		int c1,c2;
-		for(c1=0;c1 <= N-1;c1+=1)
-		 {
-		 	for(c2=c1;c2 <= N-1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2));
-		 	 }
-		 }
+		if ((I1 <= J1-4)) {
+			{
+				for(c1=0;c1 <= N_tile-1;c1+=1)
+				 {
+				 	for(c2=0;c2 <= N_tile-1;c2+=1)
+				 	 {
+				 	 	S_1((c1),(c2));
+				 	 }
+				 }
+			}
+		}
+		if ((I1 >= J1-3)) {
+			{
+				for(c1=0;c1 <= N_tile-1;c1+=1)
+				 {
+				 	for(c2=0;c2 <= N_tile-1;c2+=1)
+				 	 {
+				 	 	S0((c1),(c2));
+				 	 }
+				 }
+			}
+		}
 	}
 	#undef S0
+	#undef S_1
 	
 	//Memory Free
 }
 
 //Memory Macros
-#undef FTable_C
-#undef S2_A
-#undef S2_B
-#undef seq2_t
-#undef FTable
-#undef FTable_A
-#undef FTable_B
+#undef seq1
+#undef S1
+#undef FTable_section
+#undef FTable_C_section
 
 
 //Common Macro undefs
