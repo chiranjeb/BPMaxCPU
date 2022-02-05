@@ -21,7 +21,7 @@ let
 affine transform_reverse_1D_to_2D
 {
 	N, N_sec, N_tile, I2 | 
-	N >= 16 &&  N_sec >= 4 && N_tile >=4 && 0 <= I2 <= N_sec-1
+	N >= 16 &&  N_sec >= 2 && N_tile >=4 && 0 <= I2 <= N_sec-1
 }
 input
     int  seq2          { i | 0 <= i < N} ;
@@ -36,7 +36,7 @@ let
 affine bpmax_single_strand_s2_tile 
 {
 	M, N, N_sec, N_tile, MR, NR | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 4 && N_tile >=4 && MR >=1 && NR>=1	
+	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
 }
 input
 	  int   seq2_t   { i,  j      | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
@@ -53,7 +53,7 @@ let
 affine bpmax 
 {
 	M, N, N_sec, N_tile, MR, NR | 
-	M >= 3 &&  N >= 16 &&  N_sec >= 4 && N_tile >=4 && MR >=1 && NR>=1
+	M >= 3 &&  N >= 16 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1
 }
 input
 	int seq2 {i| 0 <= i < N} ;
