@@ -125,7 +125,7 @@ float eval_FTable(long, long, int, int, int, int);
 
 void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** _local_FTable){
 	///Parameter checking
-	if (!((M >= 3 && N >= 3))) {
+	if (!((M >= 1 && N >= 8))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -190,7 +190,7 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 	#define S0(i1,j1,i2,j2) eval_FTable(M,N,i1,j1,i2,j2)
 	{
 		//Domain
-		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && M>=3 && N>=3}
+		//{i1,j1,i2,j2|i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && j2>=i2 && N>=j2+1 && M>=1 && N>=8}
 		int c1,c2,c3,c4;
 		for(c1=0;c1 <= M-1;c1+=1)
 		 {
@@ -235,7 +235,7 @@ float reduce_bpmax_verify_S1_1(long M, long N, int ip, int jp){
 	#define S0(i,j,k) {float __temp__ = (eval_S1(M,N,i,k))+(eval_S1(M,N,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|M>=3 && N>=3 && M>=jp+1 && ip>=0 && jp>=ip+4 && M>=ip+1 && jp>=0 && j>=i+4 && M>=i+1 && j>=k+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=0 && ip==i && jp==j}
+		//{i,j,k|jp>=ip+4 && N>=8 && M>=jp+1 && ip>=0 && M>=ip+1 && jp>=0 && M>=1 && M>=i+1 && j>=0 && j>=k+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {
@@ -262,7 +262,7 @@ float reduce_bpmax_verify_S2_1(long M, long N, int ip, int jp){
 	#define S0(i,j,k) {float __temp__ = (eval_S2(M,N,i,k))+(eval_S2(M,N,k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|M>=3 && N>=3 && N>=jp+1 && ip>=0 && jp>=ip+4 && jp>=0 && N>=ip+1 && j>=i+4 && j>=0 && j>=k+1 && i>=0 && k>=i && N>=k+1 && N>=j+1 && k>=-1 && N>=i+1 && ip==i && jp==j}
+		//{i,j,k|M>=1 && N>=8 && N>=jp+1 && ip>=0 && jp>=ip+4 && jp>=0 && N>=ip+1 && j>=i+4 && j>=0 && j>=k+1 && i>=0 && k>=i && N>=k+1 && N>=j+1 && k>=-1 && N>=i+1 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {
@@ -288,7 +288,7 @@ float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_FTable(i1,j1,i2,j2) == 'N' ) {
 		_flag_FTable(i1,j1,i2,j2) = 'I';
 	//Body for FTable
-		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):(__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),0)));
+		FTable(i1,j1,i2,j2) = eval_S2(M,N,i2,j2);
 		_flag_FTable(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_FTable(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);

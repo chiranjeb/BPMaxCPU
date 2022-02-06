@@ -135,7 +135,7 @@ void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, lon
 	}
 	#undef S0
 
-	Dump2D(N, S2, "Final Transformed array");
+	Dump2D(N, C, "Final Transformed array");
 	
 	//Memory Free
 }

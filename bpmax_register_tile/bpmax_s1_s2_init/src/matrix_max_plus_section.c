@@ -121,7 +121,7 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, 
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) C_section(i3,j3) = reduce_matrix_max_plus_section_C_section_1(N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B)
+	#define S0(i3,j3) C_section(i3,j3) = max( C_section(i3,j3), reduce_matrix_max_plus_section_C_section_1(N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B))
 	{
 		//Domain
 		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && N>=8 && i3>=0 && j3>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2}

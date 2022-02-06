@@ -55,13 +55,13 @@
 #define var_FTable_verify(i1,j1,i2,j2) FTable_verify(i1,j1,i2,j2)
 
 //function prototypes
-void bpmax(long, long, int*, int*, float****);
+void bpmax(long, long, long, long, long, long, int*, int*, float****);
 void bpmax_verify(long, long, int*, int*, float****);
 
 //main
 int main(int argc, char** argv) {
 	//Check number of args
-	if (argc <= 6) {
+	if (argc <= 5) {
 		printf("Number of argument is smaller than expected.\n");
 		printf("Expecting M, N, N_tile,MR, NR\n");
 		exit(0);
