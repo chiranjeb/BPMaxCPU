@@ -23,17 +23,11 @@ verify-rand: $(OBJS) bpmax_verify.o
 bpmax.o : bpmax.c
 	$(CC) bpmax.c -o bpmax.o $(CFLAGS) $(LIBRARIES) -c
 
-bpmax_ftable_init.o : bpmax_ftable_init.c
-	$(CC) bpmax_ftable_init.c -o bpmax.o $(CFLAGS) $(LIBRARIES) -c
-
 bpmax_single_strand_s1.o : bpmax_single_strand_s1.c
 	$(CC) bpmax_single_strand_s1.c -o bpmax_single_strand_s1.o $(CFLAGS) $(LIBRARIES) -c
 
 bpmax_single_strand_s2.o : bpmax_single_strand_s2.c
 	$(CC) bpmax_single_strand_s2.c -o bpmax_single_strand_s2.o $(CFLAGS) $(LIBRARIES) -c
-
-bpmax_single_strand_s2_tile.o : bpmax_single_strand_s2_tile.c
-	$(CC) bpmax_single_strand_s2_tile.c -o bpmax_single_strand_s2_tile.o $(CFLAGS) $(LIBRARIES) -c
 
 bpmax_single_strand_diagonal_tile.o : bpmax_single_strand_diagonal_tile.c
 	$(CC) bpmax_single_strand_diagonal_tile.c -o bpmax_single_strand_diagonal_tile.o $(CFLAGS) $(LIBRARIES) -c

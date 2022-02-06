@@ -120,29 +120,27 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	}
 	//Memory Allocation
 	
-	#define S0(i,j) S1(i,j) = 0
-	#define S_1(i,j) S1(i,j) = __max_float((S1(i+1,j-1))+(e_intra_score(seq1(i),seq1(j))),reduce_bpmax_single_strand_s1_S1_1(M,i,j,S1))
+	#define S0(i,j) S1(j,i+j) = 0
+	#define S_1(i,j) S1(j,i+j) = __max_float((S1(j+1,i+j-1))+(e_intra_score(seq1(j),seq1(i+j))),reduce_bpmax_single_strand_s1_S1_1(M,j,i+j,S1))
 	{
 		//Domain
 		//{i,j|i>=j-3 && M>=1 && i>=0 && j>=i && M>=j+1}
 		//{i,j|j>=i+4 && M>=1 && i>=0 && M>=i+1 && M>=j+1 && j>=0}
 		int c1,c2;
-		for(c1=0;c1 <= M-5;c1+=1)
+		for(c1=0;c1 <= min(3,M-1);c1+=1)
 		 {
-		 	for(c2=c1;c2 <= c1+3;c2+=1)
+		 	#pragma omp parallel for 
+		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
-		 	 }
-		 	for(c2=c1+4;c2 <= M-1;c2+=1)
-		 	 {
-		 	 	S_1((c1),(c2));
 		 	 }
 		 }
-		for(c1=max(0,M-4);c1 <= M-1;c1+=1)
+		for(c1=4;c1 <= M-1;c1+=1)
 		 {
-		 	for(c2=c1;c2 <= M-1;c2+=1)
+		 	#pragma omp parallel for 
+		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
 		 	 {
-		 	 	S0((c1),(c2));
+		 	 	S_1((c1),(c2));
 		 	 }
 		 }
 	}
@@ -152,8 +150,8 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	//Memory Free
 }
 float reduce_bpmax_single_strand_s1_S1_1(long M, int ip, int jp, float** S1){
-	float reduceVar = 0;
-	#define S2(i,j,k) reduceVar = (reduceVar)+((S1(i,k))+(S1(k+1,j)))
+	float reduceVar = -FLT_MAX;
+	#define S2(i,j,k) {float __temp__ = (S1(i,k))+(S1(k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
 		//{i,j,k|jp>=ip+4 && M>=jp+1 && ip>=0 && M>=ip+1 && jp>=0 && M>=1 && j>=k+1 && M>=i+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && j>=0 && ip==i && jp==j}
