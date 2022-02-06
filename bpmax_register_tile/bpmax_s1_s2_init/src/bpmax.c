@@ -244,7 +244,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		//Domain
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==1 && i==0 && i2>=0 && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==0 && i==0 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i1,j1,i2,i3,i4|i4==0 && j1==2 && i1==1 && i2>=0 && i3>=i2 && M>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i1,j1,i2,i3,i4|i4==0 && j1==1 && i1==M && i2>=0 && i3>=i2 && M>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		//{i1,j1,i2,j2,i4|i1==1 && j1>=0 && i2>=j1 && M>=i2+1 && j2>=0 && i4>=j2 && N_sec>=i4+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
 		int c2,c3,c4,c5;
@@ -254,7 +254,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		 	S0((0),(1),(c3),(0),(0));
 		 }
 		S3((0),(2),(0),(0),(0));
-		for(c2=0;c2 <= min(1,M-1);c2+=1)
+		for(c2=0;c2 <= M-1;c2+=1)
 		 {
 		 	for(c3=c2;c3 <= M-1;c3+=1)
 		 	 {
@@ -268,183 +268,12 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1,
 		 	 	 }
 		 	 }
 		 }
-		if ((M >= N_sec+1 && N_sec >= 3)) {
-			{
-				for(c3=0;c3 <= 1;c3+=1)
-				 {
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-				for(c3=2;c3 <= N_sec-1;c3+=1)
-				 {
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=0;c4 <= c3-1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=c3;c4 <= N_sec-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for 
-				 	for(c4=N_sec;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-				for(c3=N_sec;c3 <= M-1;c3+=1)
-				 {
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=0;c4 <= N_sec-1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((M >= 3 && N_sec == 2)) {
-			{
-				for(c3=0;c3 <= 1;c3+=1)
-				 {
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-				for(c3=2;c3 <= M-1;c3+=1)
-				 {
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=0;c4 <= 1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= 1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-			}
-		}
-		if ((M >= 3 && M <= N_sec-1)) {
-			{
-				for(c3=0;c3 <= 1;c3+=1)
-				 {
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-				for(c3=2;c3 <= M-1;c3+=1)
-				 {
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=0;c4 <= c3-1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=M;c4 <= N_sec-1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 }
-			}
-		}
-		if ((M >= 3 && M == N_sec)) {
-			{
-				for(c3=0;c3 <= 1;c3+=1)
-				 {
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-				for(c3=2;c3 <= M-1;c3+=1)
-				 {
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=0;c4 <= c3-1;c4+=1)
-				 	 {
-				 	 	for(c5=c4;c5 <= M-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 	#pragma omp parallel for private(c5)
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 	for(c5=c4;c5 <= M-1;c5+=1)
-				 	 	 {
-				 	 	 	S4((1),(2),(c3),(c4),(c5));
-				 	 	 }
-				 	 }
-				 }
-			}
-		}
-		if ((M <= 2)) {
-			{
-				for(c3=0;c3 <= M-1;c3+=1)
-				 {
-				 	#pragma omp parallel for 
-				 	for(c4=c3;c4 <= M-1;c4+=1)
-				 	 {
-				 	 	S2((1),(2),(c3),(c4),(0));
-				 	 }
-				 }
-			}
-		}
-		for(c2=3;c2 <= M-1;c2+=1)
+		for(c3=0;c3 <= M-1;c3+=1)
 		 {
-		 	for(c3=c2;c3 <= M-1;c3+=1)
+		 	#pragma omp parallel for 
+		 	for(c4=c3;c4 <= M-1;c4+=1)
 		 	 {
-		 	 	#pragma omp parallel for private(c5)
-		 	 	for(c4=0;c4 <= N_sec-1;c4+=1)
-		 	 	 {
-		 	 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
-		 	 	 	 {
-		 	 	 	 	S4((1),(c2),(c3),(c4),(c5));
-		 	 	 	 }
-		 	 	 }
+		 	 	S2((M),(1),(c3),(c4),(0));
 		 	 }
 		 }
 	}
