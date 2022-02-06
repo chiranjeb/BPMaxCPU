@@ -39,27 +39,31 @@
 
 
 //Memory Macros
+#define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
-#define S2_A(k,i2,j2,i3,j3) S2_A[k][i2][j2][i3][j3]
-#define S2_B(k,i2,j2,i3,j3) S2_B[k][i2][j2][i3][j3]
-#define S2_C(k,i2,j2,i3,j3) S2_C[k][i2][j2][i3][j3]
-#define seq2_t(i,j) seq2_t[i][j]
-#define S2(k,i,j) S2[k][i][j]
+#define S1(i,j) S1[i][j]
+#define S2(i,j) S2[i][j]
+#define NR_FTable(i1,j1,i2,j2) NR_FTable[i1][j1][i2][j2]
+#define NR_FTable_1(i1,j1,i2,j2) NR_FTable_1[i1][j1][i2][j2]
+#define NR_FTable_2(i1,j1,i2,j2) NR_FTable_2[i1][j1][i2][j2]
+#define NR_FTable_3(i1,j1,i2,j2) NR_FTable_3[i1][j1][i2][j2]
+#define NR_FTable_4(i1,j1,i2,j2) NR_FTable_4[i1][j1][i2][j2]
+#define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 
-#define S2_verify(k,i,j) S2_verify[k][i][j]
-#define var_S2(k,i,j) S2(k,i,j)
-#define var_S2_verify(k,i,j) S2_verify(k,i,j)
+#define FTable_verify(i1,j1,i2,j2) FTable_verify[i1][j1][i2][j2]
+#define var_FTable(i1,j1,i2,j2) FTable(i1,j1,i2,j2)
+#define var_FTable_verify(i1,j1,i2,j2) FTable_verify(i1,j1,i2,j2)
 
 //function prototypes
-void bpmax(long, long, long, long, long, long, int*, float***);
-void bpmax_verify(long, long, long, long, long, long, int*, float**);
+void bpmax(long, long, int*, int*, float****);
+void bpmax_verify(long, long, int*, int*, float****);
 
 //main
 int main(int argc, char** argv) {
 	//Check number of args
-	if (argc <= 5) {
+	if (argc <= 6) {
 		printf("Number of argument is smaller than expected.\n");
-		printf("Expecting M,N,N_sec,N_tile,MR,NR\n");
+		printf("Expecting M, N, N_tile,MR, NR\n");
 		exit(0);
 	}
 	
@@ -101,29 +105,9 @@ int main(int argc, char** argv) {
 		printf("For parameter N: Converted part: %ld, non-convertible part: %s\n", N, end);
 		exit(EXIT_FAILURE);
 	}
-	
-	//Initialisation of N_sec
 	errno = 0;
 	end = 0;
 	val = argv[3];
-	long N_sec = strtol(val,&end,10);
-	if ((errno == ERANGE && (N_sec == LONG_MAX || N_sec == LONG_MIN)) || (errno != 0 && N_sec == 0)) {
-		perror("strtol");
-		exit(EXIT_FAILURE);
-	}
-	if (end == val) {
-		fprintf(stderr, "No digits were found for N_sec\n");
-		exit(EXIT_FAILURE);
-	}
-	if (*end != '\0'){
-		printf("For parameter N_sec: Converted part: %ld, non-convertible part: %s\n", N_sec, end);
-		exit(EXIT_FAILURE);
-	}
-	
-	//Initialisation of N_tile
-	errno = 0;
-	end = 0;
-	val = argv[4];
 	long N_tile = strtol(val,&end,10);
 	if ((errno == ERANGE && (N_tile == LONG_MAX || N_tile == LONG_MIN)) || (errno != 0 && N_tile == 0)) {
 		perror("strtol");
@@ -138,10 +122,10 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
-	//Initialisation of MR
+	///Parameter checking
 	errno = 0;
 	end = 0;
-	val = argv[5];
+	val = argv[4];
 	long MR = strtol(val,&end,10);
 	if ((errno == ERANGE && (MR == LONG_MAX || MR == LONG_MIN)) || (errno != 0 && MR == 0)) {
 		perror("strtol");
@@ -155,12 +139,11 @@ int main(int argc, char** argv) {
 		printf("For parameter MR: Converted part: %ld, non-convertible part: %s\n", MR, end);
 		exit(EXIT_FAILURE);
 	}
-	
-	//Initialisation of NR
+
 	errno = 0;
 	end = 0;
-	val = argv[6];
-	long NR = strtol(val,&end,10);
+	val = argv[5];
+	long NR = strtol(val,&end, 10);
 	if ((errno == ERANGE && (NR == LONG_MAX || NR == LONG_MIN)) || (errno != 0 && NR == 0)) {
 		perror("strtol");
 		exit(EXIT_FAILURE);
@@ -175,46 +158,84 @@ int main(int argc, char** argv) {
 	}
 	
 	
-	///Parameter checking
-	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
-		printf("The value of parameters are not valid.\n");
-		exit(-1);
-	}
-	
-	
 	//Memory Allocation
-	int mz1, mz2, mz3, mz4, mz5;
+	int mz1, mz2, mz3, mz4;
+	int* seq1 = (int*)malloc(sizeof(int)*(M));
+	mallocCheck(seq1, (M), int);
 	int* seq2 = (int*)malloc(sizeof(int)*(N));
 	mallocCheck(seq2, (N), int);
-	float* _lin_S2 = (float*)malloc(sizeof(float)*((N) * (N)));
-	mallocCheck(_lin_S2, ((N) * (N)), float);
-	float*** S2 = (float***)malloc(sizeof(float**)*(1));
-	mallocCheck(S2, (1), float**);
-	for (mz1=0;mz1 < 1; mz1++) {
-		S2[mz1] = (float**)malloc(sizeof(float*)*(N));
-		mallocCheck(S2[mz1], (N), float*);
-		for (mz2=0;mz2 < N; mz2++) {
-			S2[mz1][mz2] = &_lin_S2[(mz1*((N) * (N))) + (mz2*(N))];
+	float* _lin_FTable = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
+	mallocCheck(_lin_FTable, ((M) * (M) * (N) * (N)), float);
+	float**** FTable = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(FTable, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		FTable[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(FTable[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			FTable[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+			mallocCheck(FTable[mz1][mz2], (N), float*);
+			for (mz3=0;mz3 < N; mz3++) {
+				FTable[mz1][mz2][mz3] = &_lin_FTable[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+			}
 		}
 	}
 	#ifdef VERIFY
-		float* _lin_S2_verify = (float*)malloc(sizeof(float)*((N) * (N)));
-		mallocCheck(_lin_S2_verify, ((N) * (N)), float);
-		float*** S2_verify = (float***)malloc(sizeof(float**)*(1));
-		mallocCheck(S2_verify, (1), float**);
-		for (mz1=0;mz1 < 1; mz1++) {
-			S2_verify[mz1] = (float**)malloc(sizeof(float*)*(N));
-			mallocCheck(S2_verify[mz1], (N), float*);
-			for (mz2=0;mz2 < N; mz2++) {
-				S2_verify[mz1][mz2] = &_lin_S2_verify[(mz1*((N) * (N))) + (mz2*(N))];
+		float* _lin_FTable_verify = (float*)malloc(sizeof(float)*((M) * (M) * (N) * (N)));
+		mallocCheck(_lin_FTable_verify, ((M) * (M) * (N) * (N)), float);
+		float**** FTable_verify = (float****)malloc(sizeof(float***)*(M));
+		mallocCheck(FTable_verify, (M), float***);
+		for (mz1=0;mz1 < M; mz1++) {
+			FTable_verify[mz1] = (float***)malloc(sizeof(float**)*(M));
+			mallocCheck(FTable_verify[mz1], (M), float**);
+			for (mz2=0;mz2 < M; mz2++) {
+				FTable_verify[mz1][mz2] = (float**)malloc(sizeof(float*)*(N));
+				mallocCheck(FTable_verify[mz1][mz2], (N), float*);
+				for (mz3=0;mz3 < N; mz3++) {
+					FTable_verify[mz1][mz2][mz3] = &_lin_FTable_verify[(mz1*((M) * (N) * (N))) + (mz2*((N) * (N))) + (mz3*(N))];
+				}
 			}
 		}
 	#endif
+	
+	long N_sec;
+	if ( N % N_tile )
+	{
+	     N_sec = N/N_tile + 1;
+		 printf ("Currently partials are not supported");
+		 exit(0);
+	}
+	else
+	{
+	     N_sec = N/N_tile;
+	}
+
 
 	//Initialization of rand
 	srand((unsigned)time(NULL));
 	 
 	//Input Initialization
+	{
+		#if defined (RANDOM)
+			#define S0(i) (seq1(i) = rand()%4); 
+		#elif defined (CHECKING) || defined (VERIFY)
+			#ifdef NO_PROMPT
+				#define S0(i) scanf("%c", &seq1(i));seq1(i) = toNum(seq1(i));
+			#else
+				#define S0(i) printf("seq1(%ld)=",(long) i); scanf("%d", &seq1(i))
+			#endif
+		#else
+                #define S0(i) 
+                ReadSequencesFromFiles(argc>=7? argv[6] : NULL, seq1, M, true);
+		#endif
+		
+		
+		int c1;
+		for(c1=0;c1 <= M-1;c1+=1)
+		 {
+		 	S0((c1));
+		 }
+		#undef S0
+	}
 	{
 		#if defined (RANDOM)
 			#define S0(i) (seq2(i) = rand()%4); 
@@ -225,8 +246,8 @@ int main(int argc, char** argv) {
 				#define S0(i) printf("seq2(%ld)=",(long) i); scanf("%d", &seq2(i))
 			#endif
 		#else
-                        #define S0(i) 
-                        ReadSequencesFromFiles(argc==9? argv[8] : NULL, seq2, N, true);
+                 #define S0(i) 
+                 ReadSequencesFromFiles(argc==8? argv[7] : NULL, seq2, N, true);
 		#endif
 		
 		
@@ -242,14 +263,17 @@ int main(int argc, char** argv) {
 	struct timeval time;
 	double elapsed_time;
 	
+	printf ( "******Running bpmax with input: M (%d), N (%ld), N_sec (%ld), N_tile (%ld), MR (%ld), NR (%ld)******\n", 
+              M, N, N_sec, N_tile, MR, NR);
 	//Call the main computation
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 	
-	bpmax(M, N, N_sec, N_tile, MR, NR, seq2, S2);
+	bpmax(M, N, N_sec, N_tile, MR, NR,  seq1, seq2, FTable);
 
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+    printf("F(%d, %d, %d, %d)=%10e\n", 0 , M-1, 0, N-1, var_FTable(0, M-1, 0, N-1));  
 
 	// timing information
 	printf("Execution time : %lf sec.\n", elapsed_time);
@@ -260,7 +284,7 @@ int main(int argc, char** argv) {
 				printf("I couldn't open trace.dat for writing.\n");
 				exit(EXIT_FAILURE);
 		}
-		fprintf(fp, "%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%lf\n",M,N,N_sec,N_tile,MR,NR,elapsed_time);
+		fprintf(fp, "%ld\t%ld\t%lf\n",M,N,elapsed_time);
 		fclose(fp);
 	#endif
 	
@@ -270,7 +294,7 @@ int main(int argc, char** argv) {
 			gettimeofday(&time, NULL);
 			elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 		#endif
-    	bpmax_verify(M, N, N_sec, N_tile, MR, NR, seq2, S2_verify[0]);
+    	bpmax_verify(M, N, seq1, seq2, FTable_verify);
     	#ifdef TIMING
     		gettimeofday(&time, NULL);
 			elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
@@ -280,7 +304,7 @@ int main(int argc, char** argv) {
 					printf("I couldn't open trace_verify.dat for writing.\n");
 					exit(EXIT_FAILURE);
 			}
-			fprintf(fp, "%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%lf\n",M,N,N_sec,N_tile,MR,NR,elapsed_time);
+			fprintf(fp, "%ld\t%ld\t%lf\n",M,N,elapsed_time);
 			fclose(fp_verify);
 		#endif
 	#endif
@@ -290,16 +314,22 @@ int main(int argc, char** argv) {
 		
 		{
 			#ifdef NO_PROMPT
-				#define S0(k,i,j) printf("%0.2f\n",var_S2(k,i,j))
+				#define S0(i1,j1,i2,j2) printf("%0.2f\n",var_FTable(i1,j1,i2,j2))
 			#else
-				#define S0(k,i,j) printf("S2(%ld,%ld,%ld)=",(long) k,(long) i,(long) j);printf("%0.2f\n",var_S2(k,i,j))
+				#define S0(i1,j1,i2,j2) printf("FTable(%ld,%ld,%ld,%ld)=",(long) i1,(long) j1,(long) i2,(long) j2);printf("%0.2f\n",var_FTable(i1,j1,i2,j2))
 			#endif
-			int c2,c3;
-			for(c2=0;c2 <= N-1;c2+=1)
+			int c1,c2,c3,c4;
+			for(c1=0;c1 <= M-1;c1+=1)
 			 {
-			 	for(c3=c2;c3 <= N-1;c3+=1)
+			 	for(c2=c1;c2 <= M-1;c2+=1)
 			 	 {
-			 	 	S0((0),(c2),(c3));
+			 	 	for(c3=0;c3 <= N-1;c3+=1)
+			 	 	 {
+			 	 	 	for(c4=c3;c4 <= N-1;c4+=1)
+			 	 	 	 {
+			 	 	 	 	S0((c1),(c2),(c3),(c4));
+			 	 	 	 }
+			 	 	 }
 			 	 }
 			 }
 			#undef S0
@@ -309,50 +339,66 @@ int main(int argc, char** argv) {
 		{
 			//Error Counter
 			volatile int _errors_ = 0;
-			#define S0(k,i,j) if (fabsf(1.0f - var_S2_verify(k,i,j)/var_S2(k,i,j)) > EPSILON) _errors_++;
-			int c2,c3;
-			for(c2=0;c2 <= N-1;c2+=1)
+			#define S0(i1,j1,i2,j2) if (fabsf(1.0f - var_FTable_verify(i1,j1,i2,j2)/var_FTable(i1,j1,i2,j2)) > EPSILON) _errors_++;
+			int c1,c2,c3,c4;
+			for(c1=0;c1 <= M-1;c1+=1)
 			 {
-			 	for(c3=c2;c3 <= N-1;c3+=1)
+			 	for(c2=c1;c2 <= M-1;c2+=1)
 			 	 {
-			 	 	S0((0),(c2),(c3));
+			 	 	for(c3=0;c3 <= N-1;c3+=1)
+			 	 	 {
+			 	 	 	for(c4=c3;c4 <= N-1;c4+=1)
+			 	 	 	 {
+			 	 	 	 	S0((c1),(c2),(c3),(c4));
+			 	 	 	 }
+			 	 	 }
 			 	 }
 			 }
 			#undef S0
 			if(_errors_ == 0){
-				printf("TEST for S2 PASSED\n");
+				printf("TEST for FTable PASSED\n");
 			}else{
-				printf("TEST for S2 FAILED. #Errors: %d\n", _errors_);
-				return EXIT_FAILURE;
+				printf("TEST for FTable FAILED. #Errors: %d\n", _errors_);
 			}
 		}
     #endif
     
 	//Memory Free
+	free(seq1);
 	free(seq2);
-	free(_lin_S2);
-	for (mz1=0;mz1 < 1; mz1++) {
-		free(S2[mz1]);
-	}
-	free(S2);
-	#ifdef VERIFY
-		free(_lin_S2_verify);
-		for (mz1=0;mz1 < 1; mz1++) {
-			free(S2_verify[mz1]);
+	free(_lin_FTable);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(FTable[mz1][mz2]);
 		}
-		free(S2_verify);
+		free(FTable[mz1]);
+	}
+	free(FTable);
+	#ifdef VERIFY
+		free(_lin_FTable_verify);
+		for (mz1=0;mz1 < M; mz1++) {
+			for (mz2=0;mz2 < M; mz2++) {
+				free(FTable_verify[mz1][mz2]);
+			}
+			free(FTable_verify[mz1]);
+		}
+		free(FTable_verify);
 	#endif
 	
 	return EXIT_SUCCESS;
 }
 
 //Memory Macros
+#undef seq1
 #undef seq2
-#undef S2_A
-#undef S2_B
-#undef S2_C
-#undef seq2_t
+#undef S1
 #undef S2
+#undef NR_FTable
+#undef NR_FTable_1
+#undef NR_FTable_2
+#undef NR_FTable_3
+#undef NR_FTable_4
+#undef FTable
 
 
 //Common Macro undefs

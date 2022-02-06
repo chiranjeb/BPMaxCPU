@@ -26,7 +26,7 @@ let
         	  max( case { | I2 == J2-1 &&  i3 - j3  > N_tile -4 }: 0;
         	   	   { | I2 == J2-1 &&  i3 - j3  <= N_tile -4  } || { | I2 < J2-1 }:
         	   	       case 
-        	   	          {|j3 == 0 } : C[I2, J2-1,   i3, N_tile-1 ]  + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]) ;
+        	   	          {|j3 == 0 } : C[I2, J2-1,  i3+1, N_tile-1 ]  + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]) ;
 		                  {|j3 >  0 } : C[ I2, J2,   i3+1, j3-1 ]     + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]);
 		               esac;
 		        esac, FTable_C_section);

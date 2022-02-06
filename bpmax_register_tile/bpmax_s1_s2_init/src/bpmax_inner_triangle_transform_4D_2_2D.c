@@ -107,12 +107,12 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define S_C(i2,j2,i3,j3) S_C[i2][j2][i3][j3]
-#define S2(i,j) S2[i][j]
+#define C_in(i2,j2,i3,j3) C_in[i2][j2][i3][j3]
+#define C(i,j) C[i][j]
 
-void bpmax_inner_triangle_transform_4D_2_2D(long M, long N, long N_sec, long N_tile, long MR, long NR, float**** S_C, float** S2){
+void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, long MR, long NR, float**** C_in, float** C){
 	///Parameter checking
-	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -127,7 +127,7 @@ void bpmax_inner_triangle_transform_4D_2_2D(long M, long N, long N_sec, long N_t
               {
                   for( int j2 = 0; j2 < N_tile; j2++)
                   {
-                      S2[i1*N_tile+i2][j1*N_tile+j2] =  S_C[i1][j1][i2][j2];
+                      C[i1*N_tile+i2][j1*N_tile+j2] =  C_in[i1][j1][i2][j2];
                   }
               }
            }
@@ -141,8 +141,8 @@ void bpmax_inner_triangle_transform_4D_2_2D(long M, long N, long N_sec, long N_t
 }
 
 //Memory Macros
-#undef S_C
-#undef S2
+#undef C_in
+#undef C
 
 
 //Common Macro undefs

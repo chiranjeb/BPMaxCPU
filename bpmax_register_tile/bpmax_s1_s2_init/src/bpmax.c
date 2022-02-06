@@ -106,26 +106,43 @@ inline double __min_double(double x, double y){
 
 //SubSystem Function Declarations
 void transform_reverse_1D_to_2D(long, long, long, long, int*, int*);
-void bpmax_inner_triangle_transform_4D_2_2D(long, long, long, long, long, long, float****, float**);
-void bpmax_single_strand_s2_tile(long, long, long, long, long, long, int**, float****, float****, float****);
+void bpmax_single_strand_s1(long, int*, float**);
+void bpmax_inner_triangle_transform_4D_2_2D(long, long, long, long, long, float****, float**);
+void bpmax_single_strand_s2_tile(long, long, long, long, long, int**, float****, float****, float****);
+void bpmax_ftable_init(long, long, long, long, long, long, long, long, int*, int**, float**, float**, float**);
 
 
 //Memory Macros
+#define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
+#define S1(k,i,j) S1[k][i][j]
 #define S2_A(k,i2,j2,i3,j3) S2_A[k][i2][j2][i3][j3]
 #define S2_B(k,i2,j2,i3,j3) S2_B[k][i2][j2][i3][j3]
 #define S2_C(k,i2,j2,i3,j3) S2_C[k][i2][j2][i3][j3]
 #define seq2_t(i,j) seq2_t[i][j]
-#define S2(k,i,j) S2[k][i][j]
+#define FTable_C(i1,j1,i2,j2,i3,j3) FTable_C[i1][j1][i2][j2][i3][j3]
+#define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 
-void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2, float*** S2){
+void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq1, int* seq2, float**** FTable){
 	///Parameter checking
-	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	int mz1, mz2, mz3, mz4, mz5;
+	int mz1, mz2, mz3, mz4, mz5, mz6;
+	
+	float* _lin_S1 = (float*)malloc(sizeof(float)*((M) * (M)));
+	mallocCheck(_lin_S1, ((M) * (M)), float);
+	float*** S1 = (float***)malloc(sizeof(float**)*(1));
+	mallocCheck(S1, (1), float**);
+	for (mz1=0;mz1 < 1; mz1++) {
+		S1[mz1] = (float**)malloc(sizeof(float*)*(M));
+		mallocCheck(S1[mz1], (M), float*);
+		for (mz2=0;mz2 < M; mz2++) {
+			S1[mz1][mz2] = &_lin_S1[(mz1*((M) * (M))) + (mz2*(M))];
+		}
+	}
 	
 	float* _lin_S2_A = (float*)malloc(sizeof(float)*((N_sec) * (N_sec) * (N_tile) * (N_tile)));
 	mallocCheck(_lin_S2_A, ((N_sec) * (N_sec) * (N_tile) * (N_tile)), float);
@@ -194,27 +211,256 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2,
 	for (mz1=0;mz1 < N_sec; mz1++) {
 		seq2_t[mz1] = &_lin_seq2_t[(mz1*(N_tile))];
 	}
+	
+	float* _lin_FTable_C = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)));
+	mallocCheck(_lin_FTable_C, ((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)), float);
+	float****** FTable_C = (float******)malloc(sizeof(float*****)*(M));
+	mallocCheck(FTable_C, (M), float*****);
+	for (mz1=0;mz1 < M; mz1++) {
+		FTable_C[mz1] = (float*****)malloc(sizeof(float****)*(M));
+		mallocCheck(FTable_C[mz1], (M), float****);
+		for (mz2=0;mz2 < M; mz2++) {
+			FTable_C[mz1][mz2] = (float****)malloc(sizeof(float***)*(N_sec));
+			mallocCheck(FTable_C[mz1][mz2], (N_sec), float***);
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				FTable_C[mz1][mz2][mz3] = (float***)malloc(sizeof(float**)*(N_sec));
+				mallocCheck(FTable_C[mz1][mz2][mz3], (N_sec), float**);
+				for (mz4=0;mz4 < N_sec; mz4++) {
+					FTable_C[mz1][mz2][mz3][mz4] = (float**)malloc(sizeof(float*)*(N_tile+1));
+					mallocCheck(FTable_C[mz1][mz2][mz3][mz4], (N_tile+1), float*);
+					for (mz5=0;mz5 < N_tile+1; mz5++) {
+						FTable_C[mz1][mz2][mz3][mz4][mz5] = &_lin_FTable_C[(mz1*((M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile))) + (mz2*((N_sec) * (N_sec) * (N_tile+1) * (N_tile))) + (mz3*((N_sec) * (N_tile+1) * (N_tile))) + (mz4*((N_tile+1) * (N_tile))) + (mz5*(N_tile))];
+					}
+				}
+			}
+		}
+	}
 	#define S0(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,seq2,seq2_t[i2])
-	#define S1(i,i1,i2,i3,i4) bpmax_inner_triangle_transform_4D_2_2D(M,N,N_sec,N_tile,MR,NR,S2_C[0],S2[i2])
-	#define S_2(i,i1,i2,i3,i4) bpmax_single_strand_s2_tile(M,N,N_sec,N_tile,MR,NR,seq2_t,S2_A[i2],S2_B[i2],S2_C[i2])
+	#define S_1(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i2])
+	#define S2(i1,j1,i2,i3,i4) bpmax_inner_triangle_transform_4D_2_2D(N,N_sec,N_tile,MR,NR,FTable_C[i2][i3],FTable[i2][i3])
+	#define S3(i,i1,i2,i3,i4) bpmax_single_strand_s2_tile(N,N_sec,N_tile,MR,NR,seq2_t,S2_A[i2],S2_B[i2],S2_C[i2])
+	#define S4(i1,j1,i2,j2,i4) bpmax_ftable_init(M,N,N_sec,N_tile,j1,i2,j2,i4,seq1,seq2_t,S1[0],S2_C[0][j2][i4],FTable_C[j1][i2][j2][i4])
 	{
 		//Domain
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==0 && i==0 && i2>=0 && N_sec>=i2+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		int c3;
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i1==1 && i==0 && i2>=0 && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==0 && i==0 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i1,j1,i2,i3,i4|i4==0 && j1==2 && i1==1 && i2>=0 && i3>=i2 && M>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==2 && i==0 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i1,j1,i2,j2,i4|i1==1 && j1>=0 && i2>=j1 && M>=i2+1 && j2>=0 && i4>=j2 && N_sec>=i4+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		int c2,c3,c4,c5;
+		S_1((0),(0),(0),(0),(0));
 		for(c3=0;c3 <= N_sec-1;c3+=1)
 		 {
-		 	S0((0),(0),(c3),(0),(0));
+		 	S0((0),(1),(c3),(0),(0));
 		 }
-		S_2((0),(2),(0),(0),(0));
-		S1((1),(2),(0),(0),(0));
+		S3((0),(2),(0),(0),(0));
+		for(c2=0;c2 <= min(1,M-1);c2+=1)
+		 {
+		 	for(c3=c2;c3 <= M-1;c3+=1)
+		 	 {
+		 	 	#pragma omp parallel for private(c5)
+		 	 	for(c4=0;c4 <= N_sec-1;c4+=1)
+		 	 	 {
+		 	 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+		 	 	 	 {
+		 	 	 	 	S4((1),(c2),(c3),(c4),(c5));
+		 	 	 	 }
+		 	 	 }
+		 	 }
+		 }
+		if ((M >= N_sec+1 && N_sec >= 3)) {
+			{
+				for(c3=0;c3 <= 1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+				for(c3=2;c3 <= N_sec-1;c3+=1)
+				 {
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=0;c4 <= c3-1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=c3;c4 <= N_sec-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=N_sec;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+				for(c3=N_sec;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=0;c4 <= N_sec-1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 3 && N_sec == 2)) {
+			{
+				for(c3=0;c3 <= 1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+				for(c3=2;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=0;c4 <= 1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= 1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 3 && M <= N_sec-1)) {
+			{
+				for(c3=0;c3 <= 1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+				for(c3=2;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=0;c4 <= c3-1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=M;c4 <= N_sec-1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 }
+			}
+		}
+		if ((M >= 3 && M == N_sec)) {
+			{
+				for(c3=0;c3 <= 1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+				for(c3=2;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=0;c4 <= c3-1;c4+=1)
+				 	 {
+				 	 	for(c5=c4;c5 <= M-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 	#pragma omp parallel for private(c5)
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 	for(c5=c4;c5 <= M-1;c5+=1)
+				 	 	 {
+				 	 	 	S4((1),(2),(c3),(c4),(c5));
+				 	 	 }
+				 	 }
+				 }
+			}
+		}
+		if ((M <= 2)) {
+			{
+				for(c3=0;c3 <= M-1;c3+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c4=c3;c4 <= M-1;c4+=1)
+				 	 {
+				 	 	S2((1),(2),(c3),(c4),(0));
+				 	 }
+				 }
+			}
+		}
+		for(c2=3;c2 <= M-1;c2+=1)
+		 {
+		 	for(c3=c2;c3 <= M-1;c3+=1)
+		 	 {
+		 	 	#pragma omp parallel for private(c5)
+		 	 	for(c4=0;c4 <= N_sec-1;c4+=1)
+		 	 	 {
+		 	 	 	for(c5=c4;c5 <= N_sec-1;c5+=1)
+		 	 	 	 {
+		 	 	 	 	S4((1),(c2),(c3),(c4),(c5));
+		 	 	 	 }
+		 	 	 }
+		 	 }
+		 }
 	}
 	#undef S0
-	#undef S1
-	#undef S_2
+	#undef S_1
+	#undef S2
+	#undef S3
+	#undef S4
 	
 	//Memory Free
+	free(_lin_S1);
+	for (mz1=0;mz1 < 1; mz1++) {
+		free(S1[mz1]);
+	}
+	free(S1);
+	
 	free(_lin_S2_A);
 	for (mz1=0;mz1 < 1; mz1++) {
 		for (mz2=0;mz2 < N_sec; mz2++) {
@@ -253,15 +499,33 @@ void bpmax(long M, long N, long N_sec, long N_tile, long MR, long NR, int* seq2,
 	
 	free(_lin_seq2_t);
 	free(seq2_t);
+	
+	free(_lin_FTable_C);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				for (mz4=0;mz4 < N_sec; mz4++) {
+					free(FTable_C[mz1][mz2][mz3][mz4]);
+				}
+				free(FTable_C[mz1][mz2][mz3]);
+			}
+			free(FTable_C[mz1][mz2]);
+		}
+		free(FTable_C[mz1]);
+	}
+	free(FTable_C);
 }
 
 //Memory Macros
+#undef seq1
 #undef seq2
+#undef S1
 #undef S2_A
 #undef S2_B
 #undef S2_C
 #undef seq2_t
-#undef S2
+#undef FTable_C
+#undef FTable
 
 
 //Common Macro undefs

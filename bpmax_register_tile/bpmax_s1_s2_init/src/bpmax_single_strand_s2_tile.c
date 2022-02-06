@@ -104,7 +104,6 @@ inline double __min_double(double x, double y){
 
 
 
-//SubSystem Function Declarations
 void bpmax_single_strand_diagonal_tile(long, long, long, long, long, long, long, long, int**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
 void bpmax_single_strand_finalize(long, long, long, long, long, long, long, long, int**, float****, float**);
@@ -121,9 +120,9 @@ void transform_section_like_B_for_register_tile(long, long, long, long, long, lo
 #define S_B(i2,j2,i3,j3) S_B[i2][j2][i3][j3]
 #define S_C(i2,j2,i3,j3) S_C[i2][j2][i3][j3]
 
-void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long MR, long NR, int** seq2_t, float**** S_A, float**** S_B, float**** S_C){
+void bpmax_single_strand_s2_tile(long N, long N_sec, long N_tile, long MR, long NR, int** seq2_t, float**** S_A, float**** S_B, float**** S_C){
 	///Parameter checking
-	if (!((M >= 3 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -145,7 +144,6 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 			}
 		}
 	}
-	
 	float* _lin_S_C_2 = (float*)malloc(sizeof(float)*((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)));
 	mallocCheck(_lin_S_C_2, ((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)), float);
 	float***** S_C_2 = (float*****)malloc(sizeof(float****)*(N_sec-2));
@@ -165,7 +163,6 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 			}
 		}
 	}
-	
 	float* _lin_S_C_3 = (float*)malloc(sizeof(float)*((N_sec-1) * (N_sec) * (N_tile+1) * (N_tile)));
 	mallocCheck(_lin_S_C_3, ((N_sec-1) * (N_sec) * (N_tile+1) * (N_tile)), float);
 	float**** S_C_3 = (float****)malloc(sizeof(float***)*(N_sec-1));
@@ -188,11 +185,9 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 	#define S4(i,j,i2,i3) transform_section_like_B_for_register_tile(M,N,N_sec,N_tile,MR,NR,-i,j,S_C[-i][j],S_B[-i][j])
 	{
 		//Domain
-		//{i,j,i2,i3|i+i3==0 && i2==0 && i+j==0 && 0>=i && N_sec+i>=1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,k,i3|k==3 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,i2,i3|i3==j && i2==0 && 0>=i && i+j>=1 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,i2,i3|i3==j && i2==2 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
-		//{i,j,i2,i3|i3==j && i2==1 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=3 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1}
+		//{i2,j2,i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i2,j2,i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i2,j2,i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && i3>=0 && N_tile>=i3 && j3>=0 && N_tile>=j3+1}
 		int c1,c2,c4;
 		S0((-N_sec+1),(N_sec-1),(0),(N_sec-1));
 		S4((-N_sec+1),(N_sec-1),(1),(N_sec-1));
@@ -239,7 +234,6 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 		free(S_C_1[mz1]);
 	}
 	free(S_C_1);
-	
 	free(_lin_S_C_2);
 	for (mz1=0;mz1 < N_sec-2; mz1++) {
 		for (mz2=0;mz2 < N_sec; mz2++) {
@@ -251,7 +245,6 @@ void bpmax_single_strand_s2_tile(long M, long N, long N_sec, long N_tile, long M
 		free(S_C_2[mz1]);
 	}
 	free(S_C_2);
-	
 	free(_lin_S_C_3);
 	for (mz1=0;mz1 < N_sec-1; mz1++) {
 		for (mz2=0;mz2 < N_sec; mz2++) {
