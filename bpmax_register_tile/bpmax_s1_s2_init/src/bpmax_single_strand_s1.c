@@ -106,61 +106,70 @@ inline double __min_double(double x, double y){
 
 
 //Local Function Declarations
-float reduce_matrix_max_plus_section_C_section_1(long, long, long, long, long, long, long, long, int, int, float**, float**);
+float reduce_bpmax_single_strand_s1_S1_1(long, int, int, float**);
 
 //Memory Macros
-#define A(i3,j3) A[i3][j3]
-#define B(i3,j3) B[i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define seq1(i) seq1[i]
+#define S1(i,j) S1[i][j]
 
-void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
+void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2+1 && J2 >= K2+1))) {
+	if (!((M >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) C_section(i3,j3) = reduce_matrix_max_plus_section_C_section_1(N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B)
+	#define S0(i,j) S1(i,j) = 0
+	#define S_1(i,j) S1(i,j) = __max_float((S1(i+1,j-1))+(e_intra_score(seq1(i),seq1(j))),reduce_bpmax_single_strand_s1_S1_1(M,i,j,S1))
 	{
 		//Domain
-		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && N>=8 && i3>=0 && j3>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2}
+		//{i,j|i>=j-3 && M>=1 && i>=0 && j>=i && M>=j+1}
+		//{i,j|j>=i+4 && M>=1 && i>=0 && M>=i+1 && M>=j+1 && j>=0}
 		int c1,c2;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
+		for(c1=0;c1 <= M-5;c1+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	for(c2=c1;c2 <= c1+3;c2+=1)
+		 	 {
+		 	 	S0((c1),(c2));
+		 	 }
+		 	for(c2=c1+4;c2 <= M-1;c2+=1)
+		 	 {
+		 	 	S_1((c1),(c2));
+		 	 }
+		 }
+		for(c1=max(0,M-4);c1 <= M-1;c1+=1)
+		 {
+		 	for(c2=c1;c2 <= M-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
 		 	 }
 		 }
 	}
 	#undef S0
+	#undef S_1
 	
-        Dump2D (N_tile, A, "A");        
-        Dump2D (N_tile, B, "B");     	
-        //printf("\n================Done==================\n"); 
 	//Memory Free
 }
-float reduce_matrix_max_plus_section_C_section_1(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, int i3p, int j3p, float** A, float** B){
-	float reduceVar = -FLT_MAX;
-	#define S1(i3,j3,k) {float __temp__ = (A(i3,k))+(B(k,j3)); reduceVar = __max_float(reduceVar,__temp__); }
+float reduce_bpmax_single_strand_s1_S1_1(long M, int ip, int jp, float** S1){
+	float reduceVar = 0;
+	#define S2(i,j,k) reduceVar = (reduceVar)+((S1(i,k))+(S1(k+1,j)))
 	{
 		//Domain
-		//{i3,j3,k|N_tile>=j3p+1 && N_tile>=4 && N>=8 && i3p>=0 && j3p>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3p+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2 && k>=0 && N_tile>=k+1 && N_tile>=j3+1 && j3>=0 && N_tile>=i3+1 && i3>=0 && i3p==i3 && j3p==j3}
+		//{i,j,k|jp>=ip+4 && M>=jp+1 && ip>=0 && M>=ip+1 && jp>=0 && M>=1 && j>=k+1 && M>=i+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && j>=0 && ip==i && jp==j}
 		int c3;
-		for(c3=0;c3 <= N_tile-1;c3+=1)
+		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {
-		 	S1((i3p),(j3p),(c3));
+		 	S2((ip),(jp),(c3));
 		 }
 	}
-	#undef S1
+	#undef S2
 	return reduceVar;
 }
 
 //Memory Macros
-#undef A
-#undef B
-#undef C_section
+#undef seq1
+#undef S1
 
 
 //Common Macro undefs

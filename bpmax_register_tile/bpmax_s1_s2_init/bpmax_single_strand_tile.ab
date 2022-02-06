@@ -42,7 +42,7 @@ input
 output
     float C_section { i3, j3  | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
 let
-	C_section[i3,j3] = reduce(max, [k], {|0<=k<=N_tile-1}: A[i3, k] + B[k+1, j3]);
+	C_section[i3,j3] = reduce(max, [k], {|0<=k<=N_tile-1}: A[i3, k] + B[k, j3]);
 .	
 
 affine bpmax_single_strand_diagonal_tile 
@@ -61,8 +61,8 @@ let
 
 affine bpmax_single_strand_finalize 
 {
-	M, N, N_sec, N_tile, MR, NR, I2, J2 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+	N, N_sec, N_tile, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
 	int    seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
