@@ -359,6 +359,8 @@ int main(int argc, char** argv) {
 				printf("TEST for FTable PASSED\n");
 			}else{
 				printf("TEST for FTable FAILED. #Errors: %d\n", _errors_);
+				return EXIT_FAILURE; 
+
 			}
 		}
     #endif
