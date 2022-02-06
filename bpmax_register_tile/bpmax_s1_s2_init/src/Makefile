@@ -7,7 +7,7 @@ all: plain check
 
 debug: CFLAGS =-DDEBUG -g -Wall -Wextra -std=c99 -I/usr/include/malloc/
 debug: all
-		
+
 plain: $(OBJS)
 	$(CC) bpmax-wrapper.c external_functions.c -o bpmax $(OBJS) $(CFLAGS) $(LIBRARIES)
 
@@ -63,4 +63,4 @@ bpmax_verify.o : bpmax_verify.c
 	$(CC) bpmax_verify.c -o bpmax_verify.o $(CFLAGS) $(LIBRARIES) -c
 
 clean:
-	rm -f *.o bpmax bpmax.check bpmax.verify bpmax.verify-rand
+	rm -f *.o *.optrpt bpmax bpmax.check bpmax.verify bpmax.verify-rand

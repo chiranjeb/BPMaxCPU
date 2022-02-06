@@ -6,7 +6,7 @@ float e_inter_score (int,int) ;
 affine bpmax_ftable_init
 {
 	M, N, N_sec, N_tile, I1, J1, I2, J2 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 1 && N_tile <= N && 0<=I1<=J1<=M-1 && 0<=I2<=J2<=N_sec-1
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1  && 0<=I2<=J2<=N_sec-1
 }
 input
 	int    seq1    { i               | 0 <= i < M} ;
@@ -32,4 +32,6 @@ let
 		{ | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 < j3  }||
 		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1] + S2_C[i3, j3];
 	esac;
+	
+	//FTable_C_I1_J1_I2_J2[i3, j3] = S2_C[i3, j3];
 .

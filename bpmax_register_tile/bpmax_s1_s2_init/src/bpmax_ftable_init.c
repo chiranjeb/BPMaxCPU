@@ -121,21 +121,101 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long I1, long J1
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = S2_C(i3,j3)
+	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_inter_score(seq1(I1),seq2_t(I2,i3))
+	#define S_1(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = 0
+	#define S2(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = (S1(I1,J1))+(S2_C(i3,j3))
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1}
+		//{i3,j3|j3==i3 && J2==I2 && J1==I1 && N_tile>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && N_sec>=I2+1 && M>=I1+1 && I2>=0 && i3>=0}
+		//{i3,j3|i3==N_tile && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && j3>=0 && N_tile>=j3+1} || {i3,j3|J2==I2 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && N_sec>=I2+1 && N_tile>=i3+1 && j3>=0 && i3>=j3+1}
+		//{i3,j3|J2==I2 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && N_sec>=I2+1 && i3>=0 && J1+j3>=I1+i3+1 && j3>=i3 && N_tile>=j3+1} || {i3,j3|N>=8 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2;
-		for(c1=0;c1 <= N_tile;c1+=1)
+		if ((I1 == J1 && I2 == J2)) {
+			{
+				S0((0),(0));
+				#pragma omp parallel for 
+				for(c2=1;c2 <= N_tile-1;c2+=1)
+				 {
+				 	S2((0),(c2));
+				 }
+			}
+		}
+		if ((I1 <= J1-1 && I2 == J2)) {
+			{
+				#pragma omp parallel for 
+				for(c2=0;c2 <= N_tile-1;c2+=1)
+				 {
+				 	S2((0),(c2));
+				 }
+			}
+		}
+		if ((I2 <= J2-1)) {
+			{
+				for(c1=0;c1 <= N_tile-1;c1+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c2=0;c2 <= N_tile-1;c2+=1)
+				 	 {
+				 	 	S2((c1),(c2));
+				 	 }
+				 }
+			}
+		}
+		if ((I1 == J1 && I2 == J2)) {
+			{
+				#pragma omp parallel for private(c2)
+				for(c1=1;c1 <= N_tile-2;c1+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c2=0;c2 <= c1-1;c2+=1)
+				 	 {
+				 	 	S_1((c1),(c2));
+				 	 }
+				 	S0((c1),(c1));
+				 	#pragma omp parallel for 
+				 	for(c2=c1+1;c2 <= N_tile-1;c2+=1)
+				 	 {
+				 	 	S2((c1),(c2));
+				 	 }
+				 }
+			}
+		}
+		if ((I1 == J1 && I2 == J2)) {
+			{
+				#pragma omp parallel for 
+				for(c2=0;c2 <= N_tile-2;c2+=1)
+				 {
+				 	S_1((N_tile-1),(c2));
+				 }
+				S0((N_tile-1),(N_tile-1));
+			}
+		}
+		if ((I1 <= J1-1 && I2 == J2)) {
+			{
+				for(c1=1;c1 <= N_tile-1;c1+=1)
+				 {
+				 	#pragma omp parallel for 
+				 	for(c2=0;c2 <= c1-1;c2+=1)
+				 	 {
+				 	 	S_1((c1),(c2));
+				 	 }
+				 	#pragma omp parallel for 
+				 	for(c2=c1;c2 <= N_tile-1;c2+=1)
+				 	 {
+				 	 	S2((c1),(c2));
+				 	 }
+				 }
+			}
+		}
+		#pragma omp parallel for 
+		for(c2=0;c2 <= N_tile-1;c2+=1)
 		 {
-		 	#pragma omp parallel for 
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2));
-		 	 }
+		 	S_1((N_tile),(c2));
 		 }
 	}
 	#undef S0
+	#undef S_1
+	#undef S2
 	
 	//Memory Free
 }

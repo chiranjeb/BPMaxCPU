@@ -288,7 +288,7 @@ float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_FTable(i1,j1,i2,j2) == 'N' ) {
 		_flag_FTable(i1,j1,i2,j2) = 'I';
 	//Body for FTable
-		FTable(i1,j1,i2,j2) = eval_S2(M,N,i2,j2);
+		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2))));
 		_flag_FTable(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_FTable(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
