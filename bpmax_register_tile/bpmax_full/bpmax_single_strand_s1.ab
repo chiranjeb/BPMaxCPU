@@ -1,0 +1,17 @@
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+
+affine bpmax_single_strand_s1 {M|M>=1}
+input
+    int seq1 {i| 0 <= i < M };
+output
+	float S1 {i,j| 0 <= i <= j < M};
+let
+	S1[i,j] = case
+		{ | j-i<= 3}: 0 ;
+		{ | j-i > 3}: max(S1[i+1,j-1] + e_intra_score (seq1[i],seq1[j]),
+					   reduce(max, [k], {|k<j}:S1[i,k]+S1[k+1,j]));
+	esac;
+.
+

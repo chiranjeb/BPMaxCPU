@@ -1,0 +1,13 @@
+affine matrix_max_plus_section 
+{
+	N, N_sec, N_tile, MR, NR, I2, J2, K2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
+}
+input
+	float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float B       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+output
+    float C_section { i3, j3  | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
+let
+	C_section[i3,j3] = reduce(max, [k], {|0<=k<=N_tile-1}: A[i3, k] + B[k, j3]);
+.	
