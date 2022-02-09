@@ -228,7 +228,7 @@ void bpmax_single_strand_s2_tile(long N, long N_sec, long N_tile, long MR, long 
 	#undef S2
 	#undef S3
 	#undef S4
-        Dump4D(N_sec, N_tile+1, N_tile,  S_C, "Computed");
+    Dump4D(N_sec, N_tile+1, N_tile,  S_C, "Computed Single Strand S_C");
 	
 	//Memory Free
 	free(_lin_S_C_1);

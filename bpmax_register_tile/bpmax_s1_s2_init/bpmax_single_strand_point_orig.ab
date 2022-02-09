@@ -2,25 +2,6 @@ float e_intra_score (int,int) ;
 float e_inter_score (int,int) ;
 
 
-affine bpmax_single_strand_diagonal_tile 
-{
-	N, N_sec, N_tile, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 
-	0<=I2<=J2<=N_sec-1
-}
-input
-   int   seq2_t        { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
-output
-   float C_I2_J2       { i2, j2 | 0<=i2<=N_tile   && 0<=j2<=N_tile-1 };
-let
-	C_I2_J2[i3,j3] = case
-	    { | i3 == N_tile } ||
-	    { | i3 <  N_tile && j3-i3 <= 3 }: 0;
-	    { | i3 <  N_tile && j3-i3 > 3  }: max ( C_I2_J2[i3+1,j3-1] + e_intra_score (seq2_t[I2, i3],seq2_t[J2, j3]), 
-			                                   reduce(max, [k3], {| i3<=k3<j3}:C_I2_J2[i3,k3]+C_I2_J2[k3+1,j3])
-			                                  );
-	esac;
-.		 
 
 
 affine bpmax_single_strand_finalize 
@@ -64,5 +45,21 @@ let
 		    			         );
 	   esac;
 .
-
-
+affine bpmax_single_strand_diagonal_tile 
+{
+	N, N_sec, N_tile, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 
+	0<=I2<=J2<=N_sec-1
+}
+input
+   int   seq2_t        { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
+output
+   float C_I2_J2       { i3, j3 | 0<=i3<=N_tile   && 0<=j3<=N_tile-1 };
+let
+	C_I2_J2[i3,j3] = case
+	    { | i3 == N_tile } ||
+	    { | i3 <  N_tile && j3-i3 <= 3 }: 0;
+	    { | i3 <  N_tile && j3-i3 > 3  }: max ( C_I2_J2[i3+1,j3-1] + e_intra_score (seq2_t[I2, i3],seq2_t[J2, j3]), 
+                            reduce(max, [k3],  {| i3<=k3<j3}: C_I2_J2[i3,k3]  + C_I2_J2[k3+1,j3]));
+	esac;
+.		 

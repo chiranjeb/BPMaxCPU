@@ -80,6 +80,26 @@ let
     C[i, j] = 0;
 .
 
+
+affine bpmax_inner_reductions
+{
+	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
+	M >=1 && N >= 8 &&  N_sec >= 2 && N_tile >= 4 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1
+}
+input
+	  int   seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	  float S2_A     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float S2_B     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float S2_C     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
+	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
+output
+	  float FTable_A { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  float FTable_B { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	  FTable_A [i2, j2, i3, j3]=0; // do not initialize
+.
+
+
 affine bpmax 
 {
 	M, N, N_sec, N_tile, MR, NR | 
@@ -98,9 +118,9 @@ local
 	int   seq2_t       { i,  j                | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1 }; 
 	
 	//float FTable_elementwise { i1, j1, i2, j2         | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N-1 };
-	//float FTable_A           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	//float FTable_B           { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_C             { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 && 0<=i3<=N_tile  && 0<=j3<=N_tile-1 };	
+	float FTable_A     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_C     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };	
 let
 	// Compute single strand table - S1
 	use {ei | ei>=0 && 1>ei }  
@@ -136,12 +156,23 @@ let
 	     	(ei1, ej1, ei2, ej2, i3, j3 -> 0, ei2, ej2, i3, j3)@S2_C
 	     )returns (FTable_C);
 	    
+	// Do inner reductions
+	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
+	bpmax_inner_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1]
+	(
+	      (ei, ej, i, j->i, j)@seq2_t,
+	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_A,
+	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_B,
+	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_C,
+	      FTable_C
+	)
+	returns (FTable_A, FTable_B);
+	
 	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
 	bpmax_inner_triangle_transform_4D_2_2D[N, N_sec, N_tile, MR, NR]
 	(
 	     FTable_C
 	)returns (FTable);
-   
 .
 
 

@@ -13,7 +13,6 @@
 #include <immintrin.h>
 #include <malloc.h>
 
-#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -101,12 +100,10 @@ inline double __min_double(double x, double y){
 	return ((x)>(y) ? (y) : (x));
 }
 
+#include"external_functions.h"
 
 
 
-
-//Local Function Declarations
-float reduce_matrix_max_plus_section_C_section_1(long, long, long, long, long, long, long, long, int, int, float**, float**);
 
 //Memory Macros
 #define A(i3,j3) A[i3][j3]
@@ -120,41 +117,30 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, 
 		exit(-1);
 	}
 	//Memory Allocation
-	
-	#define S0(i3,j3) C_section(i3,j3) = max( C_section(i3,j3), reduce_matrix_max_plus_section_C_section_1(N,N_sec,N_tile,MR,NR,I2,J2,K2,i3,j3,A,B))
+	#define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
+	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
 	{
 		//Domain
-		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && N>=8 && i3>=0 && j3>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2}
-		int c1,c2;
+		//{i,j,i2|i2==0 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i>=0 && N_tile>=i+1 && j>=0 && N_tile>=j+1}
+		//{i0,i1,i2|i1>=0 && N_tile>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i0>=0 && N_tile>=i0+1 && i2>=0 && N_tile>=i2+1}
+		int c1,c2,c3;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
+		 	//#pragma omp parallel for private(c3)
 		 	for(c2=0;c2 <= N_tile-1;c2+=1)
 		 	 {
-		 	 	S0((c1),(c2));
+		 	 	S1((c1),(c2),(0));
+		 	 	for(c3=0;c3 <= N_tile-1;c3+=1)
+		 	 	 {
+		 	 	 	S0((c1),(c2),(c3));
+		 	 	 }
 		 	 }
 		 }
 	}
+	#undef S1
 	#undef S0
 	
-        Dump2D (N_tile, A, "A");        
-        Dump2D (N_tile, B, "B");     	
-        //printf("\n================Done==================\n"); 
 	//Memory Free
-}
-float reduce_matrix_max_plus_section_C_section_1(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, int i3p, int j3p, float** A, float** B){
-	float reduceVar = -FLT_MAX;
-	#define S1(i3,j3,k) {float __temp__ = (A(i3,k))+(B(k,j3)); reduceVar = __max_float(reduceVar,__temp__); }
-	{
-		//Domain
-		//{i3,j3,k|N_tile>=j3p+1 && N_tile>=4 && N>=8 && i3p>=0 && j3p>=0 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3p+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2 && k>=0 && N_tile>=k+1 && N_tile>=j3+1 && j3>=0 && N_tile>=i3+1 && i3>=0 && i3p==i3 && j3p==j3}
-		int c3;
-		for(c3=0;c3 <= N_tile-1;c3+=1)
-		 {
-		 	S1((i3p),(j3p),(c3));
-		 }
-	}
-	#undef S1
-	return reduceVar;
 }
 
 //Memory Macros

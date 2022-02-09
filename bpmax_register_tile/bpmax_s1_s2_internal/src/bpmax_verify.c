@@ -100,10 +100,14 @@ static int* seq1;
 static int* seq2;
 static float** S1;
 static float** S2;
+static float**** NR_FTable;
+static float**** NR_FTable_1;
 static float**** FTable;
 static char**** _flag_FTable;
 static char** _flag_S1;
 static char** _flag_S2;
+static char**** _flag_NR_FTable;
+static char**** _flag_NR_FTable_1;
 
 
 //Local Function Declarations
@@ -112,16 +116,24 @@ float eval_S1(long, long, int, int);
 float reduce_bpmax_verify_S2_1(long, long, int, int);
 float eval_S2(long, long, int, int);
 float eval_FTable(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_1(long, long, int, int, int, int);
+float eval_NR_FTable(long, long, int, int, int, int);
+float reduce_bpmax_verify_NR_FTable_1_1(long, long, int, int, int, int);
+float eval_NR_FTable_1(long, long, int, int, int, int);
 
 //Memory Macros
 #define seq1(i) seq1[i]
 #define seq2(i) seq2[i]
 #define S1(i,j) S1[i][j]
 #define S2(i,j) S2[i][j]
+#define NR_FTable(i1,j1,i2,j2) NR_FTable[i1][j1][i2][j2]
+#define NR_FTable_1(i1,j1,i2,j2) NR_FTable_1[i1][j1][i2][j2]
 #define FTable(i1,j1,i2,j2) FTable[i1][j1][i2][j2]
 #define _flag_FTable(i1,j1,i2,j2) _flag_FTable[i1][j1][i2][j2]
 #define _flag_S1(i,j) _flag_S1[i][j]
 #define _flag_S2(i,j) _flag_S2[i][j]
+#define _flag_NR_FTable(i1,j1,i2,j2) _flag_NR_FTable[i1][j1][i2][j2]
+#define _flag_NR_FTable_1(i1,j1,i2,j2) _flag_NR_FTable_1[i1][j1][i2][j2]
 
 void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** _local_FTable){
 	///Parameter checking
@@ -151,6 +163,38 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 	mallocCheck(S2, (N), float*);
 	for (mz1=0;mz1 < N; mz1++) {
 		S2[mz1] = &_lin_S2[(mz1*(N))];
+	}
+	
+	float* _lin_NR_FTable = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		NR_FTable[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(NR_FTable[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			NR_FTable[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable[mz1][mz2], (N-1), float*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				NR_FTable[mz1][mz2][mz3] = &_lin_NR_FTable[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	
+	float* _lin_NR_FTable_1 = (float*)malloc(sizeof(float)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin_NR_FTable_1, ((M) * (M) * (N-1) * (N)), float);
+	NR_FTable_1 = (float****)malloc(sizeof(float***)*(M));
+	mallocCheck(NR_FTable_1, (M), float***);
+	for (mz1=0;mz1 < M; mz1++) {
+		NR_FTable_1[mz1] = (float***)malloc(sizeof(float**)*(M));
+		mallocCheck(NR_FTable_1[mz1], (M), float**);
+		for (mz2=0;mz2 < M; mz2++) {
+			NR_FTable_1[mz1][mz2] = (float**)malloc(sizeof(float*)*(N-1));
+			mallocCheck(NR_FTable_1[mz1][mz2], (N-1), float*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				NR_FTable_1[mz1][mz2][mz3] = &_lin_NR_FTable_1[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
 	}
 	
 	char* _lin__flag_FTable = (char*)malloc(sizeof(char)*((M) * (M) * (N) * (N)));
@@ -187,6 +231,40 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 		_flag_S2[mz1] = &_lin__flag_S2[(mz1*(N))];
 	}
 	memset(_lin__flag_S2, 'N', ((N) * (N)));
+	
+	char* _lin__flag_NR_FTable = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
+		_flag_NR_FTable[mz1] = (char***)malloc(sizeof(char**)*(M));
+		mallocCheck(_flag_NR_FTable[mz1], (M), char**);
+		for (mz2=0;mz2 < M; mz2++) {
+			_flag_NR_FTable[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable[mz1][mz2][mz3] = &_lin__flag_NR_FTable[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	memset(_lin__flag_NR_FTable, 'N', ((M) * (M) * (N-1) * (N)));
+	
+	char* _lin__flag_NR_FTable_1 = (char*)malloc(sizeof(char)*((M) * (M) * (N-1) * (N)));
+	mallocCheck(_lin__flag_NR_FTable_1, ((M) * (M) * (N-1) * (N)), char);
+	_flag_NR_FTable_1 = (char****)malloc(sizeof(char***)*(M));
+	mallocCheck(_flag_NR_FTable_1, (M), char***);
+	for (mz1=0;mz1 < M; mz1++) {
+		_flag_NR_FTable_1[mz1] = (char***)malloc(sizeof(char**)*(M));
+		mallocCheck(_flag_NR_FTable_1[mz1], (M), char**);
+		for (mz2=0;mz2 < M; mz2++) {
+			_flag_NR_FTable_1[mz1][mz2] = (char**)malloc(sizeof(char*)*(N-1));
+			mallocCheck(_flag_NR_FTable_1[mz1][mz2], (N-1), char*);
+			for (mz3=0;mz3 < N-1; mz3++) {
+				_flag_NR_FTable_1[mz1][mz2][mz3] = &_lin__flag_NR_FTable_1[(mz1*((M) * (N-1) * (N))) + (mz2*((N-1) * (N))) + (mz3*(N))];
+			}
+		}
+	}
+	memset(_lin__flag_NR_FTable_1, 'N', ((M) * (M) * (N-1) * (N)));
 	#define S0(i1,j1,i2,j2) eval_FTable(M,N,i1,j1,i2,j2)
 	{
 		//Domain
@@ -215,6 +293,25 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 	free(_lin_S2);
 	free(S2);
 	
+    Dump2D(N, _local_FTable[0][0]   , "Verified"); 	
+	free(_lin_NR_FTable);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(NR_FTable[mz1][mz2]);
+		}
+		free(NR_FTable[mz1]);
+	}
+	free(NR_FTable);
+	
+	free(_lin_NR_FTable_1);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(NR_FTable_1[mz1][mz2]);
+		}
+		free(NR_FTable_1[mz1]);
+	}
+	free(NR_FTable_1);
+	
 	free(_lin__flag_FTable);
 	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
@@ -229,6 +326,24 @@ void bpmax_verify(long M, long N, int* _local_seq1, int* _local_seq2, float**** 
 	
 	free(_lin__flag_S2);
 	free(_flag_S2);
+	
+	free(_lin__flag_NR_FTable);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(_flag_NR_FTable[mz1][mz2]);
+		}
+		free(_flag_NR_FTable[mz1]);
+	}
+	free(_flag_NR_FTable);
+	
+	free(_lin__flag_NR_FTable_1);
+	for (mz1=0;mz1 < M; mz1++) {
+		for (mz2=0;mz2 < M; mz2++) {
+			free(_flag_NR_FTable_1[mz1][mz2]);
+		}
+		free(_flag_NR_FTable_1[mz1]);
+	}
+	free(_flag_NR_FTable_1);
 }
 float reduce_bpmax_verify_S1_1(long M, long N, int ip, int jp){
 	float reduceVar = -FLT_MAX;
@@ -288,7 +403,7 @@ float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	if ( _flag_FTable(i1,j1,i2,j2) == 'N' ) {
 		_flag_FTable(i1,j1,i2,j2) = 'I';
 	//Body for FTable
-		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2))));
+		FTable(i1,j1,i2,j2) = (((j2 == i2 && j1 == i1))?e_inter_score(seq1(i1),seq2(-i2+N-1)):(((j2 >= i2+4))?__max_float((eval_FTable(M,N,i1,j1,i2+1,j2-1))+(e_intra_score(seq2(-i2+N-1),seq2(-j2+N-1))),__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),eval_NR_FTable_1(M,N,i1,j1,i2,j2)))):(((i2 >= j2-3 && j2 >= i2+1))?__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(eval_NR_FTable(M,N,i1,j1,i2,j2),eval_NR_FTable_1(M,N,i1,j1,i2,j2)))):(__max_float(0,__max_float((eval_S1(M,N,i1,j1))+(eval_S2(M,N,i2,j2)),__max_float(0,0)))))));
 		_flag_FTable(i1,j1,i2,j2) = 'F';
 	} else if ( _flag_FTable(i1,j1,i2,j2) == 'I' ) {
 		printf("There is a self dependence on FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
@@ -296,16 +411,74 @@ float eval_FTable(long M, long N, int i1, int j1, int i2, int j2){
 	}
 	return FTable(i1,j1,i2,j2);
 }
+float reduce_bpmax_verify_NR_FTable_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
+	float reduceVar = -FLT_MAX;
+	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_FTable(M,N,i1,j1,i2,k2))+(eval_S2(M,N,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	{
+		//Domain
+		//{i1,j1,i2,j2,k2|i2p>=0 && j2p>=i2p+1 && N>=j2p+1 && N>=8 && i1p>=0 && j1p>=i1p && M>=j1p+1 && M>=1 && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && j1+j2>=i1+i2+1 && i1>=0 && j1>=i1 && M>=j1+1 && i2>=0 && N>=j2+1 && N>=k2+1 && k2>=-1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		int c5;
+		for(c5=i2p;c5 <= j2p-1;c5+=1)
+		 {
+		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
+		 }
+	}
+	#undef S0
+	return reduceVar;
+}
+float eval_NR_FTable(long M, long N, int i1, int j1, int i2, int j2){
+	if ( _flag_NR_FTable(i1,j1,i2,j2) == 'N' ) {
+		_flag_NR_FTable(i1,j1,i2,j2) = 'I';
+	//Body for NR_FTable
+		NR_FTable(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1(M,N,i1,j1,i2,j2);
+		_flag_NR_FTable(i1,j1,i2,j2) = 'F';
+	} else if ( _flag_NR_FTable(i1,j1,i2,j2) == 'I' ) {
+		printf("There is a self dependence on NR_FTable at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
+		exit(-1);
+	}
+	return NR_FTable(i1,j1,i2,j2);
+}
+float reduce_bpmax_verify_NR_FTable_1_1(long M, long N, int i1p, int j1p, int i2p, int j2p){
+	float reduceVar = -FLT_MAX;
+	#define S0(i1,j1,i2,j2,k2) {float __temp__ = (eval_S2(M,N,i2,k2))+(eval_FTable(M,N,i1,j1,k2+1,j2)); reduceVar = __max_float(reduceVar,__temp__); }
+	{
+		//Domain
+		//{i1,j1,i2,j2,k2|j1p>=i1p && j2p>=i2p+1 && M>=j1p+1 && N>=8 && i2p>=0 && N>=j2p+1 && i1p>=0 && M>=1 && j1p+j2p>=i1p+i2p+1 && k2>=i2 && j2>=k2+1 && j2>=i2+1 && j1+j2>=i1+i2+1 && i2>=0 && N>=j2+1 && N>=k2+1 && k2>=-1 && M>=j1+1 && i1>=0 && j1>=i1 && i1p==i1 && j1p==j1 && i2p==i2 && j2p==j2}
+		int c5;
+		for(c5=i2p;c5 <= j2p-1;c5+=1)
+		 {
+		 	S0((i1p),(j1p),(i2p),(j2p),(c5));
+		 }
+	}
+	#undef S0
+	return reduceVar;
+}
+float eval_NR_FTable_1(long M, long N, int i1, int j1, int i2, int j2){
+	if ( _flag_NR_FTable_1(i1,j1,i2,j2) == 'N' ) {
+		_flag_NR_FTable_1(i1,j1,i2,j2) = 'I';
+	//Body for NR_FTable_1
+		NR_FTable_1(i1,j1,i2,j2) = reduce_bpmax_verify_NR_FTable_1_1(M,N,i1,j1,i2,j2);
+		_flag_NR_FTable_1(i1,j1,i2,j2) = 'F';
+	} else if ( _flag_NR_FTable_1(i1,j1,i2,j2) == 'I' ) {
+		printf("There is a self dependence on NR_FTable_1 at (%d,%d,%d,%d) \n",i1,j1,i2,j2);
+		exit(-1);
+	}
+	return NR_FTable_1(i1,j1,i2,j2);
+}
 
 //Memory Macros
 #undef seq1
 #undef seq2
 #undef S1
 #undef S2
+#undef NR_FTable
+#undef NR_FTable_1
 #undef FTable
 #undef _flag_FTable
 #undef _flag_S1
 #undef _flag_S2
+#undef _flag_NR_FTable
+#undef _flag_NR_FTable_1
 
 
 //Common Macro undefs
