@@ -124,8 +124,8 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	#define S_1(i,j) S1(j,i+j) = __max_float((S1(j+1,i+j-1))+(e_intra_score(seq1(j),seq1(i+j))),reduce_bpmax_single_strand_s1_S1_1(M,j,i+j,S1))
 	{
 		//Domain
-		//{i,j|0>=i-3 && M>=1 && i>=0 && j>=0 && M>=i+j+1}
-		//{i,j|i>=4 && M>=1 && j>=0 && M>=j+1 && M>=i+j+1 && i+j>=0}
+		//{i,j|i>=j-3 && M>=1 && i>=0 && j>=i && M>=j+1}
+		//{i,j|j>=i+4 && M>=1 && i>=0 && M>=i+1 && M>=j+1 && j>=0}
 		int c1,c2;
 		for(c1=0;c1 <= min(3,M-1);c1+=1)
 		 {
@@ -154,7 +154,7 @@ float reduce_bpmax_single_strand_s1_S1_1(long M, int ip, int jp, float** S1){
 	#define S2(i,j,k) {float __temp__ = (S1(i,k))+(S1(k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
 	{
 		//Domain
-		//{i,j,k|jp>=ip+4 && M>=jp+1 && ip>=0 && M>=1 && jp>=0 && M>=ip+1 && j>=k+1 && j>=0 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && M>=i+1 && ip==i && jp==j}
+		//{i,j,k|jp>=ip+4 && M>=jp+1 && ip>=0 && M>=ip+1 && jp>=0 && M>=1 && j>=k+1 && M>=i+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && j>=0 && ip==i && jp==j}
 		int c3;
 		for(c3=ip;c3 <= jp-1;c3+=1)
 		 {

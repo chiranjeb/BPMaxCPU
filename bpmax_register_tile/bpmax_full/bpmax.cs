@@ -1,4 +1,4 @@
-prog = ReadAlphabets("bpmax_s1_s2_internal.ab");
+prog = ReadAlphabets("bpmax.ab");
 
 rootSystem = "bpmax";
 

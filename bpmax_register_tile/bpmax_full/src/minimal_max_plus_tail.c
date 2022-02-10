@@ -107,41 +107,67 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define C_in(i2,j2,i3,j3) C_in[i2][j2][i3][j3]
-#define C(i,j) C[i][j]
+#define FTable_A(i3,j3) FTable_A[i3][j3]
+#define FTable_B(i3,j3) FTable_B[i3][j3]
+#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, long MR, long NR, float**** C_in, float** C){
+void minimal_max_plus_tail(long N, long N_sec, long N_tile, long I2, long J2, float** FTable_A, float** FTable_B, float** FTable_C_section){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
+	#define S0(i,j,i2,i3) FTable_C_section(j,i2) = __max_float(FTable_C_section(j,i2),FTable_C_section(j,i2))
+	#define S1(i,j,i2,i3) FTable_C_section(j,i2) = __max_float(FTable_C_section(j,i2),0)
+	#define S3(i,j,i2,i3) FTable_C_section(j,i3) = 1.401298464324817E-45
+	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable_A(i1,i2))+(FTable_B(i2+1,i3)); FTable_C_section(i1,i3) = __max_float(FTable_C_section(i1,i3),__temp__); }
 	{
-       for ( int i1 = 0; i1  < N_sec; i1++ )
+		//Domain
+		//{i,j,i2,i3|i3==i2 && i==1 && N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i2>=1 && j>=0 && N_tile>=j+1 && N_tile>=i2+1}
+		//{i,j,i2,i3|i3==0 && i2==0 && i==1 && N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && J2>=I2 && N_sec>=J2+1 && j>=0 && N_tile>=j+1}
+		//{i,j,i2,i3|i2==-1 && i==-1 && N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i3+1 && i3>=1 && N_tile>=j+1 && j>=0}
+		//{i0,i1,i2,i3|i0==0 && i2>=0 && i3>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i1>=0 && N_tile>=i1+1 && i3>=1 && N_tile>=i2+1 && N_tile>=i3+1}
+		int c2,c3,c4;
+		for(c2=0;c2 <= N_tile-1;c2+=1)
 		 {
-           for ( int i2 = 0; i2 < N_tile; i2++)
-           {
-             for (int j1 = 0; j1 < N_sec; j1++)
+		 	for(c4=1;c4 <= N_tile-1;c4+=1)
 		 	 {
-                  for( int j2 = 0; j2 < N_tile; j2++)
-                  {
-                      C[i1*N_tile+i2][j1*N_tile+j2] =  C_in[i1][j1][i2][j2];
+		 	 	S3((-1),(c2),(-1),(c4));
 		 	 }
 		 }
-           }
-       }
+		for(c2=0;c2 <= N_tile-1;c2+=1)
+		 {
+		 	for(c3=0;c3 <= N_tile-2;c3+=1)
+		 	 {
+		 	 	for(c4=c3+1;c4 <= N_tile-1;c4+=1)
+		 	 	 {
+		 	 	 	S2((0),(c2),(c3),(c4));
+		 	 	 }
+		 	 }
+		 }
+		for(c2=0;c2 <= N_tile-1;c2+=1)
+		 {
+		 	S1((1),(c2),(0),(0));
+		 	for(c3=1;c3 <= N_tile-1;c3+=1)
+		 	 {
+		 	 	S0((1),(c2),(c3),(c3));
+		 	 }
+		 }
 	}
 	#undef S0
-	Dump2D(N, C, "Final Transformed array");
+	#undef S1
+	#undef S3
+	#undef S2
 	
 	//Memory Free
 }
 
 //Memory Macros
-#undef C_in
-#undef C
+#undef FTable_A
+#undef FTable_B
+#undef FTable_C_section
 
 
 //Common Macro undefs
