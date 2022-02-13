@@ -104,7 +104,21 @@ inline double __min_double(double x, double y){
 
 
 
-
+void Dump2D_l(int M, float **Tab, const char *message)
+{
+       printf("-----------------------------------------------------------------------\n");
+       printf("%s\n", message);
+       printf("-----------------------------------------------------------------------\n");
+       for ( int i = 0; i < M; i++)
+       {
+            for (int j = 0; j < M; j++ )
+            {
+               if ( i <= j) printf("%7.3f", Tab[i][j]); //printf("%4e ", Tab[i][j]);
+               else        printf("%7.3f", 0.0); //printf( "%4e ", 0.0);
+            }
+            printf("\n");
+     }
+}
 
 //Memory Macros
 #define seq1(i) seq1[i]
@@ -119,13 +133,15 @@ void bpmax_outer_south_west(long M, long N, long N_sec, long N_tile, long MR, lo
 		exit(-1);
 	}
 	//Memory Allocation
-	
+
+        //Dump2D_l ( N_tile, FTable_C_section, "Before");	
+	//fflush(stdout);
 	#define S0(i3,j3) FTable_C_section(i3,j3) = FTable_C_section(i3,j3)
 	#define S_1(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(FTable_section(i3,j3))+(e_intra_score(seq1(I1),seq1(J1))))
 	{
 		//Domain
 		//{i3,j3|M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && I1>=J1-3 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
-		//{i3,j3|M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1+4 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && J1>=0 && M>=I1+1}
+		//{i3,j3|M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1+4 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=I1+1 && J1>=0}
 		int c1,c2;
 		if ((I1 <= J1-4)) {
 			{
@@ -152,6 +168,7 @@ void bpmax_outer_south_west(long M, long N, long N_sec, long N_tile, long MR, lo
 	}
 	#undef S0
 	#undef S_1
+        //Dump2D_l ( N_tile, FTable_C_section, "after");	
 	
 	//Memory Free
 }

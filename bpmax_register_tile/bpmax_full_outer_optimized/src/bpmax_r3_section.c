@@ -122,7 +122,7 @@ void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR,
 	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && M>=K1+1}
+		//{i3,j3|I1>=0 && K1>=I1 && M>=K1+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && N_sec>=J2+1 && J1>=I1 && M>=J1+1 && J2>=I2 && J1>=K1+1 && I2>=0 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {

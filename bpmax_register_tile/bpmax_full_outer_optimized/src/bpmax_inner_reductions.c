@@ -131,8 +131,6 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	int mz1, mz2, mz3, mz4, mz5;
 	
 	
-	
-	
     Dump4D(N_sec, N_tile+1, N_tile, S2_C, "*************S2 C******************");
     Dump4D(N_sec, N_tile,   N_tile, S2_B, "*************S2 B******************");
     Dump4D(N_sec, N_tile,   N_tile, S2_A, "*************S2 A******************");

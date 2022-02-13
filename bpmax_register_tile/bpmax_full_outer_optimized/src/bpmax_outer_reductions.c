@@ -181,6 +181,7 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 		S4((0),(N_sec-1),(N_sec-1),(N_sec-1));
 		S5((0),(N_sec-1),(N_sec-1),(N_sec-1));
 		S6((0),(N_sec-1),(N_sec-1),(N_sec-1));
+                
                 #pragma omp parallel for private(c3,c4) schedule(static, 1)
 		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {

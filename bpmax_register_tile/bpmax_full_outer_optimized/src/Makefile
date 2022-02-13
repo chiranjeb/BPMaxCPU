@@ -82,8 +82,10 @@ transform_section_like_A_for_register_tile.o : transform_section_like_A_for_regi
 transform_section_like_B_for_register_tile.o : transform_section_like_B_for_register_tile.c
 	$(CC) transform_section_like_B_for_register_tile.c -o transform_section_like_B_for_register_tile.o $(CFLAGS) $(LIBRARIES) -c
 
+
 bpmax_outer_reductions_diagonal_tile.o : bpmax_outer_reductions_diagonal_tile.c
 	$(CC) bpmax_outer_reductions_diagonal_tile.c -o bpmax_outer_reductions_diagonal_tile.o $(CFLAGS) $(LIBRARIES) -c
+
 bpmax_verify.o : bpmax_verify.c
 	$(CC) bpmax_verify.c -o bpmax_verify.o $(CFLAGS) $(LIBRARIES) -c
 
