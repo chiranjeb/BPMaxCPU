@@ -121,8 +121,8 @@ void minimal_max_plus_tail(long N, long N_sec, long N_tile, long I2, long J2, fl
 	
 	#define S0(i,j,i2,i3) FTable_C_section(j,i2) = __max_float(FTable_C_section(j,i2),FTable_C_section(j,i2))
 	#define S1(i,j,i2,i3) FTable_C_section(j,i2) = __max_float(FTable_C_section(j,i2),0)
-	#define S3(i,j,i2,i3) FTable_C_section(j,i3) = 1.401298464324817E-45
-	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable_A(i1,i2))+(FTable_B(i2+1,i3)); FTable_C_section(i1,i3) = __max_float(FTable_C_section(i1,i3),__temp__); }
+	#define S3(i,j,i2,i3) //FTable_C_section(j,i3) = 1.401298464324817E-45
+	#define S2(i0,i1,i2,i3) {float __temp__ = (FTable_A(i1,i2))+(FTable_B(i2,i3)); FTable_C_section(i1,i3) = __max_float(FTable_C_section(i1,i3),__temp__); }
 	{
 		//Domain
 		//{i,j,i2,i3|i3==i2 && i==1 && N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i2>=1 && j>=0 && N_tile>=j+1 && N_tile>=i2+1}

@@ -16,6 +16,8 @@ r0_instance_label   =  "UseEquation_FTable_C_I1_J1_0";
 r0_instance_label_h = "UseEquation_FTable_C_I1_J1_1";
 r0_instance_label_t = "UseEquation_FTable_C_I1_J1_2";
 
+r0_diagonal_label   = "UseEquation_FTable_C_I1_J1_5";
+
 r3_instance_label   = "UseEquation_FTable_C_I1_J1_3";
 r4_instance_label   = "UseEquation_FTable_C_I1_J1_4";
 sw_instance_label   = "UseEquation_FTable_C_I1_J1";
@@ -28,9 +30,11 @@ sw_instance_label   = "UseEquation_FTable_C_I1_J1";
 ###############################################     bpmax_r0_r3_r4                    ########################################
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r3_instance_label,       "(i ,j            ->       0, i, i, j)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r4_instance_label,       "(i ,j            ->       0, i, i, j)");
+
+setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_diagonal_label,       "(i ,j            ->       0, i, i, j)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_instance_label,       "(i ,j, k         ->       0, i, k, j)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_instance_label_h,     "(i ,j            ->       0, i, j, 0)");
-setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_instance_label_t,     "(i ,j            ->       0, i, j, 0)");
+setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_instance_label_t,     "(i ,j            ->       0, i, j, N_sec+1)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  sw_instance_label,       "(i ,j            ->       1, i, i, j)");
 
 
@@ -86,6 +90,23 @@ setSpaceTimeMapForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_ins
       											          "(i1->  M+M,  -1,     -1,  -1    )");
 setMemorySpaceForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_instance_label_t, 1, 0, "FTable_C_I1_J1_2");
 
+
+
+setSpaceTimeMapForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_diagonal_label, 0, 0, 
+      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
+      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
+      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
+setMemorySpaceForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_diagonal_label, 0, 0, "FTable_A");
+setSpaceTimeMapForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_diagonal_label, 0, 1, 
+      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
+      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
+      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
+setMemorySpaceForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_diagonal_label, 0, 1, "FTable_B");
+setSpaceTimeMapForUseEquationOptimization(prog, r0_r3_r4_instance_system, r0_diagonal_label, 1, 0, 
+      											          "(i1 -> -1,   -1,     -1,  -1    )",
+      											          "(i1->  1,    i1,      0,  -3    )",
+      											          "(i1->  M+M,  -1,     -1,  -1    )");
+setMemorySpaceForUseEquationOptimization(prog,r0_r3_r4_instance_system , r0_diagonal_label, 1, 0, "FTable_C_I1_J1_5");
 
 
 
@@ -157,9 +178,13 @@ generateScheduledCode(prog, outer_reduction_system, outDir);
 
 NormalizeReduction(prog, "minimal_max_plus_head", "FTable_C_section");
 NormalizeReduction(prog, "minimal_max_plus_tail", "FTable_C_section");
+NormalizeReduction(prog, "bpmax_outer_reductions_diagonal_tile", "FTable_C_section");
+
 Normalize(prog);  
 AShow(prog, "minimal_max_plus_head");
 AShow(prog, "minimal_max_plus_tail");
+AShow(prog, "bpmax_outer_reductions_diagonal_tile");
+
 
 setMemorySpace(prog, "minimal_max_plus_head",    "FTable_C_section", "NR_FTable_C_section, FTable_C_section"      );
 setSpaceTimeMap(prog, "minimal_max_plus_head",  "NR_FTable_C_section",   "(i ,j, k   ->   0, i,       k,  j)",
@@ -172,8 +197,19 @@ setMemorySpace(prog, "minimal_max_plus_tail",    "FTable_C_section", "NR_FTable_
 setSpaceTimeMap(prog, "minimal_max_plus_tail",  "NR_FTable_C_section",   "(i ,j, k   ->   0, i,       k,  j)",
                                                                          "(i, j      ->  -1, i,      -1,  j)" );
 setSpaceTimeMap(prog, "minimal_max_plus_tail",  "FTable_C_section",      "(i ,j      ->   1, i,       j,   j)" );
+
+setMemorySpace(prog, "bpmax_outer_reductions_diagonal_tile",   "FTable_C_section", "NR_FTable_C_section, FTable_C_section"      );
+setSpaceTimeMap(prog, "bpmax_outer_reductions_diagonal_tile",  "NR_FTable_C_section",   "(i ,j, k   ->   0, i,       k,  j)",
+                                                                                        "(i, j      ->  -1, i,      -1,  j)" );
+setSpaceTimeMap(prog, "bpmax_outer_reductions_diagonal_tile",  "FTable_C_section",      "(i ,j      ->   1, i,       j,   j)" );
+
+
 generateScheduledCode(prog, "minimal_max_plus_tail", outDir);
+
 generateScheduledCode(prog, "minimal_max_plus_tail", outDir);
+
+generateScheduledCode(prog, "bpmax_outer_reductions_diagonal_tile", outDir);
+
 
 
 

@@ -13,6 +13,7 @@
 #include <immintrin.h>
 #include <malloc.h>
 
+#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -100,7 +101,7 @@ inline double __min_double(double x, double y){
 	return ((x)>(y) ? (y) : (x));
 }
 
-#include"external_functions.h"
+
 
 
 
@@ -117,16 +118,15 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, 
 		exit(-1);
 	}
 	//Memory Allocation
+	
 	#define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
 	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
 	{
 		//Domain
-		//{i,j,i2|i2==0 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i>=0 && N_tile>=i+1 && j>=0 && N_tile>=j+1}
-		//{i0,i1,i2|i1>=0 && N_tile>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i0>=0 && N_tile>=i0+1 && i2>=0 && N_tile>=i2+1}
+		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2,c3;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
-		 	//#pragma omp parallel for private(c3)
 		 	for(c2=0;c2 <= N_tile-1;c2+=1)
 		 	 {
 		 	 	S1((c1),(c2),(0));

@@ -129,7 +129,7 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 		int c1,c2;
 		for(c1=0;c1 <= min(3,M-1);c1+=1)
 		 {
-		 	#pragma omp parallel for 
+		 	//#pragma omp parallel for 
 		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
@@ -137,7 +137,7 @@ void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 		 }
 		for(c1=4;c1 <= M-1;c1+=1)
 		 {
-		 	#pragma omp parallel for 
+		 	//#pragma omp parallel for 
 		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
 		 	 {
 		 	 	S_1((c1),(c2));

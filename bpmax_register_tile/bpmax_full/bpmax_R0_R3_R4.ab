@@ -68,6 +68,27 @@ let
 .
 
 
+affine bpmax_outer_reductions_diagonal_tile 
+{
+	N, N_sec, N_tile, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 
+	0<=I2<=J2<=N_sec-1
+}
+input
+    float FTable_A 		     { i3, j3 |  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };
+    float FTable_B 		     { i3, j3 |  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };
+output
+    float FTable_C_section  { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+   FTable_C_section[i3,j3] = case
+                                 { | i3 == N_tile } || { | i3 >= j3     } : 0;
+	   						     { | i3 < N_tile && i3 < j3  } : max( FTable_C_section, 
+   	                              reduce(max, [k3], {|i3<=k3<j3} : FTable_A[i3, k3] +    FTable_B[k3+1, j3]));
+   	                         esac;
+.		       
+
+
+
 
 
 
@@ -126,30 +147,40 @@ output
    	float FTable_C_I1_J1 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
    	
 local
-   	float FTable_C_I1_J1_0 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2+1<=k2<j2};
+   	float FTable_C_I1_J1_0 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2+1<=k2<j2 && i2 < j2};
    	float FTable_C_I1_J1_3 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
    	float FTable_C_I1_J1_4 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	float FTable_C_I1_J1_5 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 == j2};
    	
-   	float FTable_C_I1_J1_1 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-   	float FTable_C_I1_J1_2 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	
+   	float FTable_C_I1_J1_1 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 &&  i2 < j2};
+   	float FTable_C_I1_J1_2 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 &&  i2 < j2};
    	
 let
 
-   use { ei2, ej2| 0<=ei2<=ej2<=N_sec-1} 
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 == ej2 } 
+   	bpmax_outer_reductions_diagonal_tile[N, N_sec, N_tile, MR, NR, ei2, ej2]
+   	(
+       	(ei2, ej2, i3, j3  -> ei2, ei2, i3, j3)@FTable_A, 
+	    (ei2, ej2, i3, j3  -> ei2, ej2, i3, j3)@FTable_B
+   	) returns (FTable_C_I1_J1_5);
+
+
+   use { ei2, ej2| 0<=ei2<=ej2<=N_sec-1 &&  ei2 < ej2 } 
        minimal_max_plus_head[N, N_sec, N_tile, ei2, ej2]  
        (
        	    (ei2, ej2, i3, j3  -> ei2, ei2, i3, j3)@FTable_A, 
 	    	(ei2, ej2, i3, j3  -> ei2, ej2, i3, j3)@FTable_B
 	   ) returns (FTable_C_I1_J1_1);
 	   
-   use { ei2, ej2| 0<=ei2<=ej2<=N_sec-1} 
+   use { ei2, ej2| 0<=ei2<=ej2<=N_sec-1 &&  ei2 < ej2} 
        minimal_max_plus_tail[N, N_sec, N_tile, ei2, ej2]  
        (
        	    (ei2, ej2, i3, j3  -> ei2, ej2, i3, j3)@FTable_A, 
 	    	(ei2, ej2, i3, j3  -> ej2, ej2, i3, j3)@FTable_B
 	   ) returns (FTable_C_I1_J1_2);
 
-   use { ei2, ej2, k2 | 0<=ei2<=ej2<=N_sec-1 && ei2+1<=k2<ej2} 
+   use { ei2, ej2, k2 | 0<=ei2<=ej2<=N_sec-1 && ei2 < ej2 && ei2+1<=k2<ej2} 
    	   matrix_max_plus_section[N, N_sec, N_tile, MR, NR, ei2, ej2, k2]  
        (
     		(ei2, ej2, k2, i3, j3  -> ei2, k2, i3, j3)@FTable_A, 

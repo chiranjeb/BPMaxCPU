@@ -119,13 +119,15 @@ void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, lon
 	//Memory Allocation
 	
 	{
+       int i2, j1, j2; 
+#pragma omp parallel for private(i2, j1, j2) schedule(static, 1)
        for ( int i1 = 0; i1  < N_sec; i1++ )
 		 {
-           for ( int i2 = 0; i2 < N_tile; i2++)
+           for (i2 = 0; i2 < N_tile; i2++)
            {
-             for (int j1 = 0; j1 < N_sec; j1++)
+             for (j1 = 0; j1 < N_sec; j1++)
 		 	 {
-                  for( int j2 = 0; j2 < N_tile; j2++)
+                  for( j2 = 0; j2 < N_tile; j2++)
                   {
                       C[i1*N_tile+i2][j1*N_tile+j2] =  C_in[i1][j1][i2][j2];
 		 	 }

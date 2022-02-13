@@ -118,10 +118,6 @@ void transform_section_like_B_for_register_tile(long, long, long, long, long, lo
 #define S2_B(i2,j2,i3,j3) S2_B[i2][j2][i3][j3]
 #define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
 #define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
-#define FTable_C_0(i2,j2,i3,j3) FTable_C_0[i2][j2][i3][j3]
-#define FTable_C_1(i2,j2,k2,i3,j3) FTable_C_1[i2][j2][k2][i3][j3]
-#define FTable_C_2(i2,j2,k2,i3,j3) FTable_C_2[i2][j2][k2][i3][j3]
-#define FTable_C_3(i2,j2,i3,j3) FTable_C_3[i2][j2][i3][j3]
 #define FTable_A(i2,j2,i3,j3) FTable_A[i2][j2][i3][j3]
 #define FTable_B(i2,j2,i3,j3) FTable_B[i2][j2][i3][j3]
 
@@ -134,77 +130,9 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	//Memory Allocation
 	int mz1, mz2, mz3, mz4, mz5;
 	
-	float* _lin_FTable_C_0 = (float*)malloc(sizeof(float)*((N_sec) * (N_sec) * (N_tile+1) * (N_tile)));
-	mallocCheck(_lin_FTable_C_0, ((N_sec) * (N_sec) * (N_tile+1) * (N_tile)), float);
-	float**** FTable_C_0 = (float****)malloc(sizeof(float***)*(N_sec));
-	mallocCheck(FTable_C_0, (N_sec), float***);
-	for (mz1=0;mz1 < N_sec; mz1++) {
-		FTable_C_0[mz1] = (float***)malloc(sizeof(float**)*(N_sec));
-		mallocCheck(FTable_C_0[mz1], (N_sec), float**);
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			FTable_C_0[mz1][mz2] = (float**)malloc(sizeof(float*)*(N_tile+1));
-			mallocCheck(FTable_C_0[mz1][mz2], (N_tile+1), float*);
-			for (mz3=0;mz3 < N_tile+1; mz3++) {
-				FTable_C_0[mz1][mz2][mz3] = &_lin_FTable_C_0[(mz1*((N_sec) * (N_tile+1) * (N_tile))) + (mz2*((N_tile+1) * (N_tile))) + (mz3*(N_tile))];
-			}
-		}
-	}
 	
-	float* _lin_FTable_C_1 = (float*)malloc(sizeof(float)*((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)));
-	mallocCheck(_lin_FTable_C_1, ((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)), float);
-	float***** FTable_C_1 = (float*****)malloc(sizeof(float****)*(N_sec-2));
-	mallocCheck(FTable_C_1, (N_sec-2), float****);
-	for (mz1=0;mz1 < N_sec-2; mz1++) {
-		FTable_C_1[mz1] = (float****)malloc(sizeof(float***)*(N_sec));
-		mallocCheck(FTable_C_1[mz1], (N_sec), float***);
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			FTable_C_1[mz1][mz2] = (float***)malloc(sizeof(float**)*(N_sec-1));
-			mallocCheck(FTable_C_1[mz1][mz2], (N_sec-1), float**);
-			for (mz3=0;mz3 < N_sec-1; mz3++) {
-				FTable_C_1[mz1][mz2][mz3] = (float**)malloc(sizeof(float*)*(N_tile));
-				mallocCheck(FTable_C_1[mz1][mz2][mz3], (N_tile), float*);
-				for (mz4=0;mz4 < N_tile; mz4++) {
-					FTable_C_1[mz1][mz2][mz3][mz4] = &_lin_FTable_C_1[(mz1*((N_sec) * (N_sec-1) * (N_tile) * (N_tile))) + (mz2*((N_sec-1) * (N_tile) * (N_tile))) + (mz3*((N_tile) * (N_tile))) + (mz4*(N_tile))];
-				}
-			}
-		}
-	}
 	
-	float* _lin_FTable_C_2 = (float*)malloc(sizeof(float)*((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)));
-	mallocCheck(_lin_FTable_C_2, ((N_sec-2) * (N_sec) * (N_sec-1) * (N_tile) * (N_tile)), float);
-	float***** FTable_C_2 = (float*****)malloc(sizeof(float****)*(N_sec-2));
-	mallocCheck(FTable_C_2, (N_sec-2), float****);
-	for (mz1=0;mz1 < N_sec-2; mz1++) {
-		FTable_C_2[mz1] = (float****)malloc(sizeof(float***)*(N_sec));
-		mallocCheck(FTable_C_2[mz1], (N_sec), float***);
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			FTable_C_2[mz1][mz2] = (float***)malloc(sizeof(float**)*(N_sec-1));
-			mallocCheck(FTable_C_2[mz1][mz2], (N_sec-1), float**);
-			for (mz3=0;mz3 < N_sec-1; mz3++) {
-				FTable_C_2[mz1][mz2][mz3] = (float**)malloc(sizeof(float*)*(N_tile));
-				mallocCheck(FTable_C_2[mz1][mz2][mz3], (N_tile), float*);
-				for (mz4=0;mz4 < N_tile; mz4++) {
-					FTable_C_2[mz1][mz2][mz3][mz4] = &_lin_FTable_C_2[(mz1*((N_sec) * (N_sec-1) * (N_tile) * (N_tile))) + (mz2*((N_sec-1) * (N_tile) * (N_tile))) + (mz3*((N_tile) * (N_tile))) + (mz4*(N_tile))];
-				}
-			}
-		}
-	}
 	
-	float* _lin_FTable_C_3 = (float*)malloc(sizeof(float)*((N_sec-1) * (N_sec) * (N_tile+1) * (N_tile)));
-	mallocCheck(_lin_FTable_C_3, ((N_sec-1) * (N_sec) * (N_tile+1) * (N_tile)), float);
-	float**** FTable_C_3 = (float****)malloc(sizeof(float***)*(N_sec-1));
-	mallocCheck(FTable_C_3, (N_sec-1), float***);
-	for (mz1=0;mz1 < N_sec-1; mz1++) {
-		FTable_C_3[mz1] = (float***)malloc(sizeof(float**)*(N_sec));
-		mallocCheck(FTable_C_3[mz1], (N_sec), float**);
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			FTable_C_3[mz1][mz2] = (float**)malloc(sizeof(float*)*(N_tile+1));
-			mallocCheck(FTable_C_3[mz1][mz2], (N_tile+1), float*);
-			for (mz3=0;mz3 < N_tile+1; mz3++) {
-				FTable_C_3[mz1][mz2][mz3] = &_lin_FTable_C_3[(mz1*((N_sec) * (N_tile+1) * (N_tile))) + (mz2*((N_tile+1) * (N_tile))) + (mz3*(N_tile))];
-			}
-		}
-	}
     Dump4D(N_sec, N_tile+1, N_tile, S2_C, "*************S2 C******************");
     Dump4D(N_sec, N_tile,   N_tile, S2_B, "*************S2 B******************");
     Dump4D(N_sec, N_tile,   N_tile, S2_A, "*************S2 A******************");
@@ -282,48 +210,6 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	#undef S4
 	#undef S5
 	
-	//Memory Free
-	free(_lin_FTable_C_0);
-	for (mz1=0;mz1 < N_sec; mz1++) {
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			free(FTable_C_0[mz1][mz2]);
-		}
-		free(FTable_C_0[mz1]);
-	}
-	free(FTable_C_0);
-	
-	free(_lin_FTable_C_1);
-	for (mz1=0;mz1 < N_sec-2; mz1++) {
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			for (mz3=0;mz3 < N_sec-1; mz3++) {
-				free(FTable_C_1[mz1][mz2][mz3]);
-			}
-			free(FTable_C_1[mz1][mz2]);
-		}
-		free(FTable_C_1[mz1]);
-	}
-	free(FTable_C_1);
-	
-	free(_lin_FTable_C_2);
-	for (mz1=0;mz1 < N_sec-2; mz1++) {
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			for (mz3=0;mz3 < N_sec-1; mz3++) {
-				free(FTable_C_2[mz1][mz2][mz3]);
-			}
-			free(FTable_C_2[mz1][mz2]);
-		}
-		free(FTable_C_2[mz1]);
-	}
-	free(FTable_C_2);
-	
-	free(_lin_FTable_C_3);
-	for (mz1=0;mz1 < N_sec-1; mz1++) {
-		for (mz2=0;mz2 < N_sec; mz2++) {
-			free(FTable_C_3[mz1][mz2]);
-		}
-		free(FTable_C_3[mz1]);
-	}
-	free(FTable_C_3);
 }
 
 //Memory Macros
@@ -332,10 +218,6 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 #undef S2_B
 #undef S2_C
 #undef FTable_C
-#undef FTable_C_0
-#undef FTable_C_1
-#undef FTable_C_2
-#undef FTable_C_3
 #undef FTable_A
 #undef FTable_B
 
