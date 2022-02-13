@@ -1,0 +1,72 @@
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+affine bpmax {M,N| M>=1 && N>=8}
+input
+	int seq1 {i| 0 <= i < M} ;
+	int seq2 {i| 0 <= i < N} ;
+output
+	float FTable {i1,j1,i2,j2| 0<=i1<=j1<=M-1 && 0<=i2<=j2<=N-1};
+
+local
+	float S1 {i,j| 0 <= i <= j < M };
+	float S2 {i,j| 0 <= i <= j < N };
+
+let
+	S1[i,j] = case
+		{ | j-i<= 3}: 0 ;
+		{ | j-i > 3}: max(S1[i+1,j-1] + e_intra_score (seq1[i],seq1[j]),
+					   reduce(max, [k], {|k<j}:S1[i,k]+S1[k+1,j]));
+	esac;
+	S2[i,j] = case
+		{ | j-i<= 3}: 0 ;
+		{ | j-i > 3}: max (S2[i+1,j-1] + e_intra_score (seq2[N-i-1],seq2[N-j-1]),
+					  reduce(max, [k], {| k<j}:S2[i,k]+S2[k+1,j]));
+	esac;
+	
+	//FTable[i1,j1,i2,j2] = S2[i2, j2];
+	
+     /*FTable[i1,j1,i2,j2] = case
+			{ | i1<= j1  && j2< i2} : S1[i1, j1];
+			{ | j1 < i1  && i2<=j2} : S2[i2, j2];
+			{ | i1 == j1 && i2 == j2} : e_inter_score(seq1[i1], seq2[N-i2-1]); 
+			{ | i1<j1 && i2<j2} || {|i1 ==j1 && i2<j2} || {|i1<j1 && i2==j2} :  S1[i1, j1] + S2[i2, j2];
+		esac;*/
+		
+		/*FTable[i1,j1,i2,j2] = case
+		{ | i1<= j1  && j2< i2} : S1[i1, j1];
+		{ | j1 < i1  && i2<=j2} : S2[i2, j2];
+		{ | i1 == j1 && i2 == j2} : e_inter_score(seq1[i1], seq2[N-i2-1]); 
+		{ | i1<j1 && i2<j2} || {|i1 ==j1 && i2<j2} || {|i1<j1 && i2==j2} :
+			max( case  {|j2-i2  > 3}: FTable[i1, j1, i2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
+			 	       {|j2-i2  <=3}: 0; esac, 
+			 	 max( S1[i1, j1] + S2[i2, j2],
+            		  case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : FTable[i1, j1, i2, k2] + S2[k2+1, j2]);
+            			   {|i2==j2 && i1<=j1} : 0; esac,
+            	      case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]     +  FTable[i1, j1, k2+1, j2]);
+            			   {|i2==j2 && i1<=j1} : 0; esac));
+		esac;*/
+		
+	
+	FTable[i1,j1,i2,j2] = case
+		{ | i1<= j1  && j2< i2} : S1[i1, j1];
+		{ | j1 < i1  && i2<=j2} : S2[i2, j2];
+		{ | i1 == j1 && i2 == j2} : e_inter_score(seq1[i1], seq2[N-i2-1]); 
+		{ | i1<j1 && i2<j2} || {|i1 ==j1 && i2<j2} || {|i1<j1 && i2==j2} :
+			max( case  {|j1-i1 >  3}: FTable[i1+1, j1-1, i2, j2] + e_intra_score(seq1[i1], seq1[j1]);
+				       {|j1-i1 <= 3}: 0; esac,
+			     case  {|j2-i2  > 3}: FTable[i1, j1, i2+1, j2-1] + e_intra_score(seq2[N-i2-1], seq2[N-j2-1]);
+			 	       {|j2-i2  <=3}: 0; esac, 
+			 	 max( S1[i1, j1] + S2[i2, j2],
+			 	 	  case {|i1<j1  && i2<j2}:  reduce(max, [k1, k2], {|i1<=k1<j1 && i2<=k2<j2 }: FTable[i1, k1, i2, k2] + FTable[k1+1, j1, k2+1, j2]);
+			               {|i1==j1 && i2<j2} || {|i1<j1 && i2 == j2} || {|i1==j1 && i2==j2}: 0; esac,
+            		  case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : FTable[i1, j1, i2, k2] + S2[k2+1, j2]);
+            			   {|i2==j2 && i1<=j1} : 0; esac,
+            	      case {|i2<j2  && i1<=j1} : reduce(max, [k2],  {|i2<=k2<j2} : S2[i2, k2]  +  FTable[i1, j1, k2+1, j2]);
+            			   {|i2==j2 && i1<=j1} : 0; esac,
+            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : S1[i1, k1] + FTable[k1+1, j1, i2, j2]);
+            			   {|i1==j1 && i2<=j2} : 0; esac,
+            		  case {|i1<j1  && i2<=j2} : reduce(max, [k1],  {|i1<=k1<j1} : FTable[i1, k1, i2, j2] + S1[k1+1, j1]);
+            			   {|i1==j1 && i2<=j2} : 0; esac ));
+		esac;
+.
