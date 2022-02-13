@@ -5,6 +5,11 @@
 #include <string.h>
 #include "external_functions.h"
 
+float e_get_minimum (int,int)
+{
+  return -FLT_MAX;
+}
+
 /**
 The following function implementation are ported from the piRNA application written by
 

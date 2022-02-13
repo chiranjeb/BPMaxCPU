@@ -122,7 +122,7 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long I1, long J1
 	//Memory Allocation
 	
 	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_inter_score(seq1(I1),seq2_t(I2,i3))
-	#define S_1(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = 0
+	#define S_1(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_get_minimum(seq1(I1),seq1(I1))
 	#define S2(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = (S1(I1,J1))+(S2_C(i3,j3))
 	{
 		//Domain

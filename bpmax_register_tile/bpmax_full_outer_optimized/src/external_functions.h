@@ -1,9 +1,11 @@
 //External Functions
 #include <stdlib.h>
 #include <stdio.h>
+#include <float.h>
 
 float e_intra_score(int,int);
 float e_inter_score(int,int);
+float e_get_minimum (int,int);
 unsigned char toNum(char c);
 void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool verbose);
 #define DEBUG 0
