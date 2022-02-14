@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <float.h>
 
+#define C_p(i, j) C_p[ (i * ldC) + j]
+void register_tile_3_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_4_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_3_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_2_32(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+
 float e_intra_score(int,int);
 float e_inter_score(int,int);
 float e_get_minimum (int,int);

@@ -119,28 +119,59 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 	}
 	//Memory Allocation
 	
-	#define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
-	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
-	{
-		//Domain
-		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
-		int c1,c2,c3;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
-		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	S1((c1),(c2),(0));
-		 	 	for(c3=0;c3 <= N_tile-1;c3+=1)
-		 	 	 {
-		 	 	 	S0((c1),(c2),(c3));
-		 	 	 }
-		 	 }
-		 }
-	}
-	#undef S1
-	#undef S0
-	
-	//Memory Free
+	#if REGISTER_TILED_KERNEL
+        float *m_PackA = &A[0][0];
+        float *m_PackB = &B[0][0];
+        float *C = &C_section[0][0];
+        for ( int jj=0; jj<N_tile; jj+=NR )
+        {
+            for ( int ii=0; ii<N_tile; ii+=MR )
+            {
+                if ( MR == 3 && NR == 24)
+                {
+                    register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+                }
+                else if ( _MR == 2 && _NR == 24)
+                {
+					register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+                }
+                else if ( _MR == 3 && _NR == 16)
+                {
+					register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+                }
+                else if ( _MR == 4 && _NR == 16)
+                {
+				    register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+                }
+				else
+				{
+					printf("\n************ Unknown Register Tile ********************");
+					exit(-1);
+				}
+            }
+        }
+	#else
+	    #define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
+	    #define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
+	    {
+		    //Domain
+		    //{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		    int c1,c2,c3;
+		    for(c1=0;c1 <= N_tile-1;c1+=1)
+		    {
+		 	    for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	    {
+		 	 	    S1((c1),(c2),(0));
+		 	 	    for(c3=0;c3 <= N_tile-1;c3+=1)
+		 	 	    {
+		 	 	 	    S0((c1),(c2),(c3));
+		 	 	    }
+		 	    }
+		    }
+		}
+	    #undef S1
+	    #undef S0
+	#endif
 }
 
 //Memory Macros
