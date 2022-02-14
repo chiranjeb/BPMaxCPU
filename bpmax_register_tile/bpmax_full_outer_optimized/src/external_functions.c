@@ -477,8 +477,7 @@ void Dump2D(int M, float **Tab, const char *message)
        {
             for (int j = 0; j < M; j++ )
             {
-               if ( i <= j) printf("%7.3f", Tab[i][j]); //printf("%4e ", Tab[i][j]);
-               else        printf("%7.3f", 0.0); //printf( "%4e ", 0.0);
+               printf(" %9.3e", Tab[i][j]); //printf("%4e ", Tab[i][j]);
             }
             printf("\n");
      }
@@ -500,7 +499,7 @@ void Dump4D(int N_sec, int N_i_tile, int N_j_tile,  float ****Tab, const char *m
               {
                   for( int j2 = 0; j2 < N_j_tile; j2++)
                   {
-                      printf("%7.3f", Tab[i1][j1][i2][j2]);
+                      printf("  %9.3e", Tab[i1][j1][i2][j2]);
                   }
                  printf(" | ");
               }

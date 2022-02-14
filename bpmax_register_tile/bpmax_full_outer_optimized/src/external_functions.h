@@ -5,6 +5,7 @@
 
 #define C_p(i, j) C_p[ (i * ldC) + j]
 void register_tile_3_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_2_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_4_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_3_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_2_32(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
@@ -15,6 +16,7 @@ float e_get_minimum (int,int);
 unsigned char toNum(char c);
 void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool verbose);
 #define DEBUG 0
+#define REGISTER_TILED_KERNEL 1
 void Dump2D(int M, float **Tab, const char *message);
 void Dump4D(int N_sec, int N_i_tile, int N_j_tile, float ****Tab, const char *message);
 

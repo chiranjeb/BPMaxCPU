@@ -117,7 +117,26 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 		exit(-1);
 	}
 	//Memory Allocation
-	
+#if REGISTER_TILED_KERNEL
+    //printf(" transfor B Start\n");fflush(stdout);
+    float *Pack = &B[0][0];
+    
+    long i_offset = I2 * (N_tile-1);
+    long j_offset = J2 * (N_tile-1) ;
+    for( int jj = 0; jj <= N_tile-1; jj+= NR)
+    {
+		for ( int ii = 1; ii <= N_tile ; ii++ )
+		{
+			const float *Cptr = &C[ii][jj];
+			for (int jjj = 0; jjj < NR; jjj++)
+			{
+                                //printf("B: jj(%d), ii(%d), jjj(%d)\n", jj, ii, jjj);fflush(stdout);
+				*Pack++ = *Cptr++;
+			}
+		}
+   }
+   //printf(" transfor B End\n");fflush(stdout);
+#else
 	#define S0(i3,j3) B(i3,j3) = C(i3+1,j3)
 	{
 		//Domain
@@ -132,6 +151,9 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 		 }
 	}
 	#undef S0
+#endif
+    Dump2D (N_tile, C, "Transform In B: C");
+    Dump2D (N_tile, B, "Transform In B: B");
 	
 	//Memory Free
 }

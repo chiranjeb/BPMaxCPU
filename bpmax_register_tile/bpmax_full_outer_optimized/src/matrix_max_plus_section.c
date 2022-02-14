@@ -118,8 +118,10 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 		exit(-1);
 	}
 	//Memory Allocation
+        //printf("Firrringggggggggggggggggg\n");
+        //fflush(stdout);
 	
-	#if REGISTER_TILED_KERNEL
+#if REGISTER_TILED_KERNEL
         float *m_PackA = &A[0][0];
         float *m_PackB = &B[0][0];
         float *C = &C_section[0][0];
@@ -131,26 +133,26 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
                 {
                     register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
                 }
-                else if ( _MR == 2 && _NR == 24)
+                else if ( MR == 2 && NR == 24)
                 {
-					register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+		    register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
                 }
-                else if ( _MR == 3 && _NR == 16)
+                else if ( MR == 3 && NR == 16)
                 {
-					register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+		    register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
                 }
-                else if ( _MR == 4 && _NR == 16)
+                else if ( MR == 4 && NR == 16)
                 {
-				    register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+	            register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
                 }
-				else
-				{
-					printf("\n************ Unknown Register Tile ********************");
-					exit(-1);
-				}
+		else
+		{
+		    printf("\n************ Unknown Register Tile ********************");
+		    exit(-1);
+		}
             }
         }
-	#else
+#else
 	    #define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
 	    #define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
 	    {
@@ -171,7 +173,7 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 		}
 	    #undef S1
 	    #undef S0
-	#endif
+#endif
 }
 
 //Memory Macros

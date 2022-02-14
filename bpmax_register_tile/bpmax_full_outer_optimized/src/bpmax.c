@@ -216,7 +216,8 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		seq2_t[mz1] = &_lin_seq2_t[(mz1*(N_tile))];
 	}
 	
-	float* _lin_FTable_A = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
+	//float* _lin_FTable_A = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
+	float* _lin_FTable_A = (float*)_mm_malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), 32);
 	mallocCheck(_lin_FTable_A, ((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), float);
 	float****** FTable_A = (float******)malloc(sizeof(float*****)*(M));
 	mallocCheck(FTable_A, (M), float*****);
@@ -240,7 +241,8 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		}
 	}
 	
-	float* _lin_FTable_B = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
+	//float* _lin_FTable_B = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)));
+	float* _lin_FTable_B = (float*)_mm_malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), 32);
 	mallocCheck(_lin_FTable_B, ((M) * (M) * (N_sec) * (N_sec) * (N_tile) * (N_tile)), float);
 	float****** FTable_B = (float******)malloc(sizeof(float*****)*(M));
 	mallocCheck(FTable_B, (M), float*****);
@@ -264,7 +266,8 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		}
 	}
 	
-	float* _lin_FTable_C = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)));
+	//float* _lin_FTable_C = (float*)malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)));
+	float* _lin_FTable_C = (float*)_mm_malloc(sizeof(float)*((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)), 32);
 	mallocCheck(_lin_FTable_C, ((M) * (M) * (N_sec) * (N_sec) * (N_tile+1) * (N_tile)), float);
 	float****** FTable_C = (float******)malloc(sizeof(float*****)*(M));
 	mallocCheck(FTable_C, (M), float*****);
@@ -398,7 +401,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 	free(_lin_seq2_t);
 	free(seq2_t);
 	
-	free(_lin_FTable_A);
+	_mm_free(_lin_FTable_A);
 	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			for (mz3=0;mz3 < N_sec; mz3++) {
@@ -413,7 +416,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 	}
 	free(FTable_A);
 	
-	free(_lin_FTable_B);
+	_mm_free(_lin_FTable_B);
 	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			for (mz3=0;mz3 < N_sec; mz3++) {
@@ -428,7 +431,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 	}
 	free(FTable_B);
 	
-	free(_lin_FTable_C);
+	_mm_free(_lin_FTable_C);
 	for (mz1=0;mz1 < M; mz1++) {
 		for (mz2=0;mz2 < M; mz2++) {
 			for (mz3=0;mz3 < N_sec; mz3++) {
