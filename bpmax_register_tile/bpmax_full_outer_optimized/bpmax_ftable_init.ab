@@ -7,8 +7,8 @@ float e_get_minimum (int,int) ;
 
 affine bpmax_ftable_init
 {
-	M, N, N_sec, N_tile, I1, J1 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1
+	M, N, N_sec, N_tile, R, I1, J1 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && 0<=I1<=J1<=M-1
 }
 input
 	int    seq1    { i                     | 0<=i< M} ;

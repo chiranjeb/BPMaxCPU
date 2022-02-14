@@ -110,9 +110,9 @@ inline double __min_double(double x, double y){
 #define C_in(i2,j2,i3,j3) C_in[i2][j2][i3][j3]
 #define C(i,j) C[i][j]
 
-void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, long MR, long NR, float**** C_in, float** C){
+void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, long R, long MR, long NR, float**** C_in, float** C){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}

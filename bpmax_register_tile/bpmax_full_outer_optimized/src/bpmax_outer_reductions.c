@@ -105,10 +105,10 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
-void matrix_max_plus_section(long, long, long, long, long, long, long, long, float**, float**, float**);
-void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
-void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
+void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
 
 
 //Memory Macros
@@ -119,25 +119,25 @@ void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long
 #define FTable_C(i1,j1,i2,j2,i3,j3) FTable_C[i1][j1][i2][j2][i3][j3]
 #define FTable_C_I1_J1(i2,j2,i3,j3) FTable_C_I1_J1[i2][j2][i3][j3]
 
-void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, int* seq1, float** S1, float**** FTable_A, float**** FTable_B, float****** FTable_C, float**** FTable_C_I1_J1){
+void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long I1, long J1, long K1, int* seq1, float** S1, float**** FTable_A, float**** FTable_B, float****** FTable_C, float**** FTable_C_I1_J1){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	int mz1, mz2, mz3, mz4, mz5;
 	
-	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
-	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
-	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
-	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
+	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
+	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
 	{
 		//Domain
-		//{i,j,i2,i3|i2==j && i==1 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,k,i3|i==0 && j>=0 && i3>=j && N_sec>=i3+1 && k>=j && i3>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3|i2==j && i==1 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,k,i3|i==0 && j>=0 && i3>=j && N_sec>=i3+1 && k>=j && i3>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		int c2,c3,c4;
 		#pragma omp parallel for private(c3,c4)
 		for(c2=0;c2 <= N_sec-2;c2+=1)
@@ -172,8 +172,6 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	#undef S_1
 	#undef S2
 	#undef S3
-	
-	//Memory Free
 }
 
 //Memory Macros
@@ -182,6 +180,7 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 #undef FTable_A
 #undef FTable_B
 #undef FTable_C
+
 #undef FTable_C_I1_J1
 
 

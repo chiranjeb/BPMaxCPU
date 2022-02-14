@@ -113,9 +113,9 @@ inline double __min_double(double x, double y){
 #define NR_C_I2_J2_1(i3,j3) NR_C_I2_J2_1[i3][j3]
 #define C_I2_J2(i3,j3) C_I2_J2[i3][j3]
 
-void bpmax_inner_reductions_diagonal_tile(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, int** seq2_t, float** S2_C, float** C_I2_J2){
+void bpmax_inner_reductions_diagonal_tile(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, int** seq2_t, float** S2_C, float** C_I2_J2){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -139,20 +139,20 @@ void bpmax_inner_reductions_diagonal_tile(long N, long N_sec, long N_tile, long 
 	}
 	#define S0(i,j,i2) //C_I2_J2(-i,j) = 0
 	#define S1(i,j,i2) C_I2_J2(-i,j) = __max_float(C_I2_J2(-i,j),__max_float((C_I2_J2(-i+1,j-1))+(e_intra_score(seq2_t(I2,-i),seq2_t(J2,j))),__max_float(NR_C_I2_J2(-i,j),NR_C_I2_J2_1(-i,j))))
-	#define S2(i,j,i2) C_I2_J2(-i,j) = __max_float(C_I2_J2(-i,j),__max_float( C_I2_J2(-i,j),__max_float(NR_C_I2_J2(-i,j),NR_C_I2_J2_1(-i,j))))
+	#define S2(i,j,i2) C_I2_J2(-i,j) = __max_float(C_I2_J2(-i,j),__max_float(0,__max_float(NR_C_I2_J2(-i,j),NR_C_I2_J2_1(-i,j))))
 	#define S5(i,j,i2) NR_C_I2_J2(-i,i2) = 1.401298464324817E-45
 	#define S6(i,j,i2) NR_C_I2_J2_1(-i,i2) = 1.401298464324817E-45
 	#define S3(i0,i1,i2) {float __temp__ = (C_I2_J2(-i0,i1))+(S2_C(i1+1,i2)); NR_C_I2_J2(-i0,i2) = __max_float(NR_C_I2_J2(-i0,i2),__temp__); }
 	#define S4(i0,i1,i2) {float __temp__ = (S2_C(-i0,i1))+(C_I2_J2(i1+1,i2)); NR_C_I2_J2_1(-i0,i2) = __max_float(NR_C_I2_J2_1(-i0,i2),__temp__); }
 	{
 		//Domain
-		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile+i>=0 && 0>=i+j && j>=0 && N_tile>=j+1}
-		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i+j>=4 && N_tile+i>=1 && 0>=i && J2>=0 && j>=1 && N_tile>=j+1 && N_sec>=I2+1}
-		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i+j-3 && N_tile+i>=1 && i+j>=1 && 0>=i && N_tile>=j+1 && j>=0}
-		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i2+1 && i+i2>=1 && 0>=i}
-		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i2+1 && i+i2>=1 && 0>=i}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=0 && i1>=0 && N_tile>=i1+1 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=0 && i1>=0 && N_tile>=i1+1 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
+		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile+i>=0 && 0>=i+j && j>=0 && N_tile>=j+1}
+		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && i+j>=4 && N_tile+i>=1 && 0>=i && J2>=0 && j>=1 && N_tile>=j+1 && N_sec>=I2+1}
+		//{i,j,i2|i2==j+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i+j-3 && N_tile+i>=1 && i+j>=1 && 0>=i && N_tile>=j+1 && j>=0}
+		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i2+1 && i+i2>=1 && 0>=i}
+		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i2+1 && i+i2>=1 && 0>=i}
+		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=0 && i1>=0 && N_tile>=i1+1 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
+		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=0 && i1>=0 && N_tile>=i1+1 && i2>=0 && N_tile>=i2+1 && i0+i2>=1}
 		int c1,c2,c3;
 		for(c1=-N_tile;c1 <= -N_tile+1;c1+=1)
 		 {

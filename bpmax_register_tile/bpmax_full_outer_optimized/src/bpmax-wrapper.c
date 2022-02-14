@@ -55,7 +55,7 @@
 #define var_FTable_verify(i1,j1,i2,j2) FTable_verify(i1,j1,i2,j2)
 
 //function prototypes
-void bpmax(long, long, long, long, long, long, int*, int*, float****);
+void bpmax(long, long, long, long, long, long, long, int*, int*, float****);
 void bpmax_verify(long, long, int*, int*, float****);
 
 //main
@@ -269,7 +269,7 @@ int main(int argc, char** argv) {
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 	
-	bpmax(M, N, N_sec, N_tile, MR, NR,  seq1, seq2, FTable);
+	bpmax(M, N, N_sec, N_tile, 0, MR, NR,  seq1, seq2, FTable);
 
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;

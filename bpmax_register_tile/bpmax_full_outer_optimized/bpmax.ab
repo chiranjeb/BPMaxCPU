@@ -16,8 +16,8 @@ output
 .
 affine bpmax_ftable_init
 {
-	M, N, N_sec, N_tile, I1, J1 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1
+	M, N, N_sec, N_tile, R, I1, J1 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && 0<=I1<=J1<=M-1
 }
 input
 	int   seq1     { i               | 0 <= i < M} ;
@@ -55,8 +55,8 @@ let
 
 affine bpmax_single_strand_s2_tile 
 {
-	N, N_sec, N_tile, MR, NR | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
+	N, N_sec, N_tile, R, MR, NR | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1	
 }
 input
 	  int   seq2_t   { i,  j      | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
@@ -73,8 +73,8 @@ let
 
 affine bpmax_inner_triangle_transform_4D_2_2D 
 {
-	N, N_sec, N_tile, MR, NR | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1	
+	N, N_sec, N_tile, R, MR, NR | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1	
 }
 input
 	float C_in { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1 };
@@ -87,8 +87,8 @@ let
 
 affine bpmax_inner_reductions
 {
-	M, N, N_sec, N_tile, MR, NR, I1, J1 | 
-	M >=1 && N >= 8 &&  N_sec >= 2 && N_tile >= 4 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1
+	M, N, N_sec, N_tile, R, MR, NR, I1, J1 | 
+	M >=1 && N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1
 }
 input
 	  int   seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
@@ -105,8 +105,8 @@ let
 
 affine bpmax_outer_reductions
 {   
-	M, N, N_sec, N_tile, MR, NR, I1, J1 , K1 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 
+	M, N, N_sec, N_tile, R, MR, NR, I1, J1 , K1 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 
 }
 input
 	int   seq1     { i                      |  0<=i<=M-1 } ;
@@ -125,8 +125,8 @@ let
 
 affine bpmax 
 {
-	M, N, N_sec, N_tile, MR, NR | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && MR >=1 && NR>=1
+	M, N, N_sec, N_tile, R, MR, NR | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1
 }
 input
 	int seq1 {i| 0 <= i < M} ;
@@ -165,7 +165,7 @@ let
 	
 	// Compute single strand table - S2: Tiled
 	use { ei | ei>=0 && 1>ei} 
-		bpmax_single_strand_s2_tile[N, N_sec, N_tile, MR, NR]  
+		bpmax_single_strand_s2_tile[N, N_sec, N_tile, R, MR, NR]  
     	(
         	(ei, i, j->i, j)@seq2_t
     	)returns (S2_A, S2_B, S2_C);
@@ -174,7 +174,7 @@ let
 	
 	// Initialize FTable. Internally, it will compute a 4D and transform and return a 6D
 	use {ei1,ej1| 0<=ei1<=ej1<=M-1} 
-	    bpmax_ftable_init[M, N, N_sec, N_tile, ei1, ej1] 
+	    bpmax_ftable_init[M, N, N_sec, N_tile, R, ei1, ej1] 
 	    (
 	    	(ei1, ej1, i->i)@seq1, 
 	        (ei1, ej1, i, j->i, j)@seq2_t,
@@ -184,7 +184,7 @@ let
 	    
 	
 	use {ei1,ej1, ek1 | 0<=ei1<=ej1<=M-1 && ei1<ej1 && ei1<=ek1<ej1 } 
-	bpmax_outer_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1, ek1] 
+	bpmax_outer_reductions[M, N, N_sec, N_tile, R, MR, NR, ei1, ej1, ek1] 
 	(
 	      (ei1, ej1, ek1, i->i)@seq1, 
 	      (ei1, ej1, ek1, i1, j1 -> 0, i1, j1)@S1, 
@@ -196,7 +196,7 @@ let
     
 	// Do inner reductions
 	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
-	bpmax_inner_reductions[M, N, N_sec, N_tile, MR, NR, ei1, ej1]
+	bpmax_inner_reductions[M, N, N_sec, N_tile, R, MR, NR, ei1, ej1]
 	(
 	      (ei, ej, i, j->i, j)@seq2_t,
 	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_A,
@@ -207,7 +207,7 @@ let
 	returns (FTable_A, FTable_B);
 	
 	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
-	bpmax_inner_triangle_transform_4D_2_2D[N, N_sec, N_tile, MR, NR]
+	bpmax_inner_triangle_transform_4D_2_2D[N, N_sec, N_tile, R, MR, NR]
 	(
 	     FTable_C
 	)returns (FTable);

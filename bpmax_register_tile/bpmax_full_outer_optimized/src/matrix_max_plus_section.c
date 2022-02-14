@@ -111,9 +111,9 @@ inline double __min_double(double x, double y){
 #define B(i3,j3) B[i3][j3]
 #define C_section(i3,j3) C_section[i3][j3]
 
-void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
+void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}

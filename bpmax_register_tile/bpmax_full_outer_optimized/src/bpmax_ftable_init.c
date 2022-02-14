@@ -113,9 +113,9 @@ inline double __min_double(double x, double y){
 #define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
 #define FTable_C_I1_J1(i2,j2,i3,j3) FTable_C_I1_J1[i2][j2][i3][j3]
 
-void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long I1, long J1, int* seq1, int** seq2_t, float** S1, float**** S2_C, float**** FTable_C_I1_J1){
+void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long R, long I1, long J1, int* seq1, int** seq2_t, float** S1, float**** S2_C, float**** FTable_C_I1_J1){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -126,9 +126,9 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long I1, long J1
 	#define S2(i2,j2,i3,j3) FTable_C_I1_J1(i2,j2,i3,j3) = (S1(I1,J1))+(S2_C(i2,j2,i3,j3))
 	{
 		//Domain
-		//{i2,j2,i3,j3|j3==i3 && j2==i2 && J1==I1 && N_tile>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && M>=I1+1 && i3>=0 && N_sec>=i2+1 && i2>=0}
-		//{i2,j2,i3,j3|i3==N_tile && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && j3>=0 && N_tile>=j3+1} || {i2,j2,i3,j3|j2==i2 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && N_sec>=i2+1 && N_tile>=i3+1 && j3>=0 && i3>=j3+1}
-		//{i2,j2,i3,j3|j2==i2 && N>=8 && N_sec>=2 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && N_sec>=i2+1 && i3>=0 && J1+j3>=I1+i3+1 && j3>=i3 && N_tile>=j3+1} || {i2,j2,i3,j3|N>=8 && N_tile>=4 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2+1 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i2,j2,i3,j3|j3==i3 && j2==i2 && J1==I1 && N_tile>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && M>=I1+1 && i3>=0 && N_sec>=i2+1 && i2>=0}
+		//{i2,j2,i3,j3|i3==N_tile && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2 && N_sec>=j2+1 && j3>=0 && N_tile>=j3+1} || {i2,j2,i3,j3|j2==i2 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && N_sec>=i2+1 && N_tile>=i3+1 && j3>=0 && i3>=j3+1}
+		//{i2,j2,i3,j3|j2==i2 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && N_sec>=i2+1 && i3>=0 && J1+j3>=I1+i3+1 && j3>=i3 && N_tile>=j3+1} || {i2,j2,i3,j3|N>=8 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1 && i2>=0 && j2>=i2+1 && N_sec>=j2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2,c3,c4;
 		if ((I1 == J1)) {
 			{
