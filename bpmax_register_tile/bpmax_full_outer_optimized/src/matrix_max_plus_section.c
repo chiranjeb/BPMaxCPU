@@ -113,7 +113,7 @@ inline double __min_double(double x, double y){
 
 void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2+1 && J2 >= K2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -123,7 +123,7 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, 
 	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
 	{
 		//Domain
-		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
+		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2,c3;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {

@@ -16,23 +16,19 @@ output
 .
 affine bpmax_ftable_init
 {
-	M, N, N_sec, N_tile, I1, J1 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1
+	M, N, N_sec, N_tile, I1, J1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1  && 0<=I2<=J2<=N_sec-1
 }
 input
 	int   seq1     { i               | 0 <= i < M} ;
     int   seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
 	float  S1      { i,j             | 0 <= i <= j < M };
-    //float  S2      { i3, j3          | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
-    float S_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1 };
-    
+    float  S2      { i3, j3          | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
 output
-	float FTable_C_I1_J1 { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };	
-
-	//float FTable_C_I1_J1_I2_J2   { i3, j3 |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	float FTable_C_I1_J1_I2_J2   { i3, j3 |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
 	  
 let
-	FTable_C_I1_J1[i1, j1, i2, j2] = 0;
+	FTable_C_I1_J1_I2_J2[i3, j3] = 0;
 .
 
 
@@ -173,13 +169,13 @@ let
   
 	
 	// Initialize FTable. Internally, it will compute a 4D and transform and return a 6D
-	use {ei1,ej1| 0<=ei1<=ej1<=M-1} 
-	    bpmax_ftable_init[M, N, N_sec, N_tile, ei1, ej1] 
+	use {ei1,ej1, ei2, ej2| 0<=ei1<=ej1<=M-1 && 0<=ei2<=ej2<=N_sec-1} 
+	    bpmax_ftable_init[M, N, N_sec, N_tile, ei1, ej1, ei2, ej2] 
 	    (
-	    	(ei1, ej1, i->i)@seq1, 
-	        (ei1, ej1, i, j->i, j)@seq2_t,
-	    	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1, 
-	     	(ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_C
+	    	(ei1, ej1, ei2, ej2, i->i)@seq1, 
+	        (ei1, ej1, ei2, ej2, i, j->i, j)@seq2_t,
+	    	(ei1, ej1, ei2, ej2, i1, j1 -> 0, i1, j1)@S1, 
+	     	(ei1, ej1, ei2, ej2, i3, j3 -> 0, ei2, ej2, i3, j3)@S2_C
 	     )returns (FTable_C);
 	    
 	

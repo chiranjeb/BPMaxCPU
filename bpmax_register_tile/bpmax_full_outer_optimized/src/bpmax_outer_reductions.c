@@ -107,11 +107,8 @@ inline double __min_double(double x, double y){
 //SubSystem Function Declarations
 void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, float**, float**, float**);
-void minimal_max_plus_head(long, long, long, long, long, float**, float**, float**);
-void minimal_max_plus_tail(long, long, long, long, long, float**, float**, float**);
 void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
 void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
-void bpmax_outer_reductions_diagonal_tile(long, long, long, long, long, long, long, float**, float**, float**);
 
 
 //Memory Macros
@@ -131,58 +128,38 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	//Memory Allocation
 	int mz1, mz2, mz3, mz4, mz5;
 	
-	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C[I1][J1][j][i3])
-	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C[I1][J1][j][i3])
-	#define S2(i,j,i2,i3) minimal_max_plus_head(N,N_sec,N_tile,j,i2,FTable_A[j][j],FTable_B[j][i2],FTable_C[I1][J1][j][i2])
-	#define S3(i,j,i2,i3) minimal_max_plus_tail(N,N_sec,N_tile,j,i2,FTable_A[j][i2],FTable_B[i2][i2],FTable_C[I1][J1][j][i2])
-	#define S4(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C[I1][J1][j][i3])
-	#define S5(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C[I1][J1][j][i3])
-	#define S6(i,j,i2,i3) bpmax_outer_reductions_diagonal_tile(N,N_sec,N_tile,MR,NR,j,i3,FTable_A[j][j],FTable_B[j][i3],FTable_C_I1_J1[j][i3])
+	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
+	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
 	{
 		//Domain
 		//{i,j,i2,i3|i2==j && i==1 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,k,i3|i==0 && j>=0 && i3>=j+1 && N_sec>=i3+1 && k>=j+1 && i3>=k+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i3==0 && i==0 && j>=0 && i2>=j+1 && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i3==N_sec+1 && i==0 && j>=0 && i2>=j+1 && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,k,i3|i==0 && j>=0 && i3>=j && N_sec>=i3+1 && k>=j && i3>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i3==j && i2==j && i==0 && j>=0 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		int c2,c3,c4;
-                #pragma omp parallel for private(c3,c4) schedule(static, 1)
-		for(c2=0;c2 <= N_sec-3;c2+=1)
+		#pragma omp parallel for private(c3,c4)
+		for(c2=0;c2 <= N_sec-2;c2+=1)
 		 {
-		 	S4((0),(c2),(c2),(c2));
-		 	S5((0),(c2),(c2),(c2));
-		 	S6((0),(c2),(c2),(c2));
-		 	for(c4=c2+1;c4 <= N_sec-1;c4+=1)
+		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
 		 	 {
-		 	 	S4((0),(c2),(c2),(c4));
-		 	 	S5((0),(c2),(c2),(c4));
+		 	 	S_1((0),(c2),(c2),(c4));
+		 	 	S2((0),(c2),(c2),(c4));
+		 	 	S3((0),(c2),(c2),(c4));
 		 	 }
-		 	for(c3=c2+1;c3 <= N_sec-2;c3+=1)
+		 	for(c3=c2+1;c3 <= N_sec-1;c3+=1)
 		 	 {
-		 	 	S2((0),(c2),(c3),(0));
-		 	 	for(c4=c3+1;c4 <= N_sec-1;c4+=1)
+		 	 	for(c4=c3;c4 <= N_sec-1;c4+=1)
 		 	 	 {
 		 	 	 	S_1((0),(c2),(c3),(c4));
 		 	 	 }
-		 	 	S3((0),(c2),(c3),(N_sec+1));
 		 	 }
-		 	S2((0),(c2),(N_sec-1),(0));
-		 	S3((0),(c2),(N_sec-1),(N_sec+1));
 		 }
-		S4((0),(N_sec-2),(N_sec-2),(N_sec-2));
-		S5((0),(N_sec-2),(N_sec-2),(N_sec-2));
-		S6((0),(N_sec-2),(N_sec-2),(N_sec-2));
-		S4((0),(N_sec-2),(N_sec-2),(N_sec-1));
-		S5((0),(N_sec-2),(N_sec-2),(N_sec-1));
-		S2((0),(N_sec-2),(N_sec-1),(0));
-		S3((0),(N_sec-2),(N_sec-1),(N_sec+1));
-		S4((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		S5((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		S6((0),(N_sec-1),(N_sec-1),(N_sec-1));
-                
-                #pragma omp parallel for private(c3,c4) schedule(static, 1)
+		S_1((0),(N_sec-1),(N_sec-1),(N_sec-1));
+		S2((0),(N_sec-1),(N_sec-1),(N_sec-1));
+		S3((0),(N_sec-1),(N_sec-1),(N_sec-1));
+		#pragma omp parallel for private(c4)
 		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
 		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
@@ -195,9 +172,8 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 	#undef S_1
 	#undef S2
 	#undef S3
-	#undef S4
-	#undef S5
-	#undef S6
+	
+	//Memory Free
 }
 
 //Memory Macros
@@ -206,8 +182,6 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long MR, lo
 #undef FTable_A
 #undef FTable_B
 #undef FTable_C
-#undef FTable_C_I1_J1_0
-#undef FTable_C_I1_J1_1
 #undef FTable_C_I1_J1
 
 

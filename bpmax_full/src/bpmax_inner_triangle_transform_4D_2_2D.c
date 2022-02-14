@@ -107,40 +107,41 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define S1(i,j) S1[i][j]
-#define FTable_section(i3,j3) FTable_section[i3][j3]
-#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
+#define C_in(i2,j2,i3,j3) C_in[i2][j2][i3][j3]
+#define C(i,j) C[i][j]
 
-void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, float** S1, float** FTable_section, float** FTable_C_section){
+void bpmax_inner_triangle_transform_4D_2_2D(long N, long N_sec, long N_tile, long MR, long NR, float**** C_in, float** C){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
 	{
-		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && M>=K1+1}
-		int c1,c2;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
+       for ( int i1 = 0; i1  < N_sec; i1++ )
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+           for ( int i2 = 0; i2 < N_tile; i2++)
+           {
+             for (int j1 = 0; j1 < N_sec; j1++)
 		 	 {
-		 	 	S0((c1),(c2));
+                  for( int j2 = 0; j2 < N_tile; j2++)
+                  {
+                      C[i1*N_tile+i2][j1*N_tile+j2] =  C_in[i1][j1][i2][j2];
 		 	 }
 		 }
+           }
+       }
 	}
 	#undef S0
+	Dump2D(N, C, "Final Transformed array");
 	
 	//Memory Free
 }
 
 //Memory Macros
-#undef S1
-#undef FTable_section
-#undef FTable_C_section
+#undef C_in
+#undef C
 
 
 //Common Macro undefs

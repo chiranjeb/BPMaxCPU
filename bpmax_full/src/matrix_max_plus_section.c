@@ -107,22 +107,22 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define S1(i,j) S1[i][j]
-#define FTable_section(i3,j3) FTable_section[i3][j3]
-#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
+#define A(i3,j3) A[i3][j3]
+#define B(i3,j3) B[i3][j3]
+#define C_section(i3,j3) C_section[i3][j3]
 
-void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, float** S1, float** FTable_section, float** FTable_C_section){
+void matrix_max_plus_section(long N, long N_sec, long N_tile, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2+1 && J2 >= K2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
+	#define S0(i3,j3) C_section(i3,j3) = 0
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && M>=K1+1}
+		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
 		int c1,c2;
 		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
@@ -138,9 +138,9 @@ void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR,
 }
 
 //Memory Macros
-#undef S1
-#undef FTable_section
-#undef FTable_C_section
+#undef A
+#undef B
+#undef C_section
 
 
 //Common Macro undefs

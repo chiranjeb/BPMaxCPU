@@ -107,40 +107,49 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define S1(i,j) S1[i][j]
-#define FTable_section(i3,j3) FTable_section[i3][j3]
-#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
+#define seq2(i) seq2[i]
+#define seq2_t(j) seq2_t[j]
 
-void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, float** S1, float** FTable_section, float** FTable_C_section){
+void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, int* seq2, int* seq2_t){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && I2 >= 0 && N_sec >= I2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	
-	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
+        int *seq2_rev = (int *)malloc( sizeof(int) * N);
+        for ( int i = 0; i< N; ++i)
+        {
+            seq2_rev[i] = seq2[N-1-i];
+        } 
+        int num_elements = 0;   
+	if ( (I2 + 1) * N_tile > N )
+        {
+           num_elements = N_tile - ((I2 + 1) * N_tile - N)-1;
+        }
+        else
+        {
+           num_elements = N_tile-1;
+        }  
+        #define S0(j) seq2_t(j) = seq2_rev[I2 * N_tile + j]
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && M>=K1+1}
-		int c1,c2;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
+		//{j|N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
+		int c1;
+		for(c1=0;c1 <= num_elements;c1+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2));
-		 	 }
+		 	S0((c1));
 		 }
 	}
 	#undef S0
+        free(seq2_rev);	
 	
 	//Memory Free
 }
 
 //Memory Macros
-#undef S1
-#undef FTable_section
-#undef FTable_C_section
+#undef seq2
+#undef seq2_t
 
 
 //Common Macro undefs

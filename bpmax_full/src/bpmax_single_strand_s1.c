@@ -105,42 +105,69 @@ inline double __min_double(double x, double y){
 
 
 
+//Local Function Declarations
+float reduce_bpmax_single_strand_s1_S1_1(long, int, int, float**);
 
 //Memory Macros
+#define seq1(i) seq1[i]
 #define S1(i,j) S1[i][j]
-#define FTable_section(i3,j3) FTable_section[i3][j3]
-#define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long MR, long NR, long I1, long J1, long K1, long I2, long J2, float** S1, float** FTable_section, float** FTable_C_section){
+void bpmax_single_strand_s1(long M, int* seq1, float** S1){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
+	#define S0(i,j) S1(j,i+j) = 0
+	#define S_1(i,j) S1(j,i+j) = __max_float((S1(j+1,i+j-1))+(e_intra_score(seq1(j),seq1(i+j))),reduce_bpmax_single_strand_s1_S1_1(M,j,i+j,S1))
 	{
 		//Domain
-		//{i3,j3|i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && M>=K1+1}
+		//{i,j|i>=j-3 && M>=1 && i>=0 && j>=i && M>=j+1}
+		//{i,j|j>=i+4 && M>=1 && i>=0 && M>=i+1 && M>=j+1 && j>=0}
 		int c1,c2;
-		for(c1=0;c1 <= N_tile-1;c1+=1)
+		for(c1=0;c1 <= min(3,M-1);c1+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	#pragma omp parallel for 
+		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2));
 		 	 }
 		 }
+		for(c1=4;c1 <= M-1;c1+=1)
+		 {
+		 	#pragma omp parallel for 
+		 	for(c2=0;c2 <= -c1+M-1;c2+=1)
+		 	 {
+		 	 	S_1((c1),(c2));
+		 	 }
+		 }
 	}
 	#undef S0
+	#undef S_1
 	
 	//Memory Free
 }
+float reduce_bpmax_single_strand_s1_S1_1(long M, int ip, int jp, float** S1){
+	float reduceVar = -FLT_MAX;
+	#define S2(i,j,k) {float __temp__ = (S1(i,k))+(S1(k+1,j)); reduceVar = __max_float(reduceVar,__temp__); }
+	{
+		//Domain
+		//{i,j,k|jp>=ip+4 && M>=jp+1 && ip>=0 && M>=ip+1 && jp>=0 && M>=1 && j>=k+1 && M>=i+1 && i>=0 && k>=i && M>=k+1 && M>=j+1 && k>=-1 && j>=i+4 && j>=0 && ip==i && jp==j}
+		int c3;
+		for(c3=ip;c3 <= jp-1;c3+=1)
+		 {
+		 	S2((ip),(jp),(c3));
+		 }
+	}
+	#undef S2
+	return reduceVar;
+}
 
 //Memory Macros
+#undef seq1
 #undef S1
-#undef FTable_section
-#undef FTable_C_section
 
 
 //Common Macro undefs

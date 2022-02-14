@@ -11,8 +11,8 @@ CheckProgram(prog);
 
 AShow(prog, rootSystem);
 
-setSpaceTimeMap(prog, rootSystem, "FTable_C_I1_J1",    "(i1, j1, i2, j2    ->  i1,  j1, i2, j2)");
-setParallel(prog, rootSystem, "", "0");
+setSpaceTimeMap(prog, rootSystem, "FTable_C_I1_J1_I2_J2",    "(i, j    ->  i,  j)");
+setParallel(prog, rootSystem, "", "1");
 generateScheduledCode(prog, rootSystem, outDir);
 
                              

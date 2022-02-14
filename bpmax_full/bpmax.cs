@@ -21,13 +21,13 @@ equation_FTable_output = "UseEquation_FTable";
 outer_reduction_label  = "UseEquation_FTable_outer";
 
 
-setSpaceTimeMap(prog, rootSystem, equation_s1,                "( i           ->  0,      0,   i,   0, 0)");
-setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i           ->  0,      1,   i,   0, 0)");
-setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i           ->  0,      2,   i,   0, 0)");
-setSpaceTimeMap(prog, rootSystem, initialize_FTable,          "( i, j        ->  2,    j-i,   i,   0, 1)");
-setSpaceTimeMap(prog, rootSystem, outer_reduction_label,      "( i, j, k     ->  2,    j-i,   i,   k, 2)");
-setSpaceTimeMap(prog, rootSystem, inner_reduction_label,      "( i, j        ->  2,    j-i,   M,   0, i)");
-setSpaceTimeMap(prog, rootSystem, equation_FTable_output,     "( i, j        ->  3,      i,   j,   0, 0)");
+setSpaceTimeMap(prog, rootSystem, equation_s1,                "( i                ->  0,      0,   i,   0,    0)");
+setSpaceTimeMap(prog, rootSystem, equation_seq2_t,            "( i                ->  0,      1,   i,   0,    0)");
+setSpaceTimeMap(prog, rootSystem, equation_s2,                "( i                ->  0,      2,   i,   0,    0)");
+setSpaceTimeMap(prog, rootSystem, initialize_FTable,          "( i1, j1, i2, j2   ->  1,     i1,  j1,  i2,   j2)");
+setSpaceTimeMap(prog, rootSystem, outer_reduction_label,      "( i, j, k          ->  2,    j-i,   i,   k,    0)");
+setSpaceTimeMap(prog, rootSystem, inner_reduction_label,      "( i, j             ->  2,    j-i,   M,   i,    1)");
+setSpaceTimeMap(prog, rootSystem, equation_FTable_output,     "( i, j             ->  2,    j-i,   M,   i,    2)");
 
 
 ################################   S1   #################################################
@@ -204,7 +204,7 @@ setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_FTable_outpu
 
 
 CheckProgram(prog);
-setParallel(prog, rootSystem, "", "4");
+setParallel(prog, rootSystem, "", "3");
 generateScheduledCode(prog, rootSystem, outDir);
 #generateMakefile(prog, rootSystem, outDir);
 #generateWrapper(prog, rootSystem, outDir);
