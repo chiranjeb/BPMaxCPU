@@ -3,8 +3,8 @@ float e_intra_score (int,int) ;
 
 affine transform_section_like_A_for_register_tile 
 {
-	N, N_sec, N_tile, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	float C  { i3, j3  | 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
@@ -17,8 +17,8 @@ let
 
 affine transform_section_like_B_for_register_tile 
 {
-	N, N_sec, N_tile, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	float C  { i3, j3  |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
@@ -31,8 +31,8 @@ let
 
 affine matrix_max_plus_section 
 {
-	N, N_sec, N_tile, MR, NR, I2, J2, K2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
+	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
 }
 input
     float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
@@ -46,8 +46,8 @@ let
 
 affine bpmax_inner_reductions_diagonal_tile 
 {
-	N, N_sec, N_tile, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4   && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
 }
 input
    int    seq2_t          { i,  j           | 0<=i<=N_sec-1  &&  0<=j<=N_tile-1  }; 
