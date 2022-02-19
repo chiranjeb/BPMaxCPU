@@ -290,6 +290,14 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 			}
 		}
 	}
+
+#if OUTER_REDUCTIONS_TIMING
+    struct timeval time;
+    double elapsed_time;
+    gettimeofday(&time, NULL);
+    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
+#endif
+
 	
 	#define S0(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i2])
 	#define S_1(i,j,k,i3,i4) bpmax_outer_reductions(M,N,N_sec,N_tile,R,MR,NR,k,j+k,i3,seq1,S1[0],FTable_A[k][i3],FTable_B[i3+1][j+k],FTable_C,FTable_C[k][j+k])
@@ -318,7 +326,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		 {
 		 	S5((2),(0),(c3),(0),(1));
 		 }
-		#pragma omp parallel for 
+		#pragma omp parallel for schedule(static, 1) 
 		for(c5=0;c5 <= M-1;c5+=1)
 		 {
 		 	S4((2),(0),(M),(0),(c5));
@@ -333,12 +341,19 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		 	 	 	S_1((2),(c2),(c3),(c4),(2));
 		 	 	 }
 		 	 }
-		 	#pragma omp parallel for 
+		 	#pragma omp parallel for schedule(static, 1)  
 		 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 		 	 {
 		 	 	S4((2),(c2),(M),(0),(c5));
 		 	 }
 		 }
+
+#if OUTER_REDUCTIONS_TIMING
+        gettimeofday(&time, NULL);
+        elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+        printf("==> BPMax End: Execution time : %lf sec. GFLOPS: %f\n", elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time)); fflush(stdout);
+        elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
+#endif
 		for(c2=0;c2 <= M-1;c2+=1)
 		 {
 		 	for(c3=c2;c3 <= M-1;c3+=1)
@@ -354,7 +369,13 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 	#undef S4
 	#undef S5
 	#undef S6
-	
+
+#if OUTER_REDUCTIONS_TIMING
+       gettimeofday(&time, NULL);
+       elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+       printf("==> BPMax End: Conversion Execution time : %lf sec. GFLOPS: %f\n", elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time)); fflush(stdout);
+       elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
+#endif	
 	//Memory Free
 	free(_lin_S1);
 	for (mz1=0;mz1 < 1; mz1++) {
@@ -445,7 +466,11 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, in
 		free(FTable_C[mz1]);
 	}
 	free(FTable_C);
-	
+#if OUTER_REDUCTIONS_TIMING
+        gettimeofday(&time, NULL);
+        elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+        printf("==> Memory Free End: Execution time : %lf sec. GFLOPS: %f\n", elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time)); fflush(stdout);
+#endif	
 }
 
 //Memory Macros

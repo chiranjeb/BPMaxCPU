@@ -128,7 +128,12 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		exit(-1);
 	}
 	//Memory Allocation
-	int mz1, mz2, mz3, mz4, mz5;
+#if OUTER_REDUCTIONS_TIMING
+    struct timeval time;
+    double elapsed_time;
+    gettimeofday(&time, NULL);
+    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+#endif
 
 	
 
@@ -179,6 +184,12 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		 	S5((c1),(N_sec-1),(1),(N_sec-1));
 		 	S4((c1),(N_sec-1),(2),(N_sec-1));
 		 }
+#if OUTER_REDUCTIONS_TIMING
+	gettimeofday(&time, NULL);
+    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+    printf("==>Inner Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
+#endif
+
 	}
 	#undef S0
 	#undef S1

@@ -1,10 +1,10 @@
 declare -a elems=(
-    "1 40 4"
-    "51 40 4"
-    "100 64 8"
-    "33 192 16"
-    "8 60 8"
-    "8 192 16"
+    #"1 40 4"
+    #"51 40 4"
+    #"100 64 8"
+    #"33 192 16"
+    #"8 60 8"
+    #"8 192 16"
     "2 192 48"
     "6 192 48"
     "6 480 48"
@@ -23,7 +23,7 @@ do
     for elem in "${elems[@]}"; do
        read -a strarr <<< "$elem"  # uses default whitespace IFS
        echo "Running with input" ${strarr[0]} ${strarr[1]} ${strarr[2]}
-       ./bpmax.verify-rand ${strarr[0]} ${strarr[1]} ${strarr[2]} 2 2
+       ./bpmax.verify-rand ${strarr[0]} ${strarr[1]} ${strarr[2]} 3 24
        if [ $? -eq 0 ]
        then
           echo "New program matches base program                      [PASS]"

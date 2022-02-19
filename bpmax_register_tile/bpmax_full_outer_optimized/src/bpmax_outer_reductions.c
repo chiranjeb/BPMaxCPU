@@ -125,9 +125,14 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-	//Memory Allocation
-	int mz1, mz2, mz3, mz4, mz5;
-	
+
+#if OUTER_REDUCTIONS_TIMING
+    struct timeval time;
+    double elapsed_time;
+    gettimeofday(&time, NULL);
+    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+#endif
+
 	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
 	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
 	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
@@ -139,7 +144,7 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		int c2,c3,c4;
-		#pragma omp parallel for private(c3,c4)
+		#pragma omp parallel for private(c3,c4) schedule(static, 1)
 		for(c2=0;c2 <= N_sec-2;c2+=1)
 		 {
 		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
@@ -159,7 +164,7 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		S_1((0),(N_sec-1),(N_sec-1),(N_sec-1));
 		S2((0),(N_sec-1),(N_sec-1),(N_sec-1));
 		S3((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		#pragma omp parallel for private(c4)
+		#pragma omp parallel for private(c4) schedule(static, 1)
 		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
 		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
@@ -168,6 +173,13 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		 	 }
 		 }
 	}
+
+#if OUTER_REDUCTIONS_TIMING
+	gettimeofday(&time, NULL);
+    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
+    printf("Outer Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
+#endif
+	
 	#undef S0
 	#undef S_1
 	#undef S2
