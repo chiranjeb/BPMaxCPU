@@ -1,0 +1,139 @@
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+
+affine transform_section_like_A_for_register_tile 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	//float C  { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float C  { i3, j3  | 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	
+output
+	float A { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	A [i3, j3] = C[i3, j3];
+.
+
+affine transform_section_like_B_for_register_tile 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float C  { i3, j3  |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+output
+	float B { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	B [i3, j3] = C[i3+1, j3];
+.
+
+
+affine matrix_max_plus_section 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
+}
+input
+	float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	float B       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+output
+    float C_section { i3, j3  | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
+let
+	C_section[i3,j3] = reduce(max, [k], {|0<=k<=N_tile-1}: A[i3, k] + B[k, j3]);
+.	
+
+affine bpmax_single_strand_diagonal_tile 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+   int   seq2_t          { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
+output
+   float S_C_I2_J2       { i2, j2 | 0<=i2<=N_tile   &&  0<=j2<=N_tile-1 };
+let
+	S_C_I2_J2[i3,j3] = 0;
+.		 
+
+
+affine bpmax_single_strand_finalize 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+}
+input
+	int    seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  C        { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
+
+output
+	float S_C_I2_J2         { i3, j3  |  0<=i3<=N_tile  && 0<=j3<=N_tile-1 };
+let
+  S_C_I2_J2[i3,j3] = 0;
+.
+
+
+affine bpmax_single_strand_s2_tile 
+{
+	N, N_sec, N_tile, R, MR, NR | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1	
+}
+input
+	  int   seq2_t   { i,  j      | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+output
+	  float S_A { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1  && 0<=j3<=N_tile-1 };
+	  float S_B { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1  && 0<=j3<=N_tile-1 };
+	  float S_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1 };
+local
+	  float S_C_1 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1  &&  i2 == j2};
+	  float S_C_2 { i2, j2, k2, i3, j3| 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1  && 0<=j3<=N_tile-1  && i2 < j2  && i2+1 <= k2 < j2};
+	  float S_C_3 { i2, j2, i3, j3    | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile    && 0<=j3<=N_tile-1  &&  i2 < j2 };
+ 
+let
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+   	//
+    // Step 1: Compute only the diagonals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 == ej2 } 
+   	bpmax_single_strand_diagonal_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
+   	(
+   		(ei2, ej2, i, j -> i, j)@seq2_t
+   	) returns (S_C_1); // replace it with S_C
+   	
+   	//S_C[i2, j2, i3, j3] = 0;
+	
+	
+    // Step 2: Majority of the computation : Perform matrix max plus for A and B
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2+1 <= ek2 < ej2} 
+   matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
+   ( 
+       (ei2, ej2, ek2, i3, j3 -> ei2,   ek2, i3, j3)@S_A, 
+       (ei2, ej2, ek2, i3, j3 -> ek2,   ej2, i3, j3)@S_B
+   )returns (S_C_2); // replace it with S_C
+	   
+    // Final Step : Finalize the section and transform it such that it is ready for the register tile.
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 } 
+    bpmax_single_strand_finalize[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
+    (
+    	(ei2, ej2, i,  j -> i, j)@seq2_t,
+    	(ei2, ej2, i1, j1, i2, j2 -> i1, j1, i2, j2)@S_C
+	)returns (S_C_3); // replace it with S_C
+	
+    
+	/// Finally transform the memory for register tiling  
+	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 } 
+	transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ei2, ej2]
+    (
+    	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@S_C
+    ) returns (S_B);
+
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 } 
+    transform_section_like_A_for_register_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
+    (
+    	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@S_C
+    )returns (S_A);
+ 	   
+.
