@@ -28,7 +28,7 @@ let
 	    { | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 > j3  }     : e_get_minimum(seq1[I1], seq1[I1]);
 		{ | I1 <  J1 && I2 == J2 && i3 < N_tile && i3 == j3 }||
 		{ | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 < j3  }||
-		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1] /* + S2_C[i3, j3]*/;
+		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1]  + S2_C[i3, j3];
 	esac;	
 .
 
