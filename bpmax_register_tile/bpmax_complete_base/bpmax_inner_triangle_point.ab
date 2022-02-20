@@ -4,21 +4,16 @@ float e_inter_score (int,int) ;
 affine bpmax_inner_reductions_finalize 
 {
 	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<=N_tile-1 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
 	int    seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
 	float  S2_C     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 	float  C        { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
-	
-
-
 output
-	float C_I2_J2 { i3, j3  |  0<=i3<=N_tile  && 0<=j3<=N_tile-1 };
-
+	float C_I2_J2          { i3, j3  |  R<=i3<=N_tile  && 0<=j3<=N_tile-1 };
 local
-	float C_pointwise_diag { i3, j3  |  0<=i3<=N_tile  && 0<=j3<=N_tile-1 };
-
+	float C_pointwise_diag { i3, j3  |  R<=i3<=N_tile  && 0<=j3<=N_tile-1 };
 let
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////   
     // @@@ note:
@@ -26,24 +21,19 @@ let
     // Also, we are doing a max computation with C_I2_J2[i3, j3] since we would like the C_pointwise_diag and C_I2_J2
     // share the memory space.
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    C_pointwise_diag[i3,j3] = 
-       case 
+    C_pointwise_diag[i3,j3] = case 
          { | i3 == N_tile } : C[I2+1, J2, 0, j3];
-         { | i3 < N_tile  } : max ( case 
-	                                 { | I2 == J2-1 &&  i3 - j3  > N_tile -4 }: 0;
-        	   	                     { | I2 == J2-1 &&  i3 - j3  <= N_tile -4  } || 
-			                         { | I2 < J2-1 }:
-        	   	                         case 
+         { | i3 < N_tile  } : max ( case { | I2 == J2-1 &&  i3 - j3   > N_tile - 4 }: 0;
+        	   	                         { | I2 == J2-1 &&  i3 - j3  <= N_tile - 4 } || 
+			                             { | I2 <  J2-1 }: case 
         	   	                            { |j3 == 0 } : C[I2, J2-1,  i3+1, N_tile-1 ]  + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]) ;
 		                                    { |j3 >  0 } : C[ I2, J2,   i3+1, j3-1 ]     + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]);
-		                                  esac;
+		                                    esac;
 		                            esac, 
-			                        C_I2_J2[i3, j3]
-			                       );
+			                        C_I2_J2[i3, j3]);
 	    esac;
 
-   C_I2_J2[i3,j3] = 
-       case 
+   C_I2_J2[i3,j3] = case 
          { | i3 == N_tile } : C_pointwise_diag;
          { | i3 < N_tile  } : max ( C_pointwise_diag, 
                                     reduce(max, [k3], {|i3<=k3<=N_tile-1} : S2_C[I2, I2, i3, k3] +    C[I2, J2, k3+1, j3]),
@@ -51,31 +41,29 @@ let
 		                            case { | j3 > 0  } : 
 		                                  max(  reduce(max, [k3], {|0<=k3<=j3-1} : S2_C[I2, J2, i3, k3] +   C[J2, J2, k3+1, j3]),
 		                                    	reduce(max, [k3], {|0<=k3<=j3-1} :    C[I2, J2, i3, k3] + S2_C[J2, J2, k3+1, j3]));                   
-		    	                         { | j3 == 0 } : 0; esac
-					                );
-	   esac;
+		    	                         { | j3 == 0 } : 0; esac);
+	     esac;
 .
 
 
 affine bpmax_inner_reductions_diagonal_tile 
 {
 	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<=N_tile-1 && MR >=1 && NR>=1 && 
 	0<=I2<=J2<=N_sec-1
 }
 input
-   int   seq2_t  { i, j            | 0<=i<=N_sec-1  &&  0<=j<=N_tile-1  }; 
-   float  S2_C   { i3, j3          | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
+   int   seq2_t  { i, j            | 0<=i <=N_sec-1  &&  0<=j <=N_tile-1   }; 
+   float  S2_C   { i3, j3          | 0<=i3<=N_tile   &&  0<=j3<=N_tile-1   };
 output
-   float C_I2_J2 { i3, j3 | 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+   float C_I2_J2 { i3, j3          | R<=i3<=N_tile &&  R<=j3<=N_tile-1 };
 let
 	C_I2_J2[i3,j3] = case
-	   { | i3 == N_tile } ||
-	   { | i3 >= j3 } : 0;
-	   { | i3 < N_tile && i3 < j3  } : 
+	   { | i3 == N_tile } || { | i3 >= j3 } : 0;
+	   { | i3 < N_tile && i3 < j3  } :
 	                 max (  C_I2_J2[i3, j3],
 	                 	    case {|j3-i3  > 3}: C_I2_J2[i3+1, j3-1]  + e_intra_score(seq2_t[I2, i3], seq2_t[J2, j3]);
-	                             {|j3-i3  <=3}: 0;esac, 
+	                             {|j3-i3  <=3}: 0;esac,
                             reduce(max, [k3],  {|i3<=k3<j3} : C_I2_J2[i3, k3] + S2_C[k3+1, j3]),
                             reduce(max, [k3],  {|i3<=k3<j3} : S2_C[i3, k3]    + C_I2_J2[k3+1, j3]));
         esac;

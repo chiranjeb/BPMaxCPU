@@ -3,6 +3,37 @@ float e_intra_score (int,int) ;
 float e_inter_score (int,int) ;
 
 
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+
+
+affine bpmax_ftable_init_section
+{
+	M, N, N_sec, N_tile, I1, J1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=I1<=J1<=M-1  && 0<=I2<=J2<=N_sec-1
+}
+input
+	int    seq1    { i               | 0 <= i < M} ;
+    int    seq2_t  { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  S1      { i,j             | 0 <= i <= j < M };
+    float  S2_C    { i3, j3          | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
+output
+	float FTable_C_I1_J1_I2_J2   { i3, j3 |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	  
+let
+	FTable_C_I1_J1_I2_J2[i3, j3] = case
+		{ | I1 == J1 && I2 == J2 && i3 < N_tile && i3 == j3 }     : e_inter_score(seq1[I1], seq2_t[I2, i3]); 
+	    { | i3 == N_tile} || 
+	    { | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 > j3  }     : 0;
+		{ | I1 <  J1 && I2 == J2 && i3 < N_tile && i3 == j3 }||
+		{ | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 < j3  }||
+		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1] + S2_C[i3, j3];
+	esac;
+	
+	//FTable_C_I1_J1_I2_J2[i3, j3] = S2_C[i3, j3];
+.
+
+
 affine bpmax_ftable_init
 {
 	M, N, N_sec, N_tile, I1, J1, I2, J2 | 
@@ -17,13 +48,6 @@ output
 	float FTable_C_I1_J1_I2_J2   { i3, j3 |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
 	  
 let
-	//	{ | I1<= J1  && j2< i2} : S1[I1, J1];
-	//	{ | J1 < I1  && i2<=j2} : S2[i2, j2];
-	//	{ | I1 == J1 && i2 == j2} : e_inter_score(seq1[I1], seq2[N-i2-1]); 
-	//	{ | I1<J1 && i2<j2} || {|I1 ==J1 && i2<j2} || {|I1<J1 && i2==j2} : 			
-	//	        max(case {|J1-I1 >  3}: FTable_4D[I1+1, J1-1, i2, j2] + e_intra_score(seq1[I1], seq1[J1]);
-	//			       {|J1-I1 <= 3}: 0; esac, S1[I1, J1] + S2[i2, j2]);
-				       
 	FTable_C_I1_J1_I2_J2[i3, j3] = case
 		{ | I1 == J1 && I2 == J2 && i3 < N_tile && i3 == j3 }     : e_inter_score(seq1[I1], seq2_t[I2, i3]); 
 	    { | i3 == N_tile} || 
@@ -33,5 +57,4 @@ let
 		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1] + S2_C[i3, j3];
 	esac;
 	
-	//FTable_C_I1_J1_I2_J2[i3, j3] = S2_C[i3, j3];
 .

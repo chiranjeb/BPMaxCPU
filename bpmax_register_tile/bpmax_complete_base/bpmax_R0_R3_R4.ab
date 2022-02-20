@@ -3,13 +3,13 @@ float e_intra_score (int,int) ;
 affine matrix_max_plus_section 
 {
 	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4   && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 <= J2
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 <= J2
 }
 input
     float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
     float B       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 output
-    float C_section { i3, j3  | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
+    float C_section { i3, j3  | R<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
 let
 	C_section[i3,j3] = 0;
 .		           		
@@ -18,14 +18,14 @@ let
 
 affine bpmax_r3_section
 {
-	M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, I2, J2 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, K1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	float S1               { i,  j    |   0<=i<=j<=M-1 };
 	float FTable_section   { i3, j3   |   0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 output
-   float FTable_C_section  { i3, j3   |   0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   float FTable_C_section  { i3, j3   |   R_i<=i3<=N_tile-1 && R_j<=j3<=N_tile-1 };
 
 let
 	FTable_C_section[i3, j3] = max(FTable_C_section, S1[I1, K1]+FTable_section[i3, j3]);
@@ -33,14 +33,14 @@ let
 
 affine bpmax_r4_section
 {
-	M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, I2, J2 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, K1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	float FTable_section   { i3, j3  |   0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float S1               { i,  j   |   0<=i<=j<=M-1 };
 output
-   float FTable_C_section  {i3, j3   | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   float FTable_C_section  {i3, j3   |   R_i<=i3<=N_tile-1 && R_j<=j3<=N_tile-1 };
 
 let
 	FTable_C_section[i3, j3] = max(FTable_C_section, FTable_section[i3, j3] + S1[K1+1, J1]);
@@ -49,15 +49,15 @@ let
 
 affine bpmax_outer_south_west
 {
-	M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, I2, J2 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, K1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
 }
 input
 	int   seq1             { i        | 0<=i<=M-1 } ;
 	float S1               { i,  j    | 0<=i<=j<=M-1 };
 	float FTable_section   { i3, j3   | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 output
-    float FTable_C_section { i3, j3   | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+    float FTable_C_section { i3, j3   | R_i<=i3<=N_tile-1 && R_j<=j3<=N_tile-1 };
 let
     // when I2 == J2 and i2 > j2 , we don't have to really do anything. But we will fix it later
     FTable_C_section[i3, j3] = 
@@ -100,7 +100,7 @@ let
 	  		
 	  		
    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
-    	bpmax_r3_section[M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, ei2, ej2]  
+    	bpmax_r3_section[M, N, N_sec, N_tile, R, R, MR, NR, I1, J1, K1, ei2, ej2]  
     	(
     		(ei2, ej2, i, j -> i, j)@S1,
     		(ei2, ej2, i3, j3 -> K1+1, J1, ei2, ej2, i3, j3)@FTable_C
@@ -109,7 +109,7 @@ let
 	  		
 
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
-    	bpmax_r4_section[M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, ei2, ej2]  
+    	bpmax_r4_section[M, N, N_sec, N_tile, R, R, MR, NR, I1, J1, K1, ei2, ej2]  
     	(
     		(ei2, ej2, i3, j3 -> I1, K1, ei2, ej2, i3, j3)@FTable_C,
     		(ei2, ej2, i, j -> i, j)@S1
@@ -118,7 +118,7 @@ let
 	  	
 	
 	use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
-    	bpmax_outer_south_west[M, N, N_sec, N_tile, R, MR, NR, I1, J1, K1, ei2, ej2]  
+    	bpmax_outer_south_west[M, N, N_sec, N_tile, R, R, MR, NR, I1, J1, K1, ei2, ej2]  
     	(
     		(ei, ej, i->i)@seq1, 
     		(ei2, ej2, i, j -> i, j)@S1,

@@ -1,4 +1,4 @@
-prog = ReadAlphabets("bpmax_R0_R3_R4_concise.ab");
+prog = ReadAlphabets("bpmax_R0_R3_R4.ab");
 outer_reduction_system = "bpmax_outer_reductions";
 
 r0_r3_r4_instance_system = "bpmax_outer_reductions";
@@ -10,7 +10,7 @@ CheckProgram(prog);
 outDir = "./src";
 #PrintAST(prog, r0_r3_r4_instance_system);
 
-r0_instance_label   =  "UseEquation_FTable_C_I1_J1_0";
+r0_instance_label   = "UseEquation_FTable_C_I1_J1_0";
 r3_instance_label   = "UseEquation_FTable_C_I1_J1_1";
 r4_instance_label   = "UseEquation_FTable_C_I1_J1_2";
 sw_instance_label   = "UseEquation_FTable_C_I1_J1";

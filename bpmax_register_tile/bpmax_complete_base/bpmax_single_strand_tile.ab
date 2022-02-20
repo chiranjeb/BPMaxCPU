@@ -33,8 +33,8 @@ let
 
 affine matrix_max_plus_section 
 {
-	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
+	N, N_sec, N_tile, R_i, MR, NR, I2, J2, K2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R_i<=N_tile-1 && 0<=R_j<=N_tile-1 && R_i <= R_j && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
 }
 input
 	float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
@@ -48,7 +48,8 @@ let
 affine bpmax_single_strand_diagonal_tile 
 {
 	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<=N_tile-1 && MR >=1 && NR>=1 && 
+	0<=I2<=J2<=N_sec-1
 }
 input
    int   seq2_t          { i, j   | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1  }; 
@@ -61,8 +62,8 @@ let
 
 affine bpmax_single_strand_finalize 
 {
-	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
+	N, N_sec, N_tile, R_i, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R_i<=N_tile-1 && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2<J2
 }
 input
 	int    seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
@@ -103,9 +104,6 @@ let
    		(ei2, ej2, i, j -> i, j)@seq2_t
    	) returns (S_C_1); // replace it with S_C
    	
-   	//S_C[i2, j2, i3, j3] = 0;
-	
-	
     // Step 2: Majority of the computation : Perform matrix max plus for A and B
    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2+1 <= ek2 < ej2} 
    matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
