@@ -1,17 +1,15 @@
 prog = ReadAlphabets("matrix_max_plus.ab");
 
-system_s1 = "matrix_max_plus_section";
+system_s1 = "matrix_max_plus";
 
 outDir = "./src";
 
-NormalizeReduction(prog, system_s1, "C_section");
+NormalizeReduction(prog, system_s1, "C");
 Normalize(prog); 
 CheckProgram(prog);
 
 
 
 AShow(prog, system_s1);
-setSpaceTimeMap(prog, system_s1, "C_section", "(i,j, k ->  i,   k,  j)" ,
-                                              "(i,j    ->  i,   j,  0)" );
-setParallel(prog, system_s1, "", "1");
+setSpaceTimeMap(prog, system_s1, "C", "(i,j, k ->  i,   k,  j)" , "(i,j    -> -1,   i,  j)" );
 generateScheduledCode(prog, system_s1, outDir);
