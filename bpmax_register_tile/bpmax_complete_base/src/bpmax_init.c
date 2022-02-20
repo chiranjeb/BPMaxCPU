@@ -104,116 +104,39 @@ inline double __min_double(double x, double y){
 
 
 
+//SubSystem Function Declarations
+void bpmax_ftable_init(long, long, long, long, long, long, long, long, long, long, int*, int**, float**, float**, float**);
 
 
 //Memory Macros
 #define seq1(i) seq1[i]
 #define seq2_t(i,j) seq2_t[i][j]
 #define S1(i,j) S1[i][j]
-#define S2_C(i3,j3) S2_C[i3][j3]
-#define FTable_C_I1_J1_I2_J2(i3,j3) FTable_C_I1_J1_I2_J2[i3][j3]
+#define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
+#define FTable_C_I1_J1(i2,j2,i3,j3) FTable_C_I1_J1[i2][j2][i3][j3]
 
-void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long R_i, long R_j, long I1, long J1, long I2, long J2, int* seq1, int** seq2_t, float** S1, float** S2_C, float** FTable_C_I1_J1_I2_J2){
+void bpmax_init(long M, long N, long N_sec, long N_tile, long R, long I1, long J1, int* seq1, int** seq2_t, float** S1, float**** S2_C, float**** FTable_C_I1_J1){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R_i >= 0 && N_tile >= R_i+1 && R_j >= 0 && N_tile >= R_j+1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_inter_score(seq1(I1),seq2_t(I2,i3))
-	#define S_1(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_get_minimum(seq1(I1),seq1(I1))
-	#define S2(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = S1(I1,J1)
+	#define S0(i,j,i2) bpmax_ftable_init(M,N,N_sec,N_tile,(j==0)?R:0, (j==0&& i2 == 0)?R:0,I1,J1,j,i2,seq1,seq2_t,S1,S2_C[j][i2],FTable_C_I1_J1[j][i2])
 	{
 		//Domain
-		//{i3,j3|j3==i3 && J2==I2 && J1==I1 && N_tile>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R_i>=0 && N_tile>=R_i+1 && R_j>=0 && N_tile>=R_j+1 && I1>=0 && N_sec>=I2+1 && M>=I1+1 && I2>=0 && i3>=0 && i3>=R_i && i3>=R_j}
-		//{i3,j3|i3==N_tile && N>=8 && N_sec>=2 && N_tile>=4 && R_i>=0 && N_tile>=R_i+1 && R_j>=0 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && j3>=R_j && N_tile>=j3+1} || {i3,j3|J2==I2 && N>=8 && N_sec>=2 && N_tile>=4 && R_i>=0 && R_j>=0 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && N_sec>=I2+1 && i3>=R_i && N_tile>=i3+1 && j3>=R_j && i3>=j3+1}
-		//{i3,j3|J2==I2 && N>=8 && N_sec>=2 && N_tile>=4 && j3>=R_j && j3>=i3 && R_i>=0 && J1>=I1 && M>=J1+1 && R_j>=0 && I1>=0 && J1+j3>=I1+i3+1 && I2>=0 && N_tile>=j3+1 && N_sec>=I2+1 && i3>=R_i} || {i3,j3|N>=8 && N_tile>=4 && R_i>=0 && R_j>=0 && I1>=0 && J1>=I1 && M>=J1+1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=R_i && N_tile>=i3+1 && j3>=R_j && N_tile>=j3+1}
-		int c1,c2;
-		if ((I2 == J2)) {
-			{
-				for(c1=R_i;c1 <= min(R_j,R_j-I1+J1-1);c1+=1)
-				 {
-				 	for(c2=R_j;c2 <= N_tile-1;c2+=1)
-				 	 {
-				 	 	S2((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I2 <= J2-1)) {
-			{
-				for(c1=R_i;c1 <= N_tile-1;c1+=1)
-				 {
-				 	for(c2=R_j;c2 <= N_tile-1;c2+=1)
-				 	 {
-				 	 	S2((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 == J1 && I2 == J2 && N_tile >= R_j+2 && R_i <= R_j)) {
-			{
-				S0((R_j),(R_j));
-				for(c2=R_j+1;c2 <= N_tile-1;c2+=1)
-				 {
-				 	S2((R_j),(c2));
-				 }
-			}
-		}
-		if ((I1 == J1 && I2 == J2 && N_tile == R_j+1)) {
-			{
-				S0((N_tile-1),(N_tile-1));
-			}
-		}
-		if ((I1 <= J1-1 && I2 == J2)) {
-			{
-				for(c1=max(R_i,R_j+1);c1 <= N_tile-1;c1+=1)
-				 {
-				 	for(c2=R_j;c2 <= c1-1;c2+=1)
-				 	 {
-				 	 	S_1((c1),(c2));
-				 	 }
-				 	for(c2=c1;c2 <= N_tile-1;c2+=1)
-				 	 {
-				 	 	S2((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 == J1 && I2 == J2)) {
-			{
-				for(c1=max(R_i,R_j+1);c1 <= N_tile-2;c1+=1)
-				 {
-				 	for(c2=R_j;c2 <= c1-1;c2+=1)
-				 	 {
-				 	 	S_1((c1),(c2));
-				 	 }
-				 	S0((c1),(c1));
-				 	for(c2=c1+1;c2 <= N_tile-1;c2+=1)
-				 	 {
-				 	 	S2((c1),(c2));
-				 	 }
-				 }
-			}
-		}
-		if ((I1 == J1 && I2 == J2 && N_tile >= R_j+2)) {
-			{
-				for(c2=R_j;c2 <= N_tile-2;c2+=1)
-				 {
-				 	S_1((N_tile-1),(c2));
-				 }
-				S0((N_tile-1),(N_tile-1));
-			}
-		}
-		for(c2=R_j;c2 <= N_tile-1;c2+=1)
+		//{i,j,i2|i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1}
+		int c2,c3;
+		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
-		 	S_1((N_tile),(c2));
+		 	for(c3=c2;c3 <= N_sec-1;c3+=1)
+		 	 {
+		 	 	S0((0),(c2),(c3));
+		 	 }
 		 }
 	}
 	#undef S0
-	#undef S_1
-	#undef S2
 	
 	//Memory Free
 }
@@ -223,7 +146,7 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long R_i, long R
 #undef seq2_t
 #undef S1
 #undef S2_C
-#undef FTable_C_I1_J1_I2_J2
+#undef FTable_C_I1_J1
 
 
 //Common Macro undefs
