@@ -122,8 +122,6 @@ void transform_section_like_A_for_register_tile(long N, long N_sec, long N_tile,
    //printf(" transfor A Start\n");fflush(stdout);
 
    float *Pack = &A[0][0];
-   long i_offset = I2 * (N_tile-1);
-   long j_offset = J2 * (N_tile-1) ;
    for( int ii = 0; ii <= N_tile-1; ii+= MR)
    {  
        for( int k = 0; k <= N_tile-1; k++)

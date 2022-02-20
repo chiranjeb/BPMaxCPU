@@ -133,32 +133,32 @@ void bpmax_single_strand_diagonal_tile(long N, long N_sec, long N_tile, long R, 
 	#define S2(i0,i1,i2) {float __temp__ = (C_I2_J2(-i0,i1))+(C_I2_J2(i1+1,i2)); NR_C_I2_J2(-i0,i2) = __max_float(NR_C_I2_J2(-i0,i2),__temp__); }
 	{
 		//Domain
-		//{i,j,i2|i2==j && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i && N_tile+i>=0 && 0>=i+j-3 && j>=0 && N_tile>=j+1}
-		//{i,j,i2|i2==j && N_tile+i>=1 && i+j>=4 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i && N_sec>=I2+1 && j>=1 && N_tile>=j+1 && J2>=0}
-		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && N_tile>=i2+1 && i+i2>=4 && J2>=0 && i2>=1 && N_tile+i>=1 && N_sec>=I2+1 && 0>=i}
-		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=i0 && N_tile+i0>=1 && i1>=0 && N_tile>=i1+1 && i2>=1 && N_tile>=i2+1 && N_sec>=I2+1 && i0+i2>=4 && J2>=0}
+		//{i,j,i2|i2==j && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=R+i && N_tile+i>=0 && j>=R && 0>=i+j-3 && N_tile>=j+1}
+		//{i,j,i2|i2==j && N_tile+i>=1 && i+j>=4 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=R+i && J2>=0 && j>=R+1 && N_tile>=j+1 && 0>=i && N_sec>=I2+1 && j>=0}
+		//{i,j,i2|i+j==-1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=R+i && i+i2>=4 && i2>=0 && N_sec>=I2+1 && 0>=i && i2>=R+1 && N_tile>=i2+1 && N_tile+i>=1 && J2>=0}
+		//{i0,i1,i2|i0+i1>=0 && i2>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && 0>=R+i0 && N_tile+i0>=1 && i1>=R && N_tile>=i1+1 && i2>=R+1 && N_tile>=i2+1 && J2>=0 && i0+i2>=4 && 0>=i0 && N_sec>=I2+1 && i2>=0}
 		int c1,c2,c3;
-		for(c1=-N_tile;c1 <= -N_tile+4;c1+=1)
+		for(c1=-N_tile;c1 <= min(-R,-N_tile+4);c1+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	for(c2=R;c2 <= N_tile-1;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2),(c2));
 		 	 }
 		 }
-		if ((N_tile == 5)) {
+		if ((N_tile == R+5)) {
 			{
-				S3((0),(-1),(4));
-				for(c2=0;c2 <= 3;c2+=1)
+				S3((-N_tile+5),(N_tile-6),(N_tile-1));
+				for(c2=N_tile-5;c2 <= N_tile-2;c2+=1)
 				 {
-				 	S0((0),(c2),(c2));
-				 	S2((0),(c2),(4));
+				 	S0((-N_tile+5),(c2),(c2));
+				 	S2((-N_tile+5),(c2),(N_tile-1));
 				 }
-				S1((0),(4),(4));
+				S1((-N_tile+5),(N_tile-1),(N_tile-1));
 			}
 		}
-		if ((N_tile >= 7)) {
+		if ((N_tile >= R+7)) {
 			{
-				for(c2=0;c2 <= N_tile-7;c2+=1)
+				for(c2=R;c2 <= N_tile-7;c2+=1)
 				 {
 				 	S0((-N_tile+5),(c2),(c2));
 				 }
@@ -172,21 +172,21 @@ void bpmax_single_strand_diagonal_tile(long N, long N_sec, long N_tile, long R, 
 				S1((-N_tile+5),(N_tile-1),(N_tile-1));
 			}
 		}
-		if ((N_tile == 6)) {
+		if ((N_tile == R+6)) {
 			{
-				S0((-1),(0),(0));
-				S3((-1),(0),(5));
-				for(c2=1;c2 <= 4;c2+=1)
+				S0((-N_tile+5),(N_tile-6),(N_tile-6));
+				S3((-N_tile+5),(N_tile-6),(N_tile-1));
+				for(c2=N_tile-5;c2 <= N_tile-2;c2+=1)
 				 {
-				 	S0((-1),(c2),(c2));
-				 	S2((-1),(c2),(5));
+				 	S0((-N_tile+5),(c2),(c2));
+				 	S2((-N_tile+5),(c2),(N_tile-1));
 				 }
-				S1((-1),(5),(5));
+				S1((-N_tile+5),(N_tile-1),(N_tile-1));
 			}
 		}
-		for(c1=-N_tile+6;c1 <= -2;c1+=1)
+		for(c1=-N_tile+6;c1 <= -R-2;c1+=1)
 		 {
-		 	for(c2=0;c2 <= -c1-2;c2+=1)
+		 	for(c2=R;c2 <= -c1-2;c2+=1)
 		 	 {
 		 	 	S0((c1),(c2),(c2));
 		 	 }
@@ -213,55 +213,55 @@ void bpmax_single_strand_diagonal_tile(long N, long N_sec, long N_tile, long R, 
 		 	 }
 		 	S1((c1),(N_tile-1),(N_tile-1));
 		 }
-		if ((N_tile >= 7)) {
+		if ((N_tile >= R+7)) {
 			{
-				S0((-1),(0),(0));
-				for(c3=5;c3 <= N_tile-1;c3+=1)
+				S0((-R-1),(R),(R));
+				for(c3=R+5;c3 <= N_tile-1;c3+=1)
 				 {
-				 	S3((-1),(0),(c3));
+				 	S3((-R-1),(R),(c3));
 				 }
-				for(c2=1;c2 <= 4;c2+=1)
+				for(c2=R+1;c2 <= R+4;c2+=1)
 				 {
-				 	S0((-1),(c2),(c2));
-				 	for(c3=5;c3 <= N_tile-1;c3+=1)
+				 	S0((-R-1),(c2),(c2));
+				 	for(c3=R+5;c3 <= N_tile-1;c3+=1)
 				 	 {
-				 	 	S2((-1),(c2),(c3));
+				 	 	S2((-R-1),(c2),(c3));
 				 	 }
 				 }
-				for(c2=5;c2 <= N_tile-2;c2+=1)
+				for(c2=R+5;c2 <= N_tile-2;c2+=1)
 				 {
-				 	S1((-1),(c2),(c2));
+				 	S1((-R-1),(c2),(c2));
 				 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
 				 	 {
-				 	 	S2((-1),(c2),(c3));
+				 	 	S2((-R-1),(c2),(c3));
 				 	 }
 				 }
-				S1((-1),(N_tile-1),(N_tile-1));
+				S1((-R-1),(N_tile-1),(N_tile-1));
 			}
 		}
-		if ((N_tile >= 6)) {
+		if ((N_tile >= R+6)) {
 			{
-				for(c3=4;c3 <= N_tile-1;c3+=1)
+				for(c3=R+4;c3 <= N_tile-1;c3+=1)
 				 {
-				 	S3((0),(-1),(c3));
+				 	S3((-R),(R-1),(c3));
 				 }
-				for(c2=0;c2 <= 3;c2+=1)
+				for(c2=R;c2 <= R+3;c2+=1)
 				 {
-				 	S0((0),(c2),(c2));
-				 	for(c3=4;c3 <= N_tile-1;c3+=1)
+				 	S0((-R),(c2),(c2));
+				 	for(c3=R+4;c3 <= N_tile-1;c3+=1)
 				 	 {
-				 	 	S2((0),(c2),(c3));
+				 	 	S2((-R),(c2),(c3));
 				 	 }
 				 }
-				for(c2=4;c2 <= N_tile-2;c2+=1)
+				for(c2=R+4;c2 <= N_tile-2;c2+=1)
 				 {
-				 	S1((0),(c2),(c2));
+				 	S1((-R),(c2),(c2));
 				 	for(c3=c2+1;c3 <= N_tile-1;c3+=1)
 				 	 {
-				 	 	S2((0),(c2),(c3));
+				 	 	S2((-R),(c2),(c3));
 				 	 }
 				 }
-				S1((0),(N_tile-1),(N_tile-1));
+				S1((-R),(N_tile-1),(N_tile-1));
 			}
 		}
 	}

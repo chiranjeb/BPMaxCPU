@@ -123,7 +123,7 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long R_i, long R
 	
 	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_inter_score(seq1(I1),seq2_t(I2,i3))
 	#define S_1(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_get_minimum(seq1(I1),seq1(I1))
-	#define S2(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = S1(I1,J1)
+	#define S2(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = (S1(I1,J1))+(S2_C(i3,j3))
 	{
 		//Domain
 		//{i3,j3|j3==i3 && J2==I2 && J1==I1 && N_tile>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R_i>=0 && N_tile>=R_i+1 && R_j>=0 && N_tile>=R_j+1 && I1>=0 && N_sec>=I2+1 && M>=I1+1 && I2>=0 && i3>=0 && i3>=R_i && i3>=R_j}

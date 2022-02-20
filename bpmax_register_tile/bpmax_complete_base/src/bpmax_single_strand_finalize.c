@@ -160,48 +160,9 @@ void bpmax_single_strand_finalize(long N, long N_sec, long N_tile, long R_i, lon
 		 {
 		 	S4((-N_tile),(3),(c3),(c3+1));
 		 }
-		if ((I2 <= J2-2)) {
-			{
-				for(c1=-N_tile+1;c1 <= 0;c1+=1)
-				 {
-				 	S2((c1),(0),(0),(0));
-				 	for(c3=1;c3 <= N_tile-1;c3+=1)
-				 	 {
-				 	 	S3((c1),(0),(c3),(c3));
-				 	 }
-				 	for(c4=0;c4 <= N_tile-1;c4+=1)
-				 	 {
-				 	 	S9((c1),(1),(-1),(c4));
-				 	 }
-				 	for(c3=-c1;c3 <= N_tile-1;c3+=1)
-				 	 {
-				 	 	for(c4=0;c4 <= N_tile-1;c4+=1)
-				 	 	 {
-				 	 	 	S7((c1),(1),(c3),(c4));
-				 	 	 }
-				 	 }
-				 	for(c4=1;c4 <= N_tile-1;c4+=1)
-				 	 {
-				 	 	S10((c1),(2),(-1),(c4));
-				 	 }
-				 	for(c3=0;c3 <= N_tile-2;c3+=1)
-				 	 {
-				 	 	for(c4=c3+1;c4 <= N_tile-1;c4+=1)
-				 	 	 {
-				 	 	 	S8((c1),(2),(c3),(c4));
-				 	 	 }
-				 	 }
-				 	S6((c1),(3),(0),(1));
-				 	for(c3=1;c3 <= N_tile-1;c3+=1)
-				 	 {
-				 	 	S5((c1),(3),(c3),(c3+1));
-				 	 }
-				 }
-			}
-		}
 		if ((I2 == J2-1)) {
 			{
-				for(c1=-N_tile+1;c1 <= -N_tile+3;c1+=1)
+				for(c1=-N_tile+1;c1 <= min(-R_i,-N_tile+3);c1+=1)
 				 {
 				 	for(c3=0;c3 <= -c1-N_tile+3;c3+=1)
 				 	 {
@@ -243,7 +204,46 @@ void bpmax_single_strand_finalize(long N, long N_sec, long N_tile, long R_i, lon
 		}
 		if ((I2 == J2-1)) {
 			{
-				for(c1=-N_tile+4;c1 <= 0;c1+=1)
+				for(c1=-N_tile+4;c1 <= -R_i;c1+=1)
+				 {
+				 	S2((c1),(0),(0),(0));
+				 	for(c3=1;c3 <= N_tile-1;c3+=1)
+				 	 {
+				 	 	S3((c1),(0),(c3),(c3));
+				 	 }
+				 	for(c4=0;c4 <= N_tile-1;c4+=1)
+				 	 {
+				 	 	S9((c1),(1),(-1),(c4));
+				 	 }
+				 	for(c3=-c1;c3 <= N_tile-1;c3+=1)
+				 	 {
+				 	 	for(c4=0;c4 <= N_tile-1;c4+=1)
+				 	 	 {
+				 	 	 	S7((c1),(1),(c3),(c4));
+				 	 	 }
+				 	 }
+				 	for(c4=1;c4 <= N_tile-1;c4+=1)
+				 	 {
+				 	 	S10((c1),(2),(-1),(c4));
+				 	 }
+				 	for(c3=0;c3 <= N_tile-2;c3+=1)
+				 	 {
+				 	 	for(c4=c3+1;c4 <= N_tile-1;c4+=1)
+				 	 	 {
+				 	 	 	S8((c1),(2),(c3),(c4));
+				 	 	 }
+				 	 }
+				 	S6((c1),(3),(0),(1));
+				 	for(c3=1;c3 <= N_tile-1;c3+=1)
+				 	 {
+				 	 	S5((c1),(3),(c3),(c3+1));
+				 	 }
+				 }
+			}
+		}
+		if ((I2 <= J2-2)) {
+			{
+				for(c1=-N_tile+1;c1 <= -R_i;c1+=1)
 				 {
 				 	S2((c1),(0),(0),(0));
 				 	for(c3=1;c3 <= N_tile-1;c3+=1)

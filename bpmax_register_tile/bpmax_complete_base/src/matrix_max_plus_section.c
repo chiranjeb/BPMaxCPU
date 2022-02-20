@@ -105,6 +105,7 @@ inline double __min_double(double x, double y){
 
 
 
+//Local Function Declarations
 
 //Memory Macros
 #define A(i3,j3) A[i3][j3]
@@ -118,61 +119,105 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 		exit(-1);
 	}
 	//Memory Allocation
-        //printf("Firrringggggggggggggggggg\n");
-        //fflush(stdout);
 	
 #if REGISTER_TILED_KERNEL
-        float *m_PackA = &A[0][0];
-        float *m_PackB = &B[0][0];
-        float *C = &C_section[0][0];
-        for ( int jj=0; jj<N_tile; jj+=NR )
+    float *m_PackA = &A[0][0];
+    float *m_PackB = &B[0][0];
+    float *C = &C_section[0][0];
+    for ( int jj=0; jj<N_tile; jj+=NR )
+	{
+		//Domain
+		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && N>=8 && i3>=0 && j3>=0 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2}
+        for ( int ii=0; ii<N_tile; ii+=MR )
         {
-            for ( int ii=0; ii<N_tile; ii+=MR )
+            if ( MR == 3 && NR == 24)
             {
-                if ( MR == 3 && NR == 24)
+                register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+            }
+            else if ( MR == 2 && NR == 24)
+            {
+                register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+            }
+            else if ( MR == 3 && NR == 16)
+            {
+                register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+            }
+            else if ( MR == 4 && NR == 16)
+            {
+                register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+            }
+            else
+            {
+                printf("\n************ Unknown Register Tile ********************");
+		        exit(-1);
+            }
+    }
+#else
+            #if 1
+            int start_i = 0, start_j=0, start_k =0;   
+            if( I2 == 0 )
+             {
+                  start_i = R;
+                  if ( J2 == 0)
+                   { 
+                      start_j = R;  
+                      start_k = R;
+                   }     
+             } 
+             else
+             {
+                 start_i = 0;
+                 start_j = 0;     
+                 start_k = 0;
+             }  
+             if( I2 == 0 && 0 == K2 )
+             {
+                 start_k = R;  
+             } 
+             #else
+            int start_i = 0, start_j=0, start_k =0;   
+            if( I2 == 0 )
+             {
+                  start_i = R;
+                  if ( J2 == 0)
+                   { 
+                      start_j = R;  
+                      start_k = R;
+                   }     
+             } 
+             else
+             {
+                 start_i = 0;
+                 start_j = 0;     
+                 start_k = 0;
+             }  
+             if( I2 == K2 )
+             {
+                 start_i = 0;  
+                 start_j = 0;  
+                 start_k = 0;  
+             } 
+             #endif
+    #define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
+    #define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
+	{
+        //Domain
+        //{i3,j3,k|N_tile>=j3p+1 && N_tile>=4 && N>=8 && i3p>=0 && j3p>=0 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3p+1 && N_sec>=J2+1 && K2>=I2+1 && J2>=K2+1 && J2>=I2 && N_sec>=2 && k>=0 && N_tile>=k+1 && N_tile>=j3+1 && j3>=0 && N_tile>=i3+1 && i3>=0 && i3p==i3 && j3p==j3}
+        int c1,c2,c3;
+		    for(c1=start_i;c1 <= N_tile-1;c1+=1)
+        {
+		 	    for(c2=start_k;c2 <= N_tile-1;c2+=1)
+            {
+                S1((c1),(c2),(0));
+		 	 	    for(c3=start_j;c3 <= N_tile-1;c3+=1)
                 {
-                    register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
+                    S0((c1),(c2),(c3));
                 }
-                else if ( MR == 2 && NR == 24)
-                {
-		    register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
-                }
-                else if ( MR == 3 && NR == 16)
-                {
-		    register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
-                }
-                else if ( MR == 4 && NR == 16)
-                {
-	            register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C[ii * N_tile + jj], 0, 0, N_tile );
-                }
-		else
-		{
-		    printf("\n************ Unknown Register Tile ********************");
-		    exit(-1);
-		}
             }
         }
-#else
-	    #define S1(i,j,i2) //C_section(i,j) = 1.401298464324817E-45
-	    #define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C_section(i0,i2) = __max_float(C_section(i0,i2),__temp__); }
-	    {
-		    //Domain
-		    //{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && N_tile>=i3+1 && j3>=0 && N_tile>=j3+1}
-		    int c1,c2,c3;
-		    for(c1=0;c1 <= N_tile-1;c1+=1)
-		    {
-		 	    for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	    {
-		 	 	    S1((c1),(c2),(0));
-		 	 	    for(c3=0;c3 <= N_tile-1;c3+=1)
-		 	 	    {
-		 	 	 	    S0((c1),(c2),(c3));
-		 	 	    }
-		 	    }
-		    }
-		}
-	    #undef S1
-	    #undef S0
+    }
+    #undef S1
+    #undef S0
 #endif
 }
 

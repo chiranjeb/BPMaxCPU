@@ -110,33 +110,50 @@ inline double __min_double(double x, double y){
 #define seq2(i) seq2[i]
 #define seq2_t(j) seq2_t[j]
 
-void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, int* seq2, int* seq2_t){
+void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, long R, int* seq2, int* seq2_t){
 	///Parameter checking
 	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && I2 >= 0 && N_sec >= I2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-        int *seq2_rev = (int *)malloc( sizeof(int) * N);
-        for ( int i = 0; i< N; ++i)
+        int *seq2_rev;
+        if ( R != 0)
         {
-            seq2_rev[i] = seq2[N-1-i];
-        } 
-        int num_elements = 0;   
-	if ( (I2 + 1) * N_tile > N )
-        {
-           num_elements = N_tile - ((I2 + 1) * N_tile - N)-1;
+            seq2_rev = (int *)malloc( sizeof(int) * N_sec * N_tile);
+            for( int i = 0; i < R; i++)
+             seq2_rev[i] = 0;
         }
         else
         {
-           num_elements = N_tile-1;
+            seq2_rev = (int *)malloc( sizeof(int) * N);
         }  
+        for ( int i = 0; i< N; ++i)
+        {
+            seq2_rev[i+R] = seq2[N-1-i];
+            seq2_rev[i+R] = seq2[N-1-i];
+        } 
+
+        #if 0  
+        printf ("\n   Input:");
+        for ( int i = 0; i < N_sec * N_tile; i++)
+        {
+            printf ("%d ", (i< N)?seq2[i]:0);
+        }
+ 
+        printf ("\n Reverse:");
+        for ( int i = 0; i < N_sec * N_tile; i++)
+        {
+            printf ("%d ", seq2_rev[i]);
+        }  
+        printf( "\n"); 
+        #endif      
         #define S0(j) seq2_t(j) = seq2_rev[I2 * N_tile + j]
 	{
 		//Domain
 		//{j|N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
 		int c1;
-		for(c1=0;c1 <= num_elements;c1+=1)
+		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
 		 	S0((c1));
 		 }

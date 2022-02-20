@@ -137,10 +137,10 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 
 	
 
-	#define S0(i,j,i2,i3) bpmax_inner_reductions_diagonal_tile(N,N_sec,N_tile,R,MR,NR,-i,j,seq2_t,S2_C[-i][j],FTable_C[-i][j])
-	#define S1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B[j][i3],FTable_C[-i][i3])
-	#define S2(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,-i,i3,j,FTable_A[-i][j],S2_B[j][i3],FTable_C[-i][i3])
-	#define S3(i,j,i2,i3) bpmax_inner_reductions_finalize(N,N_sec,N_tile,R,MR,NR,-i,j,seq2_t,S2_C,FTable_C,FTable_C[-i][j])
+	#define S0(i,j,i2,i3) bpmax_inner_reductions_diagonal_tile(N,N_sec,N_tile,(-i == 0)?R:0,MR,NR,-i,j,seq2_t,S2_C[-i][j],FTable_C[-i][j])
+	#define S1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B[j][i3],FTable_C[-i][i3])
+	#define S2(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,FTable_A[-i][j],S2_B[j][i3],FTable_C[-i][i3])
+	#define S3(i,j,i2,i3) bpmax_inner_reductions_finalize(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,j,seq2_t,S2_C,FTable_C,FTable_C[-i][j])
 	#define S4(i,j,i2,i3) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_A[-i][j])
 	#define S5(i,j,i2,i3) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_B[-i][j])
 	{

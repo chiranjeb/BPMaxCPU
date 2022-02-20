@@ -105,10 +105,10 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
+void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
-void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
-void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
 
 
 //Memory Macros
@@ -132,11 +132,10 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
     gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
 #endif
-
-	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
 	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
-	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
-	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,R,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
+	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
+	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
 	{
 		//Domain
 		//{i,j,i2,i3|i2==j && i==1 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}

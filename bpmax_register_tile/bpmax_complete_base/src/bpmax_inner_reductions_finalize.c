@@ -146,22 +146,22 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 	{
 		//Domain
 		//{i,j,i2,i3|i3==i2 && j==0 && N_tile+i==0 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && N_tile>=i2+1 && i2>=0}
-		//{i,j,i2,i3|i3==i2 && j==0 && J2==I2+1 && 0>=N_tile+i+i2-3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && N_tile+i>=1 && N_tile>=i2+1 && i2>=0 && 0>=i}
-		//{i,j,i2,i3|i3==0 && i2==0 && j==0 && J2==I2+1 && N>=8 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && 0>=i && N_tile+i>=4} || {i,j,i2,i3|i3==0 && i2==0 && j==0 && N>=8 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+2 && N_sec>=J2+1 && 0>=i && N_tile+i>=1}
-		//{i,j,i2,i3|i3==i2 && j==0 && J2==I2+1 && N>=8 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && 0>=i && N_tile+i>=1 && i2>=1 && N_tile>=i2+1 && N_tile+i+i2>=4} || {i,j,i2,i3|i3==i2 && j==0 && N>=8 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+2 && N_sec>=J2+1 && 0>=i && N_tile+i>=1 && i2>=1 && N_tile>=i2+1}
+		//{i,j,i2,i3|i3==i2 && j==0 && J2==I2+1 && 0>=N_tile+i+i2-3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && N_tile+i>=1 && N_tile>=i2+1 && i2>=0 && 0>=R+i}
+		//{i,j,i2,i3|i3==0 && i2==0 && j==0 && J2==I2+1 && N>=8 && R>=0 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && 0>=R+i && N_tile+i>=4} || {i,j,i2,i3|i3==0 && i2==0 && j==0 && N>=8 && N_tile>=4 && R>=0 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+2 && N_sec>=J2+1 && 0>=R+i && N_tile+i>=1}
+		//{i,j,i2,i3|i3==i2 && j==0 && J2==I2+1 && N>=8 && N_tile>=4 && R>=0 && MR>=1 && NR>=1 && I2>=0 && N_sec>=I2+2 && 0>=R+i && N_tile+i>=1 && i2>=1 && N_tile>=i2+1 && N_tile+i+i2>=4} || {i,j,i2,i3|i3==i2 && j==0 && N>=8 && N_tile>=4 && R>=0 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+2 && N_sec>=J2+1 && 0>=R+i && N_tile+i>=1 && i2>=1 && N_tile>=i2+1}
 		//{i,j,i2,i3|i3==i2+1 && j==3 && N_tile+i==0 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && N_tile>=i2+1 && i2>=0}
-		//{i,j,i2,i3|i3==i2+1 && j==3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i2>=1 && N_tile+i>=1 && 0>=i && N_tile>=i2+1}
-		//{i,j,i2,i3|i3==1 && i2==0 && j==3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && N_tile+i>=1 && 0>=i}
-		//{i,j,i2,i3|i2==-1 && 2N_tile+i==0 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=j+1 && j>=0 && N_tile>=i3+1}
-		//{i,j,i2,i3|i2==-1 && 2N_tile+i==1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && j>=0 && i3>=1 && N_tile>=j+1 && N_tile>=i3+1}
-		//{i,j,i2,i3|i2==-1 && j==1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile+i>=1 && 0>=i && N_tile>=i3+1}
-		//{i,j,i2,i3|i2==-1 && j==2 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && 0>=i && i3>=1 && N_tile+i>=1 && N_tile>=i3+1}
-		//{i0,i1,i2,i3|2N_tile+i0==0 && i2>=i1 && N_tile>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && N_sec>=I2+1 && i1>=0 && N_tile>=i1+1 && i2>=0}
-		//{i0,i1,i2,i3|2N_tile+i0==1 && i2>=0 && i3>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=1 && N_tile>=i3+1 && J2>=0 && i1>=0 && N_tile>=i1+1 && N_tile>=i2+1}
-		//{i0,i1,i2,i3|i1==1 && i0+i2>=0 && N_tile>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && N_sec>=I2+1 && 0>=i0 && N_tile+i0>=1 && i2>=0}
-		//{i0,i1,i2,i3|i1==2 && i2>=0 && i3>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=1 && N_tile>=i3+1 && J2>=0 && 0>=i0 && N_tile+i0>=1 && N_tile>=i2+1}
+		//{i,j,i2,i3|i3==i2+1 && j==3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i2>=1 && N_tile+i>=1 && 0>=R+i && 0>=i && N_tile>=i2+1}
+		//{i,j,i2,i3|i3==1 && i2==0 && j==3 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && N_tile+i>=1 && 0>=R+i && 0>=i}
+		//{i,j,i2,i3|i2==-1 && 2N_tile+i==0 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && j>=R && N_tile>=j+1 && i3>=0 && N_tile>=i3+1 && j>=0}
+		//{i,j,i2,i3|i2==-1 && 2N_tile+i==1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && j>=R && i3>=1 && j>=0 && N_tile>=i3+1 && N_tile>=j+1}
+		//{i,j,i2,i3|i2==-1 && j==1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && 0>=R+i && N_tile+i>=1 && i3>=0 && N_tile>=i3+1 && 0>=i}
+		//{i,j,i2,i3|i2==-1 && j==2 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && 0>=R+i && i3>=1 && 0>=i && N_tile>=i3+1 && N_tile+i>=1}
+		//{i0,i1,i2,i3|2N_tile+i0==0 && i2>=i1 && N_tile>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && N_sec>=I2+1 && i1>=0 && N_tile>=i1+1 && i2>=0 && i1>=R}
+		//{i0,i1,i2,i3|2N_tile+i0==1 && i2>=0 && i3>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=1 && N_tile>=i3+1 && J2>=0 && i1>=0 && N_tile>=i1+1 && N_tile>=i2+1 && i1>=R}
+		//{i0,i1,i2,i3|i1==1 && i0+i2>=0 && N_tile>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3+1 && N_sec>=I2+1 && 0>=i0 && N_tile+i0>=1 && i2>=0 && 0>=R+i0}
+		//{i0,i1,i2,i3|i1==2 && i2>=0 && i3>=i2+1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=1 && N_tile>=i3+1 && J2>=0 && 0>=i0 && N_tile+i0>=1 && N_tile>=i2+1 && 0>=R+i0}
 		int c1,c2,c3,c4;
-		for(c2=0;c2 <= N_tile-1;c2+=1)
+		for(c2=R;c2 <= N_tile-1;c2+=1)
 		 {
 		 	for(c4=0;c4 <= N_tile-1;c4+=1)
 		 	 {
@@ -175,7 +175,7 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 		 	 	 }
 		 	 }
 		 }
-		for(c2=0;c2 <= N_tile-1;c2+=1)
+		for(c2=R;c2 <= N_tile-1;c2+=1)
 		 {
 		 	for(c4=1;c4 <= N_tile-1;c4+=1)
 		 	 {
@@ -199,7 +199,7 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 		 }
 		if ((I2 <= J2-2)) {
 			{
-				for(c1=-N_tile+1;c1 <= 0;c1+=1)
+				for(c1=-N_tile+1;c1 <= -R;c1+=1)
 				 {
 				 	S2((c1),(0),(0),(0));
 				 	for(c3=1;c3 <= N_tile-1;c3+=1)
@@ -238,7 +238,7 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 		}
 		if ((I2 == J2-1)) {
 			{
-				for(c1=-N_tile+1;c1 <= -N_tile+3;c1+=1)
+				for(c1=-N_tile+1;c1 <= min(-R,-N_tile+3);c1+=1)
 				 {
 				 	for(c3=0;c3 <= -c1-N_tile+3;c3+=1)
 				 	 {
@@ -280,7 +280,7 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 		}
 		if ((I2 == J2-1)) {
 			{
-				for(c1=-N_tile+4;c1 <= 0;c1+=1)
+				for(c1=-N_tile+4;c1 <= -R;c1+=1)
 				 {
 				 	S2((c1),(0),(0),(0));
 				 	for(c3=1;c3 <= N_tile-1;c3+=1)
