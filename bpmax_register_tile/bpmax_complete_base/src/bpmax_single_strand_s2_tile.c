@@ -182,7 +182,7 @@ void bpmax_single_strand_s2_tile(long N, long N_sec, long N_tile, long R, long M
 		}
 	}
 	#define S0(i,j,i2,i3) bpmax_single_strand_diagonal_tile(N,N_sec,N_tile,(-i == 0)?R:0,MR,NR,-i,j,seq2_t,S_C[-i][j])
-	#define S1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile, (-i==0)?R:0, MR,NR,-i,i3,j,S_A[-i][j],S_B[j][i3],S_C[-i][i3])
+	#define S1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile, R, MR,NR,-i,i3,j,S_A[-i][j],S_B[j][i3],S_C[-i][i3])
 	#define S2(i,j,i2,i3) bpmax_single_strand_finalize(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,j,seq2_t,S_C,S_C[-i][j])
 	#define S3(i,j,i2,i3) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,S_C[-i][j],S_A[-i][j])
 	#define S4(i,j,i2,i3) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,S_C[-i][j],S_B[-i][j])

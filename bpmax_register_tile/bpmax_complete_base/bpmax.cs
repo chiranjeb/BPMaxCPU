@@ -190,19 +190,6 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_labe
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 1, "FTable_B");
 
-################################   Transform  output f#################################################
-#setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_FTable_output, 0, 0, 
-#      											"(i -> -1,   -1,     -1,  -1, 0)",
-#      											"(i ->  1,    i,     -1,  -1, 0)",
-#      											"(i ->  M,   -1,     -1,  -1, 0)");
-#setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_FTable_output, 0, 0, "FTable");
-#setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, equation_FTable_output, 1, 0, 
-#      											"(i -> -1,   -1,     -1,  -1, 0)",
-#      											"(i ->  1,    i,     -1,  -1, 0)",
-#      											"(i ->  M,   -1,     -1,  -1, 0)");
-#setMemorySpaceForUseEquationOptimization(prog, rootSystem, equation_FTable_output, 1, 0, "FTable");
-
-
 CheckProgram(prog);
 setParallel(prog, rootSystem, "", "4");
 generateScheduledCode(prog, rootSystem, outDir);

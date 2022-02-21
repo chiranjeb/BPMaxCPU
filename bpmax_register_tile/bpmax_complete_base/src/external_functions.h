@@ -4,6 +4,7 @@
 #include <float.h>
 #include <time.h>
 #include <sys/time.h>
+#include<immintrin.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                           FEATURES and OPTIONS
@@ -16,10 +17,17 @@
 #define C_p(i, j) C_p[ (i * ldC) + j]
 void register_tile_3_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_2_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_1_24(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_4_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_3_16(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 void register_tile_2_32(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_1_8(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_2_8(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
+void register_tile_3_8(int ldK, float *A, float *B, float *C, int ldA, int ldB, int ldC);
 
+
+
+void print256_num(__m256 var);
 float e_intra_score(int,int);
 float e_inter_score(int,int);
 float e_get_minimum (int,int);

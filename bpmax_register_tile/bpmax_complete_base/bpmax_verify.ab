@@ -26,14 +26,14 @@ let
 	
 	//FTable[i1,j1,i2,j2] = S2[i2, j2];
 	
-     /*FTable[i1,j1,i2,j2] = case
+    /*  FTable[i1,j1,i2,j2] = case
 			{ | i1<= j1  && j2< i2} : S1[i1, j1];
 			{ | j1 < i1  && i2<=j2} : S2[i2, j2];
 			{ | i1 == j1 && i2 == j2} : e_inter_score(seq1[i1], seq2[N-i2-1]); 
 			{ | i1<j1 && i2<j2} || {|i1 ==j1 && i2<j2} || {|i1<j1 && i2==j2} :  S1[i1, j1]  + S2[i2, j2];
-		esac;*/
+		esac;
 		
-		/*FTable[i1,j1,i2,j2] = case
+		FTable[i1,j1,i2,j2] = case
 		{ | i1<= j1  && j2< i2} : S1[i1, j1];
 		{ | j1 < i1  && i2<=j2} : S2[i2, j2];
 		{ | i1 == j1 && i2 == j2} : e_inter_score(seq1[i1], seq2[N-i2-1]); 

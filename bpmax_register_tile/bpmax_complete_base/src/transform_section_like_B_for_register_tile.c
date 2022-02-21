@@ -103,6 +103,22 @@ inline double __min_double(double x, double y){
 
 
 
+void Dump2D_l(int M, float **Tab, const char *message)
+{
+#if DEBUG
+       printf("-----------------------------------------------------------------------\n");
+       printf("%s\n", message);
+       printf("-----------------------------------------------------------------------\n");
+       for ( int i = 0; i < M+1; i++)
+       {
+            for (int j = 0; j < M; j++ )
+            {
+               printf(" %9.3e", Tab[i][j]); //printf("%4e ", Tab[i][j]);
+            }
+            printf("\n");
+     }
+#endif
+}
 
 
 
@@ -120,21 +136,46 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 #if REGISTER_TILED_KERNEL
     //printf(" transfor B Start\n");fflush(stdout);
     float *Pack = &B[0][0];
+    if ( I2 !=0 && J2 !=0)
+       R = 0;   
     
-    long i_offset = I2 * (N_tile-1);
-    long j_offset = J2 * (N_tile-1) ;
-    for( int jj = 0; jj <= N_tile-1; jj+= NR)
+    long START_I=0;
+    if ( I2 == 0 )
     {
-		for ( int ii = 1; ii <= N_tile ; ii++ )
-		{
-			const float *Cptr = &C[ii][jj];
-			for (int jjj = 0; jjj < NR; jjj++)
-			{
-                                //printf("B: jj(%d), ii(%d), jjj(%d)\n", jj, ii, jjj);fflush(stdout);
-				*Pack++ = *Cptr++;
-			}
-		}
-   }
+        START_I = R;
+    }
+
+    if ( START_I == 0)
+    {
+        for( int jj = 0; jj <= N_tile-1; jj+= NR)
+        {
+		    for ( int ii = 1 ; ii <= N_tile ; ii++ )
+		    {
+			    const float *Cptr = &C[ii][jj];
+			    for (int jjj = 0; jjj < NR; jjj++)
+			    {
+                    //printf("B: jj(%d), ii(%d), jjj(%d)\n", jj, ii, jjj);fflush(stdout);
+				    *Pack++ = *Cptr++;
+			    }
+		    }
+        }
+    }
+    else
+    {
+	    #define S0(i3,j3) B(i3,j3) = C(i3+1,j3)
+	    {
+    		int c1,c2;
+	    	for(c1=0;c1 <= N_tile-1;c1+=1)
+		     {
+		 	    for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	    {
+		 	 	    S0((c1),(c2));
+		 	    }
+		    }
+	    }
+	    #undef S0
+    }
+
    //printf(" transfor B End\n");fflush(stdout);
 #else
 	#define S0(i3,j3) B(i3,j3) = C(i3+1,j3)
@@ -152,7 +193,7 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 	}
 	#undef S0
 #endif
-    Dump2D (N_tile, C, "Transform In B: C");
+    Dump2D_l (N_tile, C, "Transform In B: C");
     Dump2D (N_tile, B, "Transform In B: B");
 	
 	//Memory Free

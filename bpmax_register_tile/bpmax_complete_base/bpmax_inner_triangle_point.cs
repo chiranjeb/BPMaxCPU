@@ -27,7 +27,6 @@ setSpaceTimeMap(prog, system_bpmax_inner_reductions_finalize, "NR_C_I2_J2_3",   
                                                         	                       "(i,j   ->   -i,   2, -1,  j)");
 setSpaceTimeMap(prog, system_bpmax_inner_reductions_finalize, "C_I2_J2",           "(i,j   ->   -i,   3,  j,  j+1)"); 
 generateScheduledCode(prog, system_bpmax_inner_reductions_finalize, outDir);
-generateMakefile(prog, system_bpmax_inner_reductions_finalize, outDir +"/mk_r1_r2_finalize");
 
 
 
@@ -39,7 +38,6 @@ setSpaceTimeMap(prog, system_bpmax_inner_reductions_diagonal_tile, "NR_C_I2_J2_1
                                                         	                         "(i,j     ->   -i,  i-1,    j)");
 setSpaceTimeMap(prog, system_bpmax_inner_reductions_diagonal_tile, "C_I2_J2",        "(i,j     ->   -i,    j,  j+1)");   
 generateScheduledCode(prog, system_bpmax_inner_reductions_diagonal_tile, outDir);
-generateMakefile(prog, system_bpmax_inner_reductions_diagonal_tile, outDir + "/mk_r1_r2_finalize");
 
                              
                                              

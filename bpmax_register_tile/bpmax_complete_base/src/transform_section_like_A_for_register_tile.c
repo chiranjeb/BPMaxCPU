@@ -116,21 +116,47 @@ void transform_section_like_A_for_register_tile(long N, long N_sec, long N_tile,
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-	//Memory Allocation
+
+    if ( I2 != 0 )
+       R = 0;
+    long START_J=0, START_I=0;
+    if ( I2 == 0 )
+    {
+        START_I = R;   
+        if (J2 == 0) START_J = R;
+    }
 	
 #if REGISTER_TILED_KERNEL
    //printf(" transfor A Start\n");fflush(stdout);
-
-   float *Pack = &A[0][0];
-   for( int ii = 0; ii <= N_tile-1; ii+= MR)
-   {  
-       for( int k = 0; k <= N_tile-1; k++)
-       { 
-		   for(int iii = 0; iii < MR; iii++ )
-		   {  
-			   *Pack++ = C[ii+iii][k]; 
-		   }
-		}
+    if ( START_J == 0)
+    {
+        float *Pack = &A[START_I][0];
+        for( int ii = R; ii <= N_tile-1; ii+= MR)
+        {  
+            int mr = min(MR, N_tile-ii);
+            for( int k = 0; k <= N_tile-1; k++)
+            { 
+		        for(int iii = 0; iii < mr; iii++ )
+		        {  
+			        *Pack++ = C[ii+iii][k]; 
+		        }
+	    	}
+        }
+    }
+    else
+    {
+     	#define S0(i3,j3) A(i3,j3) = C(i3,j3)
+	    {
+		    int c1,c2;
+		    for(c1=0;c1 <= N_tile-1;c1+=1)
+		     {
+		 	    for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	    {
+		 	 	    S0((c1),(c2));
+		 	    }
+		    }
+        }
+	    #undef S0   
     }
    //printf(" transfor A Done\n");fflush(stdout);
 #else

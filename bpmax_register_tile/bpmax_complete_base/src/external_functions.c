@@ -509,3 +509,13 @@ void Dump4D(int N_sec, int N_i_tile, int N_j_tile,  float ****Tab, const char *m
        }
 #endif
 }
+
+void print256_num(__m256 var)
+{
+    float val[8];
+    memcpy(val, &var, sizeof(val));
+    printf("Numerical: %f %f %f %f %f %f %f %f \n", 
+           val[0], val[1], val[2], val[3], val[4], val[5], 
+           val[6], val[7]);
+}
+

@@ -13,7 +13,6 @@
 #include <immintrin.h>
 #include <malloc.h>
 
-#include "external_functions.h"
 
 // Common Macros
 #define max(x, y)   ((x)>(y) ? (x) : (y))
@@ -105,21 +104,21 @@ inline double __min_double(double x, double y){
 
 
 
-//Local Function Declarations
 
 //Memory Macros
 #define A(i3,j3) A[i3][j3]
 #define B(i3,j3) B[i3][j3]
 #define C(i3,j3) C[i3][j3]
 
-
 void matrix_max_plus(long N, long N_sec, long N_tile, long START_I, long START_K, long START_J, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && START_I >= 0 && N_tile >= START_I+1 && START_J >= 0 && N_tile >= START_J+1 && START_K >= 0 && N_tile >= START_K+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
+	if (!((N_tile >= 4 && START_I >= 0 && N_tile >= START_I+1 && START_J >= 0 && N_tile >= START_J+1 && START_K >= 0 && N_tile >= START_K+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-	#define S1(i,j,i2) //C(j,i2) = 1.401298464324817E-45
+	//Memory Allocation
+	
+	#define S1(i,j,i2) C(j,i2) = 1.401298464324817E-45
 	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C(i0,i2) = __max_float(C(i0,i2),__temp__); }
 	{
 		//Domain
@@ -144,105 +143,16 @@ void matrix_max_plus(long N, long N_sec, long N_tile, long START_I, long START_K
 		 	 }
 		 }
 	}
-    #undef S1
-    #undef S0
-}
-
-void matrix_max_plus_register_tile(long N, long N_sec, long N_tile, long START_I, long START_K, long START_J, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C){
-	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && START_I >= 0 && N_tile >= START_I+1 && START_J == 0 && START_K == 0 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
-		printf("matrix_max_plus_register_tile: The value of parameters are not valid.\n");
-		exit(-1);
-	}
-
-    Dump2D (N_tile, A, ":matrix_max_plus_register_tile A");
-    Dump2D (N_tile, B, "matrix_max_plus_register_tile  B");
-    float *m_PackA = &A[0][0];
-    float *m_PackB = &B[0][0];
-    float *C_1D = &C[0][0];
-    #if 1
-    for ( int jj=0; jj<N_tile; jj+=NR )
-	{
-        for ( int ii=START_I; ii<N_tile; ii+=MR )
-        {
-            int mr = min(MR, N_tile-ii);
-            if ( mr == 3 && NR == 24)
-            {
-                register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 2 && NR == 24)
-            {
-                register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 1 && NR == 24)
-            {
-                register_tile_1_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 3 && NR == 8)
-            {   
-                //printf("***********reister_tile 3, 8\n");
-                register_tile_3_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 2 && NR == 8)
-            {   
-                printf("**********reister_tile 2, 8\n");
-                register_tile_2_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 1 && NR == 8)
-            {   
-                printf("**************reister_tile 1, 8\n");
-                register_tile_1_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 3 && NR == 16)
-            {
-                register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 4 && NR == 16)
-            {
-                register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else
-            {
-                printf("\n************ Unknown Register Tile ********************");
-		        exit(-1);
-            }
-        }
-    }
-    #endif
-    Dump2D (N_tile, C, "matrix_max_plus_register_tile  C");
-}
-
-void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
-	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
-		printf("The value of parameters are not valid.\n");
-		exit(-1);
-	}
-
-    long START_I, START_K, START_J;
-    START_I = START_K = START_J = 0;
-    if ( I2 == 0)
-    {
-        START_I = R;
-        if ( K2 == 0) START_K = R;
-        if ( J2 == 0) START_J = R;
-    }
-#if REGISTER_TILED_KERNEL
-    if (START_J == 0 && START_K == 0)
-        matrix_max_plus_register_tile(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-    else
-     {   
-        matrix_max_plus(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-     }
-#else
-    matrix_max_plus(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-#endif
+	#undef S1
+	#undef S0
+	
+	//Memory Free
 }
 
 //Memory Macros
 #undef A
 #undef B
-#undef C_section
+#undef C
 
 
 //Common Macro undefs

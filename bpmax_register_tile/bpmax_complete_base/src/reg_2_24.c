@@ -6,15 +6,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-void print256_num(__m256 var)
-{
-    float val[8];
-    memcpy(val, &var, sizeof(val));
-    printf("Numerical: %f %f %f %f %f %f %f %f \n", 
-           val[0], val[1], val[2], val[3], val[4], val[5], 
-           val[6], val[7]);
-}
-
 void register_tile_2_24(int ldK, float *A, float *B, float *C_p, int ldA, int ldB, int ldC)
 {
     int i = 0, j =0;
