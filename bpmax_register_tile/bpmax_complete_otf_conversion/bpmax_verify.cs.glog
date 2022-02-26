@@ -1,0 +1,14 @@
+script bpmax_verify.cs {
+    pass ReadAlphabets:ReadAlphabets {
+    }
+    pass NormalizeReduction:NormalizeReduction {
+    }
+    pass AShow:AShow {
+    }
+    pass CheckProgram:CheckProgram {
+    }
+    pass Normalize:Normalize {
+    }
+    pass generateVerificationCode:GenerateVerificationCode {
+    }
+}
