@@ -3,9 +3,6 @@ float e_intra_score (int,int) ;
 float e_inter_score (int,int) ;
 
 
-float e_intra_score (int,int) ;
-float e_inter_score (int,int) ;
-
 
 affine bpmax_ftable_init_section
 {

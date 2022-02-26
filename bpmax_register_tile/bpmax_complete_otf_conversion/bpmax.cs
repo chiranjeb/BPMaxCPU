@@ -15,8 +15,8 @@ PrintAST(prog, rootSystem);
 equation_s1            = "UseEquation_S1";
 equation_s2            = "UseEquation_S2_A";
 equation_seq2_t        = "UseEquation_seq2_t";
-initialize_FTable      = "UseEquation_FTable";
-inner_reduction_label  = "UseEquation_FTable_A";
+initialize_FTable      = "UseEquation_FTable_d";
+inner_reduction_label  = "UseEquation_FTable";
 #equation_FTable_output = "UseEquation_FTable";
 outer_reduction_label  = "UseEquation_FTable_outer";
 
@@ -105,7 +105,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, initialize_FTable, 1
       											"(i1,j1 -> -1,   -1,     -1,  -1,      0)",
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-3,    0)",
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     0)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 1, 0, "FTable");      
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, initialize_FTable, 1, 0, "FTable_d");      
 
 
 ##################################### Outer Reductions ##################################
@@ -139,6 +139,18 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, outer_reduction_labe
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 0, 4, "FTable");
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 0, 5, 
+      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
+      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
+      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 0, 5, "FTable_Pack_A");
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 0, 6, 
+      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
+      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
+      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 0, 6, "FTable_Pack_B");
+
+
 
 
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, outer_reduction_label, 1, 0, 
@@ -171,24 +183,26 @@ setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_labe
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-6,    -1)",
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
 setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 3, "S2_C");
-
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 4, 
       											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 4, "FTable");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 4, "FTable_Pack_A");
+setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 5, 
+      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
+      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
+      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 0, 5, "FTable_Pack_B");
 
 
 setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 0, 
       											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
       											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
       											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 0, "FTable_A");
-setSpaceTimeMapForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 1, 
-      											"(i1,j1 -> -1,   -1,     -1,  -1,      -1)",
-      											"(i1,j1 ->  1,   j1-i1,  i1,  j1-7,    -1)",
-      											"(i1,j1 ->  M+M,  -1,     -1,  -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 1, "FTable_B");
+setMemorySpaceForUseEquationOptimization(prog, rootSystem, inner_reduction_label, 1, 0, "FTable");
+
+
+
 
 CheckProgram(prog);
 setParallel(prog, rootSystem, "", "4");
