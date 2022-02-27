@@ -34,8 +34,8 @@ let
 
 affine transform_reverse_1D_to_2D
 {
-	N, N_sec, N_tile, I2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0 <= I2 <= N_sec-1
+	N, N_sec, N_tile, I2, R | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0 <= I2 <= N_sec-1 && 0<=R<N_tile
 }
 input
     int  seq2          { i | 0 <= i < N} ;
@@ -123,13 +123,14 @@ local
 	float S2_C         { k,  i2, j2, i3, j3   | 0<=k<1          &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 	int   seq2_t       { i,  j                | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1 }; 
 	
-	float FTable_A     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	float FTable_B     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	
 	float FTable_Pack_A  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_Pack_B  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	
-	float FTable_d     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };	
+	// The following are dummy variables. Currently the memory mapping for the sub-system call does not work. 
+	// Thus, these need to be manually point to the FTable.
+	float FTable_A     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+    float FTable_d     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };	
 	float FTable_outer { i1, j1, k1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  i1<j1  && i1<=k1<j1 && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
 let
@@ -142,7 +143,7 @@ let
 	
     // Transform seq2: Reverse and then 2D transform N_sec-1 x N_tile-1
 	use {ei | 0<=ei<=N_sec-1 }  
-	    transform_reverse_1D_to_2D[N, N_sec, N_tile, ei] 
+	    transform_reverse_1D_to_2D[N, N_sec, N_tile, ei, R] 
 	    (
 	    	(ei, i->i)@seq2
 	    ) returns  (seq2_t);
@@ -171,8 +172,8 @@ let
 	use {ei1,ej1, ek1 | 0<=ei1<=ej1<=M-1 && ei1<ej1 && ei1<=ek1<ej1 } 
 	bpmax_outer_reductions[M, N, N_sec, N_tile, R, MR, NR, P, ei1, ej1, ek1] 
 	(
-	      (ei1, ej1, ek1, i->i)@seq1, 
-	      (ei1, ej1, ek1, i1, j1 -> 0, i1, j1)@S1, 
+	      (ei1, ej1, ek1, i                       ->i)@seq1, 
+	      (ei1, ej1, ek1, i1, j1                  -> 0, i1, j1)@S1, 
 	      (ei1, ej1, ek1, i2, j2, i3, j3          -> ei1,   ek1, i2, j2, i3, j3)@FTable_A,
 	      (ei1, ej1, ek1, i2, j2, i3, j3          -> ek1+1, ej1, i2, j2, i3, j3)@FTable_B,
 	      (ei1, ej1, ek1, i1, j1, i2, j2, i3, j3  -> i1,     j1, i2, j2, i3, j3)@FTable,

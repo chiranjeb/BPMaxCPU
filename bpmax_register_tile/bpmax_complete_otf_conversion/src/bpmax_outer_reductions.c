@@ -108,7 +108,9 @@ inline double __min_double(double x, double y){
 void bpmax_outer_south_west(long, long, long, long, long, long, long, long, long, long, long, long, long, int*, float**, float**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
 void bpmax_r3_section(long, long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void transform_section_like_B_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
 void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long, long, long, long, float**, float**, float**);
+void transform_section_like_A_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
 
 
 //Memory Macros
@@ -119,9 +121,9 @@ void bpmax_r4_section(long, long, long, long, long, long, long, long, long, long
 #define FTable_C(i1,j1,i2,j2,i3,j3) FTable_C[i1][j1][i2][j2][i3][j3]
 #define FTable_C_I1_J1(i2,j2,i3,j3) FTable_C_I1_J1[i2][j2][i3][j3]
 
-void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long I1, long J1, long K1, int* seq1, float** S1, float**** FTable_A, float**** FTable_B, float****** FTable_C, float**** FTable_C_I1_J1){
+void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long P, long I1, long J1, long K1, int* seq1, float** S1, float**** FTable_A, float**** FTable_B, float****** FTable_C, float*** FTable_Pack_A, float*** FTable_Pack_B, float**** FTable_C_I1_J1){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && P >= 1 && 0 >= P-128 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -132,53 +134,59 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
     gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
 #endif
-	#define S0(i,j,i2,i3) bpmax_outer_south_west(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,seq1,S1,FTable_C[I1+1][J1-1][j][i3],FTable_C_I1_J1[j][i3])
-	#define S_1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i3,k,FTable_A[j][k],FTable_B[k][i3],FTable_C_I1_J1[j][i3])
-	#define S2(i,j,i2,i3) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,S1,FTable_C[K1+1][J1][j][i3],FTable_C_I1_J1[j][i3])
-	#define S3(i,j,i2,i3) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i3,FTable_C[I1][K1][j][i3],S1,FTable_C_I1_J1[j][i3])
+
+
+	
+
+	
+
+
+	#define S0(i,j,i2,i3,i4,i5) bpmax_outer_south_west(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i4,seq1,S1,FTable_C[I1+1][J1-1][j][i4],FTable_C_I1_J1[j][i4])
+	#define S_1(i,j,k,i3,i4,i5) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i4,k,FTable_A[j][k],FTable_B[k][i4],FTable_C_I1_J1[j][i4])
+	#define S2(i,j,i2,i3,i4,i5) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,S1,FTable_C[K1+1][J1][j][i2],FTable_C_I1_J1[j][i2])
+	#define S3(i,j,k,i3,i4,i5) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i4,FTable_C[I1][J1][k][i4],FTable_Pack_B[thread_id])
+	#define S4(i,j,i2,i3,i4,i5) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,FTable_C[I1][K1][j][i2],S1,FTable_C_I1_J1[j][i2])
+	#define S5(i,j,i2,i3,i4,i5) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i2,FTable_C[I1][J1][j][i2],FTable_Pack_A[thread_id])
 	{
 		//Domain
-		//{i,j,i2,i3|i2==j && i==1 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,k,i3|i==0 && j>=0 && i3>=j && N_sec>=i3+1 && k>=j && i3>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		//{i,j,i2,i3|i2==j && i==0 && j>=0 && i3>=j && N_sec>=i3+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
-		int c2,c3,c4;
-		#pragma omp parallel for private(c3,c4) schedule(static, 1)
-		for(c2=0;c2 <= N_sec-2;c2+=1)
+		//{i,j,i2,i3,i4,i5|i5==0 && i3==0 && i2==j && i==1 && j>=0 && i4>=j && N_sec>=i4+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,k,i3,i4,i5|i5==1 && i3==1 && i==0 && j>=0 && i4>=j && N_sec>=i4+1 && k>=j && i4>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3,i4,i5|i5==0 && i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,k,i3,i4,i5|i5==0 && i3==1 && i==0 && j>=0 && i4>=j && N_sec>=i4+1 && k>=j && i4>=k && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3,i4,i5|i5==0 && i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		//{i,j,i2,i3,i4,i5|i5==0 && i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
+		int c2,c3,c5, thread_id;
+        #pragma omp parallel for private(c3,c5,thread_id)  schedule(static, 1)
+		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
-		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
+            thread_id = omp_get_thread_num();
+		 	for(c3=c2;c3 <= N_sec-1;c3+=1)
 		 	 {
-		 	 	S_1((0),(c2),(c2),(c4));
-		 	 	S2((0),(c2),(c2),(c4));
-		 	 	S3((0),(c2),(c2),(c4));
-		 	 }
-		 	for(c3=c2+1;c3 <= N_sec-1;c3+=1)
-		 	 {
-		 	 	for(c4=c3;c4 <= N_sec-1;c4+=1)
+		 	 	S2((0),(c2),(c3),(0),(0),(0));
+		 	 	S4((0),(c2),(c3),(0),(0),(0));
+		 	 	S5((0),(c2),(c3),(0),(0),(0));
+		 	 	for(c5=c3;c5 <= N_sec-1;c5+=1)
 		 	 	 {
-		 	 	 	S_1((0),(c2),(c3),(c4));
+		 	 	 	S3((0),(c2),(c3),(1),(c5),(0));
+		 	 	 	S_1((0),(c2),(c3),(1),(c5),(1));
 		 	 	 }
 		 	 }
 		 }
-		S_1((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		S2((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		S3((0),(N_sec-1),(N_sec-1),(N_sec-1));
-		#pragma omp parallel for private(c4) schedule(static, 1)
+
+        #pragma omp parallel for private(c5) schedule(static, 1)
 		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
-		 	for(c4=c2;c4 <= N_sec-1;c4+=1)
+		 	for(c5=c2;c5 <= N_sec-1;c5+=1)
 		 	 {
-		 	 	S0((1),(c2),(c2),(c4));
+		 	 	S0((1),(c2),(c2),(0),(c5),(0));
 		 	 }
 		 }
 	}
-
 #if OUTER_REDUCTIONS_TIMING
 	gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
     printf("Outer Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
 #endif
-	
 	#undef S0
 	#undef S_1
 	#undef S2

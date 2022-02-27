@@ -48,7 +48,7 @@
 #define var_FTable_verify(i1,j1,i2,j2) FTable_verify(i1,j1,i2,j2)
 
 //function prototypes
-void bpmax(long, long, long, long, long, long, long, int*, int*, float******);
+void bpmax(long, long, long, long, long, long, long, long, int*, int*, float******);
 void bpmax_verify(long, long, int*, int*, float****);
 
 //main
@@ -151,6 +151,9 @@ int main(int argc, char** argv) {
 		printf("For parameter NR: Converted part: %ld, non-convertible part: %s\n", NR, end);
 		exit(EXIT_FAILURE);
 	}
+
+
+    long max_num_threads = omp_get_max_threads();
 	
     long N_sec, R;
 	if ( N % N_tile)
@@ -265,13 +268,13 @@ int main(int argc, char** argv) {
 	struct timeval time;
 	double elapsed_time;
 	
-	printf ( "******Running bpmax with input: M (%d), N (%ld), N_sec (%ld),  N_tile (%ld), R(%ld), MR (%ld), NR (%ld)******\n", 
-              M, N, N_sec, N_tile, R, MR, NR);
+	printf ( "******Running bpmax with input: M (%d), N (%ld), N_sec (%ld),  N_tile (%ld), R(%ld), MR (%ld), NR (%ld), max_num_threads(%ld)******\n", 
+              M, N, N_sec, N_tile, R, MR, NR, max_num_threads);
 	//Call the main computation
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 	
-	bpmax(M, N, N_sec, N_tile, R, MR, NR, seq1, seq2, FTable);
+	bpmax(M, N, N_sec, N_tile, R, MR, NR, max_num_threads, seq1, seq2, FTable);
 
 	gettimeofday(&time, NULL);
 	elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;

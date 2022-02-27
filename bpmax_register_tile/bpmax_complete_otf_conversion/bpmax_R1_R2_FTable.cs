@@ -15,18 +15,19 @@ inner_diagonal_label   = "UseEquation_FTable_C_0";
 r1_instance_label      = "UseEquation_FTable_C_1";
 r2_instance_label      = "UseEquation_FTable_C_2";
 inner_red_final_label  = "UseEquation_FTable_C_3";
-FTable_r_tile_format_A = "UseEquation_FTable_A";
-FTable_r_tile_format_B = "UseEquation_FTable_B";
+FTable_r_tile_format_A = "UseEquation_FTable_AA";
+FTable_r_tile_format_B = "UseEquation_FTable_BB";
 
 
 
 
-setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   -i,    j,  0,  j )");
-setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j, k  ->   -i,    k,  3,  j )");
-setSpaceTimeMap(prog, inner_reduction_system,  r2_instance_label,       "(i, j, k  ->   -i,    k,  4,  j )");
-setSpaceTimeMap(prog, inner_reduction_system,  inner_red_final_label,   "(i, j     ->   -i,    j,  0,  j )");
-setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j     ->   -i,    j,  1,  j )");
-setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_A,  "(i, j     ->   -i,    j,  2,  j )");
+setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   -i,    j,  0,  j, 0 )");
+setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j, k  ->   -i,    k,  3,  j, 0 )");
+setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j, k  ->   -i,    k,  3,  j, 1 )");
+
+setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_A,  "(i, j     ->   -i,    j,  4,  j, 0 )");
+setSpaceTimeMap(prog, inner_reduction_system,  r2_instance_label,       "(i, j, k  ->   -i,    k,  5,  j, 0 )");
+setSpaceTimeMap(prog, inner_reduction_system,  inner_red_final_label,   "(i, j     ->   -i,    j,  0,  j, 0 )");
 
 
 
@@ -120,7 +121,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, FTable_r
       											"(i1,j1 -> -1,  -1,    -1   )",
       											"(i1,j1 ->  1, -i1,   j1-6  )",
       											"(i1,j1 ->  N,  -1,    -1   )");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_A, 1, 0, "FTable_A");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_A, 1, 0, "FTable_AA");
   
 ################################## Transform FTable_C --> FTable_B #################################################
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_B, 0, 0, 
@@ -132,7 +133,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, FTable_r
       											"(i1,j1 -> -1,   -1,    -1)",
       											"(i1,j1 ->  1,  -i1,    j1-6)",
       											"(i1,j1 ->  N,  -1,     -1)");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_B, 1, 0, "FTable_A");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, FTable_r_tile_format_B, 1, 0, "FTable_BB");
  
 
 

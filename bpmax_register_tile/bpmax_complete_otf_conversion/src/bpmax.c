@@ -218,7 +218,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 	
 	
 	
-	float* _lin_FTable_Pack_A = (float*)_mm_malloc(sizeof(float)*((P) * (N_tile) * (N_tile)));
+	float* _lin_FTable_Pack_A = (float*)_mm_malloc(sizeof(float)*((P) * (N_tile) * (N_tile)), 32);
 	mallocCheck(_lin_FTable_Pack_A, ((P) * (N_tile) * (N_tile)), float);
 	float*** FTable_Pack_A = (float***)malloc(sizeof(float**)*(P));
 	mallocCheck(FTable_Pack_A, (P), float**);
@@ -230,7 +230,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 		}
 	}
 	
-	float* _lin_FTable_Pack_B = (float*)_mm_malloc(sizeof(float)*((P) * (N_tile) * (N_tile)));
+	float* _lin_FTable_Pack_B = (float*)_mm_malloc(sizeof(float)*((P) * (N_tile) * (N_tile)), 32);
 	mallocCheck(_lin_FTable_Pack_B, ((P) * (N_tile) * (N_tile)), float);
 	float*** FTable_Pack_B = (float***)malloc(sizeof(float**)*(P));
 	mallocCheck(FTable_Pack_B, (P), float**);

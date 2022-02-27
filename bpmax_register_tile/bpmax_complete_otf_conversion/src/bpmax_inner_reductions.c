@@ -105,11 +105,11 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void bpmax_inner_reductions_diagonal_tile(long, long, long, long, long, long, long, long, int**, float**, float**);
 void matrix_max_plus_section(long, long, long, long, long, long, long, long, long, float**, float**, float**);
 void bpmax_inner_reductions_finalize(long, long, long, long, long, long, long, long, int**, float****, float****, float**);
-void transform_section_like_A_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
 void transform_section_like_B_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
+void transform_section_like_A_for_register_tile(long, long, long, long, long, long, long, long, float**, float**);
+void bpmax_inner_reductions_diagonal_tile(long, long, long, long, long, long, long, long, int**, float**, float**);
 
 
 //Memory Macros
@@ -117,13 +117,14 @@ void transform_section_like_B_for_register_tile(long, long, long, long, long, lo
 #define S2_A(i2,j2,i3,j3) S2_A[i2][j2][i3][j3]
 #define S2_B(i2,j2,i3,j3) S2_B[i2][j2][i3][j3]
 #define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
-#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
-#define FTable_A(i2,j2,i3,j3) FTable_A[i2][j2][i3][j3]
-#define FTable_B(i2,j2,i3,j3) FTable_B[i2][j2][i3][j3]
+#define FTable_A(i,i3,j3) FTable_A[i][i3][j3]
+#define FTable_B(i,i3,j3) FTable_B[i][i3][j3]
 
-void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long I1, long J1, int** seq2_t, float**** S2_A, float**** S2_B, float**** S2_C, float**** FTable_C, float**** FTable_A, float**** FTable_B){
+#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
+
+void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long P, long I1, long J1, int** seq2_t, float**** S2_A, float**** S2_B, float**** S2_C, float*** FTable_A, float*** FTable_B, float**** FTable_C){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && P >= 1 && 0 >= P-128 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
@@ -135,61 +136,50 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
 #endif
 
-	
-
-	#define S0(i,j,i2,i3) bpmax_inner_reductions_diagonal_tile(N,N_sec,N_tile,(-i == 0)?R:0,MR,NR,-i,j,seq2_t,S2_C[-i][j],FTable_C[-i][j])
-	#define S1(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B[j][i3],FTable_C[-i][i3])
-	#define S2(i,j,k,i3) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,FTable_A[-i][j],S2_B[j][i3],FTable_C[-i][i3])
-	#define S3(i,j,i2,i3) bpmax_inner_reductions_finalize(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,j,seq2_t,S2_C,FTable_C,FTable_C[-i][j])
-	#define S4(i,j,i2,i3) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_A[-i][j])
-	#define S5(i,j,i2,i3) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_B[-i][j])
+	#define S0(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B[0],FTable_C[-i][i3])
+	#define S1(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,FTable_A[0],S2_B[j][i3],FTable_C[-i][i3])
+	#define S2(i,j,i2,i3,i4) bpmax_inner_reductions_finalize(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,j,seq2_t,S2_C,FTable_C,FTable_C[-i][j])
+	#define S3(i,j,k,i3,i4) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,i3,FTable_C[j][i3],FTable_B[0])
+	#define S4(i,j,i2,i3,i4) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_A[0])
+	#define S5(i,j,i2,i3,i4) bpmax_inner_reductions_diagonal_tile(N,N_sec,N_tile,(-i == 0)?R:0,MR,NR,-i,j,seq2_t,S2_C[-i][j],FTable_C[-i][j])
 	{
 		//Domain
-		//{i,j,i2,i3|i+i3==0 && i2==0 && i+j==0 && 0>=i && N_sec+i>=1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		//{i,j,k,i3|k==3 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		//{i,j,k,i3|k==4 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		//{i,j,i2,i3|i3==j && i2==0 && 0>=i && i+j>=1 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		//{i,j,i2,i3|i3==j && i2==2 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
-		//{i,j,i2,i3|i3==j && i2==1 && 0>=i && i+j>=0 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,k,i3,i4|i4==1 && k==3 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,k,i3,i4|i4==0 && k==5 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,i2,i3,i4|i4==0 && i3==j && i2==0 && 0>=i && i+j>=1 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,k,i3,i4|i4==0 && k==3 && 0>=i && i+i3>=1 && N_sec>=i3+1 && i+j>=1 && i3>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,i2,i3,i4|i4==0 && i3==j && i2==4 && 0>=i && i+j>=1 && N_sec>=j+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
+		//{i,j,i2,i3,i4|i4==0 && i+i3==0 && i2==0 && i+j==0 && 0>=i && N_sec+i>=1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1}
 		int c1,c2,c4;
-		S0((-N_sec+1),(N_sec-1),(0),(N_sec-1));
-		S5((-N_sec+1),(N_sec-1),(1),(N_sec-1));
-		S4((-N_sec+1),(N_sec-1),(2),(N_sec-1));
-		S0((-N_sec+2),(N_sec-2),(0),(N_sec-2));
-		S5((-N_sec+2),(N_sec-2),(1),(N_sec-2));
-		S4((-N_sec+2),(N_sec-2),(2),(N_sec-2));
-		S3((-N_sec+2),(N_sec-1),(0),(N_sec-1));
-		S5((-N_sec+2),(N_sec-1),(1),(N_sec-1));
-		S4((-N_sec+2),(N_sec-1),(2),(N_sec-1));
+		S5((-N_sec+1),(N_sec-1),(0),(N_sec-1),(0));
+		S5((-N_sec+2),(N_sec-2),(0),(N_sec-2),(0));
+		S2((-N_sec+2),(N_sec-1),(0),(N_sec-1),(0));
+		S4((-N_sec+2),(N_sec-1),(4),(N_sec-1),(0));
 		for(c1=-N_sec+3;c1 <= 0;c1+=1)
 		 {
-		 	S0((c1),(-c1),(0),(-c1));
-		 	S5((c1),(-c1),(1),(-c1));
-		 	S4((c1),(-c1),(2),(-c1));
+		 	S5((c1),(-c1),(0),(-c1),(0));
 		 	for(c2=-c1+1;c2 <= N_sec-2;c2+=1)
 		 	 {
-		 	 	S3((c1),(c2),(0),(c2));
-		 	 	S5((c1),(c2),(1),(c2));
-		 	 	S4((c1),(c2),(2),(c2));
+		 	 	S2((c1),(c2),(0),(c2),(0));
 		 	 	for(c4=c2+1;c4 <= N_sec-1;c4+=1)
 		 	 	 {
-		 	 	 	S1((c1),(c2),(3),(c4));
+		 	 	 	S3((c1),(c2),(3),(c4),(0));
+		 	 	 	S0((c1),(c2),(3),(c4),(1));
 		 	 	 }
+		 	 	S4((c1),(c2),(4),(c2),(0));
 		 	 	for(c4=c2+1;c4 <= N_sec-1;c4+=1)
 		 	 	 {
-		 	 	 	S2((c1),(c2),(4),(c4));
+		 	 	 	S1((c1),(c2),(5),(c4),(0));
 		 	 	 }
 		 	 }
-		 	S3((c1),(N_sec-1),(0),(N_sec-1));
-		 	S5((c1),(N_sec-1),(1),(N_sec-1));
-		 	S4((c1),(N_sec-1),(2),(N_sec-1));
+		 	S2((c1),(N_sec-1),(0),(N_sec-1),(0));
+		 	S4((c1),(N_sec-1),(4),(N_sec-1),(0));
 		 }
 #if OUTER_REDUCTIONS_TIMING
 	gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
     printf("==>Inner Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
 #endif
-
 	}
 	#undef S0
 	#undef S1
@@ -197,6 +187,15 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 	#undef S3
 	#undef S4
 	#undef S5
+	
+	//Memory Free
+	
+	
+	
+	
+
+	
+
 }
 
 //Memory Macros
@@ -205,8 +204,8 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 #undef S2_B
 #undef S2_C
 #undef FTable_C
-#undef FTable_A
-#undef FTable_B
+
+
 
 
 //Common Macro undefs
