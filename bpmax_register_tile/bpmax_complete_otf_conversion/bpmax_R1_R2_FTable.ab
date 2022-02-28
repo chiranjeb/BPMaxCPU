@@ -87,8 +87,8 @@ input
 	  float S2_A           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	  float S2_B           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	  float S2_C           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
-	  float FTable_A       { i, i3, j3       | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	  float FTable_B       { i, i3, j3       | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  float FTable_A       { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	  float FTable_B       { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
 output
 	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 local
@@ -127,14 +127,14 @@ let
     matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     ( 
     	(ei2, ej2, ek2, i3, j3 -> ei2, ek2, i3, j3)@S2_A, 
-    	(ei2, ej2, ek2, i3, j3 -> 0, i3, j3)@FTable_B
+    	(ei2, ej2, ek2, i3, j3 -> i3, j3)@FTable_B
 	)returns (FTable_C_1); // replace it with FTable_C
 	
    // Step 2.2 : Then do it with the As
    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
    matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     (
-    	(ei2, ej2, ek2, i3, j3 -> 0, i3, j3)@FTable_A, 
+    	(ei2, ej2, ek2, i3, j3 -> i3, j3)@FTable_A, 
     	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@S2_B
 	)returns (FTable_C_2); // replace it with FTable_C
 	
@@ -154,12 +154,12 @@ let
     transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ei2, ej2]
     (
     	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@FTable_C
-    ) returns (FTable_BB);
+    ) returns (FTable_B);
     
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2} 
     transform_section_like_A_for_register_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
     (
     	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@FTable_C
-    )returns (FTable_AA);
+    )returns (FTable_A);
 .
 
