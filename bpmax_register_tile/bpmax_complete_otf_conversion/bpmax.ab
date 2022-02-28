@@ -73,12 +73,12 @@ affine bpmax_inner_reductions
 	M >=1 && N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && 1 <= P <=128
 }
 input
-	  int   seq2_t   { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
-	  float S2_A     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float S2_B     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float S2_C     { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
-	  float FTable_Pack_A  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
-	  float FTable_Pack_B  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  int   seq2_t         { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	  float S2_A           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float S2_B           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  float S2_C           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
+	  float FTable_Pack_A  { i3, j3          | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	  float FTable_Pack_B  { i3, j3          | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 output
 	  float FTable { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 let
@@ -190,8 +190,8 @@ let
 	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_A,
 	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_B,
 	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_C,
-	      (ei1, ej1, i, i3, j3 -> i, i3, j3)@FTable_Pack_A,
-	      (ei1, ej1, i, i3, j3 -> i, i3, j3)@FTable_Pack_B
+	      (ei1, ej1, i3, j3 -> 0, i3, j3)@FTable_Pack_A,
+	      (ei1, ej1, i3, j3 -> 0, i3, j3)@FTable_Pack_B
 	)
 	returns (FTable);
 .

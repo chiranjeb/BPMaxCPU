@@ -224,10 +224,12 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
     printf("\n============================================================================================");
     printf("\nmatrix_max_plus_section I2(%ld), J2(%ld), K2(%ld)", I2, J2, K2);   
     printf("\n============================================================================================\n");
+
     Dump2D (N_tile, A, ":matrix_max_plus_register_tile() A", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);
     Dump2D (N_tile, B, "matrix_max_plus_register_tile  B", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
     Dump2D (N_tile, C_section, "matrix_max_plus_register_tile  C - before", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
 #endif
+
     long START_I, START_K, START_J;
     START_I = START_K = START_J = 0;
     if ( I2 == 0)
