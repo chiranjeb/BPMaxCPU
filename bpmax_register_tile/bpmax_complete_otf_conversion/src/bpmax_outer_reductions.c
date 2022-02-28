@@ -143,9 +143,9 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 
 	#define S0(i,j,i2,i3,i4,i5) bpmax_outer_south_west(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i4,seq1,S1,FTable_C[I1+1][J1-1][j][i4],FTable_C_I1_J1[j][i4])
 	#define S_1(i,j,k,i3,i4,i5) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i4,k,FTable_Pack_A[thread_id],FTable_Pack_B[thread_id],FTable_C_I1_J1[j][i4])
-	#define S2(i,j,i2,i3,i4,i5) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,S1,FTable_C[K1+1][J1][j][i2],FTable_C_I1_J1[j][i2])
+	#define S2(i,j,i2,i3,i4,i5) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,S1,FTable_B[j][i2],FTable_C_I1_J1[j][i2])
 	#define S3(i,j,k,i3,i4,i5) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,k,i4,FTable_B[k][i4],FTable_Pack_B[thread_id])
-	#define S4(i,j,i2,i3,i4,i5) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,FTable_C[I1][K1][j][i2],S1,FTable_C_I1_J1[j][i2])
+	#define S4(i,j,i2,i3,i4,i5) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,FTable_A[j][i2],S1,FTable_C_I1_J1[j][i2])
 	#define S5(i,j,i2,i3,i4,i5) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i2,FTable_A[j][i2],FTable_Pack_A[thread_id])
 	{
 		//Domain
