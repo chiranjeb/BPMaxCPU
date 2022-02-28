@@ -122,7 +122,7 @@ void bpmax_inner_reductions_diagonal_tile(long, long, long, long, long, long, lo
 
 #define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
 
-void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long P, long I1, long J1, int** seq2_t, float**** S2_A, float**** S2_B, float**** S2_C, float*** FTable_A, float*** FTable_B, float**** FTable_C){
+void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long P, long I1, long J1, int** seq2_t, float**** S2_A, float**** S2_B, float**** S2_C, float** FTable_A, float** FTable_B, float**** FTable_C){
 	///Parameter checking
 	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && P >= 1 && 0 >= P-128 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
@@ -136,11 +136,11 @@ void bpmax_inner_reductions(long M, long N, long N_sec, long N_tile, long R, lon
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
 #endif
 
-	#define S0(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B[0],FTable_C[-i][i3])
-	#define S1(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,FTable_A[0],S2_B[j][i3],FTable_C[-i][i3])
+	#define S0(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,S2_A[-i][j],FTable_B,FTable_C[-i][i3])
+	#define S1(i,j,k,i3,i4) matrix_max_plus_section(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,i3,j,FTable_A,S2_B[j][i3],FTable_C[-i][i3])
 	#define S2(i,j,i2,i3,i4) bpmax_inner_reductions_finalize(N,N_sec,N_tile,(-i==0)?R:0,MR,NR,-i,j,seq2_t,S2_C,FTable_C,FTable_C[-i][j])
-	#define S3(i,j,k,i3,i4) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,i3,FTable_C[j][i3],FTable_B[0])
-	#define S4(i,j,i2,i3,i4) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_A[0])
+	#define S3(i,j,k,i3,i4) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i3,FTable_C[j][i3],FTable_B)
+	#define S4(i,j,i2,i3,i4) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,-i,j,FTable_C[-i][j],FTable_A)
 	#define S5(i,j,i2,i3,i4) bpmax_inner_reductions_diagonal_tile(N,N_sec,N_tile,(-i == 0)?R:0,MR,NR,-i,j,seq2_t,S2_C[-i][j],FTable_C[-i][j])
 	{
 		//Domain

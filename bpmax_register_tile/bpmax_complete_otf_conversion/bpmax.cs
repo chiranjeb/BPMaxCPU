@@ -17,7 +17,6 @@ equation_s2            = "UseEquation_S2_A";
 equation_seq2_t        = "UseEquation_seq2_t";
 initialize_FTable      = "UseEquation_FTable_d";
 inner_reduction_label  = "UseEquation_FTable";
-#equation_FTable_output = "UseEquation_FTable";
 outer_reduction_label  = "UseEquation_FTable_outer";
 
 

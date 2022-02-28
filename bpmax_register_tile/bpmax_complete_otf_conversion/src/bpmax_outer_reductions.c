@@ -142,11 +142,11 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 
 
 	#define S0(i,j,i2,i3,i4,i5) bpmax_outer_south_west(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i4,seq1,S1,FTable_C[I1+1][J1-1][j][i4],FTable_C_I1_J1[j][i4])
-	#define S_1(i,j,k,i3,i4,i5) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i4,k,FTable_A[j][k],FTable_B[k][i4],FTable_C_I1_J1[j][i4])
+	#define S_1(i,j,k,i3,i4,i5) matrix_max_plus_section(N,N_sec,N_tile,R,MR,NR,j,i4,k,FTable_Pack_A[thread_id],FTable_Pack_B[thread_id],FTable_C_I1_J1[j][i4])
 	#define S2(i,j,i2,i3,i4,i5) bpmax_r3_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,S1,FTable_C[K1+1][J1][j][i2],FTable_C_I1_J1[j][i2])
-	#define S3(i,j,k,i3,i4,i5) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i4,FTable_C[I1][J1][k][i4],FTable_Pack_B[thread_id])
+	#define S3(i,j,k,i3,i4,i5) transform_section_like_B_for_register_tile(N,N_sec,N_tile,R,MR,NR,k,i4,FTable_B[k][i4],FTable_Pack_B[thread_id])
 	#define S4(i,j,i2,i3,i4,i5) bpmax_r4_section(M,N,N_sec,N_tile,(j == 0)?R:0,(j == 0 && i3 == 0)?R:0,MR,NR,I1,J1,K1,j,i2,FTable_C[I1][K1][j][i2],S1,FTable_C_I1_J1[j][i2])
-	#define S5(i,j,i2,i3,i4,i5) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i2,FTable_C[I1][J1][j][i2],FTable_Pack_A[thread_id])
+	#define S5(i,j,i2,i3,i4,i5) transform_section_like_A_for_register_tile(N,N_sec,N_tile,R,MR,NR,j,i2,FTable_A[j][i2],FTable_Pack_A[thread_id])
 	{
 		//Domain
 		//{i,j,i2,i3,i4,i5|i5==0 && i3==0 && i2==j && i==1 && j>=0 && i4>=j && N_sec>=i4+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
@@ -157,8 +157,8 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		//{i,j,i2,i3,i4,i5|i5==0 && i4==0 && i3==0 && i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128 && I1>=0 && J1>=I1 && M>=J1+1 && K1>=I1 && J1>=K1+1}
 		int c2,c3,c5, thread_id;
         #pragma omp parallel for private(c3,c5,thread_id)  schedule(static, 1)
-		for(c2=0;c2 <= N_sec-1;c2+=1)
-		 {
+        for(c2=0;c2 <= N_sec-1;c2+=1)
+        {
             thread_id = omp_get_thread_num();
 		 	for(c3=c2;c3 <= N_sec-1;c3+=1)
 		 	 {
@@ -171,19 +171,20 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		 	 	 	S_1((0),(c2),(c3),(1),(c5),(1));
 		 	 	 }
 		 	 }
-		 }
+        }
 
         #pragma omp parallel for private(c5) schedule(static, 1)
-		for(c2=0;c2 <= N_sec-1;c2+=1)
-		 {
+        for(c2=0;c2 <= N_sec-1;c2+=1)
+        {
 		 	for(c5=c2;c5 <= N_sec-1;c5+=1)
 		 	 {
 		 	 	S0((1),(c2),(c2),(0),(c5),(0));
 		 	 }
-		 }
+        }
 	}
+    
 #if OUTER_REDUCTIONS_TIMING
-	gettimeofday(&time, NULL);
+    gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
     printf("Outer Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
 #endif

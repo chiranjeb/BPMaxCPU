@@ -105,11 +105,11 @@ inline double __min_double(double x, double y){
 
 
 //SubSystem Function Declarations
-void transform_reverse_1D_to_2D(long, long, long, long, int*, int*);
+void transform_reverse_1D_to_2D(long, long, long, long, long, int*, int*);
 void bpmax_outer_reductions(long, long, long, long, long, long, long, long, long, long, long, int*, float**, float****, float****, float******, float***, float***, float****);
 void bpmax_single_strand_s2_tile(long, long, long, long, long, long, int**, float****, float****, float****);
 void bpmax_single_strand_s1(long, int*, float**);
-void bpmax_inner_reductions(long, long, long, long, long, long, long, long, long, long, int**, float****, float****, float****, float***, float***, float****);
+void bpmax_inner_reductions(long, long, long, long, long, long, long, long, long, long, int**, float****, float****, float****, float**, float**, float****);
 void bpmax_init(long, long, long, long, long, long, long, int*, int**, float**, float****, float****);
 
 
@@ -121,10 +121,8 @@ void bpmax_init(long, long, long, long, long, long, long, int*, int**, float**, 
 #define S2_B(k,i2,j2,i3,j3) S2_B[k][i2][j2][i3][j3]
 #define S2_C(k,i2,j2,i3,j3) S2_C[k][i2][j2][i3][j3]
 #define seq2_t(i,j) seq2_t[i][j]
-
 #define FTable_Pack_A(i,i3,j3) FTable_Pack_A[i][i3][j3]
 #define FTable_Pack_B(i,i3,j3) FTable_Pack_B[i][i3][j3]
-
 #define FTable(i1,j1,i2,j2,i3,j3) FTable[i1][j1][i2][j2][i3][j3]
 
 void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, long P, int* seq1, int* seq2, float****** FTable){
@@ -250,12 +248,11 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 #endif	
 
 	
-
-	#define S0(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,seq2,seq2_t[i2])
+	#define S0(i,i1,i2,i3,i4) transform_reverse_1D_to_2D(N,N_sec,N_tile,i2,R,seq2,seq2_t[i2])
 	#define S_1(i,j,k,i3,i4) bpmax_outer_reductions(M,N,N_sec,N_tile,R,MR,NR,P,k,j+k,i3,seq1,S1[0],FTable[k][i3],FTable[i3+1][j+k],FTable,FTable_Pack_A,FTable_Pack_B,FTable[k][j+k])
 	#define S2(i,i1,i2,i3,i4) bpmax_single_strand_s2_tile(N,N_sec,N_tile,R,MR,NR,seq2_t,S2_A[i2],S2_B[i2],S2_C[i2])
 	#define S3(i,i1,i2,i3,i4) bpmax_single_strand_s1(M,seq1,S1[i2])
-	#define S4(i,j,i2,i3,i4) bpmax_inner_reductions(M,N,N_sec,N_tile,R,MR,NR,P,i4,j+i4,seq2_t,S2_A[0],S2_B[0],S2_C[0],FTable_Pack_A,FTable_Pack_B,FTable[i4][j+i4])
+	#define S4(i,j,i2,i3,i4) bpmax_inner_reductions(M,N,N_sec,N_tile,R,MR,NR,P,i4,j+i4,seq2_t,S2_A[0],S2_B[0],S2_C[0],FTable_Pack_A[thread_id],FTable_Pack_B[thread_id],FTable[i4][j+i4])
 	#define S5(i,j,i2,i3,i4) bpmax_init(M,N,N_sec,N_tile,R,i2,j+i2,seq1,seq2_t,S1[0],S2_C[0],FTable[i2][j+i2])
 	{
 		//Domain
@@ -265,7 +262,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 		//{i,i1,i2,i3,i4|i4==0 && i3==0 && i2==0 && i1==0 && i==0 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128}
 		//{i,j,i2,i3,i4|i3==0 && i2==M && i==2 && i4>=0 && j>=0 && M>=j+i4+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128}
 		//{i,j,i2,i3,i4|i4==1 && i3==0 && i==2 && i2>=0 && j>=0 && M>=j+i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && P>=1 && 0>=P-128}
-		int c2,c3,c4,c5;
+		int c2,c3,c4,c5, thread_id;
 		S3((0),(0),(0),(0),(0));
 		for(c3=0;c3 <= N_sec-1;c3+=1)
 		 {
@@ -279,6 +276,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 		#pragma omp parallel for schedule(static, 1) 
 		for(c5=0;c5 <= M-1;c5+=1)
 		 {
+             thread_id = omp_get_thread_num();
 		 	S4((2),(0),(M),(0),(c5));
 		 }
 		for(c2=1;c2 <= M-1;c2+=1)
@@ -294,6 +292,7 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 		 	#pragma omp parallel for schedule(static, 1)  
 		 	for(c5=0;c5 <= -c2+M-1;c5+=1)
 		 	 {
+                thread_id = omp_get_thread_num();
 		 	 	S4((2),(c2),(M),(0),(c5));
 		 	 }
 		 }

@@ -34,7 +34,7 @@ float e_get_minimum (int,int);
 unsigned char toNum(char c);
 void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool verbose);
 
-void Dump2D(int M, float **Tab, const char *message);
+void Dump2D(int M, float **Tab, const char *message, int dump=false);
 void Dump4D(int N_sec, int N_i_tile, int N_j_tile, float ****Tab, const char *message);
 
 class Alloc {

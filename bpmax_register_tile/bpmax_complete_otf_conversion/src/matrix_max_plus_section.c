@@ -112,6 +112,8 @@ inline double __min_double(double x, double y){
 #define B(i3,j3) B[i3][j3]
 #define C(i3,j3) C[i3][j3]
 
+//#define ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG true
+#define ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG false 
 
 void matrix_max_plus(long N, long N_sec, long N_tile, long START_I, long START_K, long START_J, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C){
 	///Parameter checking
@@ -155,8 +157,7 @@ void matrix_max_plus_register_tile(long N, long N_sec, long N_tile, long START_I
 		exit(-1);
 	}
 
-    Dump2D (N_tile, A, ":matrix_max_plus_register_tile A");
-    Dump2D (N_tile, B, "matrix_max_plus_register_tile  B");
+
     float *m_PackA = &A[0][0];
     float *m_PackB = &B[0][0];
     float *C_1D = &C[0][0];
@@ -190,7 +191,7 @@ void matrix_max_plus_register_tile(long N, long N_sec, long N_tile, long START_I
             }
             else if ( mr == 1 && NR == 8)
             {   
-                printf("**************reister_tile 1, 8\n");
+                //printf("**************reister_tile 1, 8\n");
                 register_tile_1_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
             }
             else if ( mr == 3 && NR == 16)
@@ -219,6 +220,14 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 		exit(-1);
 	}
 
+#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
+    printf("\n============================================================================================");
+    printf("\nmatrix_max_plus_section I2(%ld), J2(%ld), K2(%ld)", I2, J2, K2);   
+    printf("\n============================================================================================\n");
+    Dump2D (N_tile, A, ":matrix_max_plus_register_tile() A", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);
+    Dump2D (N_tile, B, "matrix_max_plus_register_tile  B", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
+    Dump2D (N_tile, C_section, "matrix_max_plus_register_tile  C - before", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
+#endif
     long START_I, START_K, START_J;
     START_I = START_K = START_J = 0;
     if ( I2 == 0)
@@ -227,6 +236,9 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
         if ( K2 == 0) START_K = R;
         if ( J2 == 0) START_J = R;
     }
+#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
+    printf("\nmatrix_max_plus_section START_I(%ld), START_J(%ld), START_K(%ld)", START_I, START_J, START_K);   
+#endif
 #if REGISTER_TILED_KERNEL
     if (START_J == 0 && START_K == 0)
         matrix_max_plus_register_tile(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
@@ -236,6 +248,9 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
      }
 #else
     matrix_max_plus(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
+#endif
+#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
+    Dump2D (N_tile, C_section, "matrix_max_plus_register_tile  C - after", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
 #endif
 }
 

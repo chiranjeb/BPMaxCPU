@@ -35,7 +35,7 @@
 #define RMUL(x,y)    ((x)*=(y))
 #define RMAX(x,y)    ((x)=MAX((x),(y)))
 #define RMIN(x,y)    ((x)=MIN((x),(y)))
-
+#define ENABLE_B_TRANSFORM_DEBUG false 
 // Common functions for min and max
 //functions for integer max
 inline int __max_int(int x, int y){
@@ -135,6 +135,9 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 	//Memory Allocation
 #if REGISTER_TILED_KERNEL
     //printf(" transfor B Start\n");fflush(stdout);
+#if ENABLE_B_TRANSFORM_DEBUG
+    printf("\n ==========================================transfor B Starti (I2 (%ld), J2(%ld)==============================================================\n", I2, J2);fflush(stdout);
+#endif
     float *Pack = &B[0][0];
     if ( I2 !=0 && J2 !=0)
        R = 0;   
@@ -193,8 +196,8 @@ void transform_section_like_B_for_register_tile(long N, long N_sec, long N_tile,
 	}
 	#undef S0
 #endif
-    Dump2D_l (N_tile, C, "Transform In B: C");
-    Dump2D (N_tile, B, "Transform In B: B");
+    Dump2D (N_tile, C, "Transform In B: C", ENABLE_B_TRANSFORM_DEBUG);
+    Dump2D (N_tile, B, "Transform In B: B", ENABLE_B_TRANSFORM_DEBUG);
 	
 	//Memory Free
 }

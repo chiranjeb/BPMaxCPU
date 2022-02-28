@@ -467,9 +467,11 @@ void ReadSequencesFromFiles(char *file_name, int *outSequence, long length, bool
 }
 
 
-void Dump2D(int M, float **Tab, const char *message)
+void Dump2D(int M, float **Tab, const char *message, int dump)
 {
-#if DEBUG
+   //if (dump)
+   if (0)
+   {
        printf("-----------------------------------------------------------------------\n");
        printf("%s\n", message);
        printf("-----------------------------------------------------------------------\n");
@@ -481,7 +483,7 @@ void Dump2D(int M, float **Tab, const char *message)
             }
             printf("\n");
      }
-#endif
+   } 
 }
 
 
