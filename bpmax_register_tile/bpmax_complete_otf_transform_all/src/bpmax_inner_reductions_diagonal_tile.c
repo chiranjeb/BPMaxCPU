@@ -119,6 +119,9 @@ void bpmax_inner_reductions_diagonal_tile(long N, long N_sec, long N_tile, long 
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
+
+    R = CALCULATE_R_i(I2, R);
+
 	//Memory Allocation
 	int mz1, mz2;
 	

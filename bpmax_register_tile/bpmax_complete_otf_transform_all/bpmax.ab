@@ -15,20 +15,21 @@ output
 	esac;
 .
 
-affine bpmax_init
+affine bpmax_ftable_init
 {
-	M, N, N_sec, N_tile, R, I1, J1 | 
-	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && 0<=I1<=J1<=M-1
+	M, N, N_sec, N_tile, R_i, R_j, I1, J1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R_i<N_tile && 0<=R_j<N_tile && 0<=I1<=J1<=M-1 && 0<=I2<=J2<=N_sec-1
 }
 input
-	int    seq1    { i                     | 0<=i< M} ;
-    int    seq2_t  { i,  j                 | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
-	float  S1      { i,j                   | 0<=i<= j < M };
-    float  S2_C    { i2, j2, i3, j3        | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	int    seq1                          { i      | 0 <= i < M                            };
+    int    seq2_t                        { i ,  j | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  S1                            { i ,  j | 0 <= i <= j < M };
+	float  S2_C                          { i3, j3 | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
+	
 output
-	float FTable_C_I1_J1 { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	float FTable_C_I1_J1_I2_J2           { i3, j3 | 0<=i3<=N_tile && 0<=j3<=N_tile-1  };
 let
-	FTable_C_I1_J1[i1, j1, i2, j2] = 0;
+	FTable_C_I1_J1_I2_J2 [ i3, j3] =  0;
 .
 
 
@@ -66,6 +67,26 @@ let
    S_C[i2, j2, i3, j3] = 0;
 .
 
+affine bpmax_outer_south_west
+{
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	int   seq1             { i        | 0<=i<=M-1 } ;
+	float S1               { i,  j    | 0<=i<=j<=M-1 };
+	float FTable_section   { i3, j3   | 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+output
+    float FTable_C_section { i3, j3   | R_i<=i3<=N_tile && R_j<=j3<=N_tile-1 };
+let
+    // when I2 == J2 and i2 > j2 , we don't have to really do anything. But we will fix it later
+    FTable_C_section[i3, j3] = 
+   	   case
+	 	  { | J1-I1 <= 3}  : FTable_C_section[i3, j3];
+	 	  { | J1-I1 >  3}  : max(FTable_C_section, FTable_section + e_intra_score(seq1[I1], seq1[J1]));
+	   esac;
+.
+
 
 affine bpmax_inner_reductions
 {
@@ -74,8 +95,6 @@ affine bpmax_inner_reductions
 }
 input
 	  int   seq2_t         { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
-	  float S2_A           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float S2_B           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
 	  float S2_C           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 	  float FTable_Pack_A  { i3, j3          | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	  float FTable_Pack_B  { i3, j3          | 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
@@ -123,6 +142,7 @@ local
 	float S2_C         { k,  i2, j2, i3, j3   | 0<=k<1          &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 	int   seq2_t       { i,  j                | 0<=i<=N_sec-1   &&  0<=j<=N_tile-1 }; 
 	
+	
 	float FTable_Pack_A  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_Pack_B  { i, i3, j3 | 0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	
@@ -131,7 +151,8 @@ local
 	float FTable_A     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 	float FTable_B     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
     float FTable_d     { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };	
-	float FTable_outer { i1, j1, k1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  i1<j1  && i1<=k1<j1 && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+    float FTable_sw    { i1, j1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1  &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 && i1<j1 };	
+    float FTable_outer { i1, j1, k1, i2, j2, i3, j3 | 0<=i1<=j1<=M-1 &&  0<=i2<=j2<=N_sec-1 &&  i1<j1  && i1<=k1<j1 && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
 
 let
 	// Compute single strand table - S1
@@ -159,15 +180,24 @@ let
   
 	
 	// Initialize FTable. Internally, it will compute a 4D and transform and return a 6D
-	use {ei1,ej1| 0<=ei1<=ej1<=M-1} 
-	    bpmax_init[M, N, N_sec, N_tile, R, ei1, ej1] 
+	use {ei1,ej1, ei2, ej2| 0<=ei1<=ej1<=M-1 && 0<=ei2<=ej2<=N_sec-1} 
+	    bpmax_ftable_init[M, N, N_sec, N_tile, R, R, ei1, ej1, ei2, ej2] 
 	    (
-	    	(ei1, ej1, i->i)@seq1, 
-	        (ei1, ej1, i, j->i, j)@seq2_t,
-	    	(ei1, ej1, i1, j1 -> 0, i1, j1)@S1, 
-	     	(ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_C
+	    	(ei1, ej1, ei2, ej2, i->i)@seq1, 
+	        (ei1, ej1, ei2, ej2, i, j->i, j)@seq2_t,
+	    	(ei1, ej1, ei2, ej2, i1, j1 -> 0, i1, j1)@S1, 
+	     	(ei1, ej1, ei2, ej2, i3, j3 -> 0, ei2, ej2, i3, j3)@S2_C
 	     )returns (FTable_d);
-	    
+	     
+	 use { ei1,ej1, ei2, ej2 | 0<=ei1<=ej1<=M-1 && 0<=ei2<=ej2<=N_sec-1 && ei1<ej1} 
+    	bpmax_outer_south_west[M, N, N_sec, N_tile, R, R, MR, NR, ei1, ej1, ei2, ej2]  
+    	(
+    		(ei1,ej1, ei2, ej2, i->i)@seq1, 
+    		(ei1,ej1, ei2, ej2, i, j -> 0, i, j)@S1 ,
+    		(ei1,ej1, ei2, ej2, i3, j3  -> ei1+1, ej1-1, ei2, ej2, i3, j3)@FTable
+	    )
+	  	returns (FTable_sw);
+	  	
 	
 	use {ei1,ej1, ek1 | 0<=ei1<=ej1<=M-1 && ei1<ej1 && ei1<=ek1<ej1 } 
 	bpmax_outer_reductions[M, N, N_sec, N_tile, R, MR, NR, P, ei1, ej1, ek1] 
@@ -182,13 +212,13 @@ let
 	) 
     returns (FTable_outer); // Manually replace it by FTable
     
+
+    
 	// Do inner reductions
 	use {ei1, ej1| 0<=ei1<=ej1<=M-1 } 
 	bpmax_inner_reductions[M, N, N_sec, N_tile, R, MR, NR, P, ei1, ej1]
 	(
 	      (ei, ej, i, j->i, j)@seq2_t,
-	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_A,
-	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_B,
 	      (ei1, ej1, i2, j2, i3, j3 -> 0, i2, j2, i3, j3)@S2_C,
 	      (ei1, ej1, i3, j3 -> 0, i3, j3)@FTable_Pack_A,
 	      (ei1, ej1, i3, j3 -> 0, i3, j3)@FTable_Pack_B

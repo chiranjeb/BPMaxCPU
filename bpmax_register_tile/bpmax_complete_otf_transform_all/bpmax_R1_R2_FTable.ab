@@ -73,7 +73,7 @@ output
 	float C_section { i3, j3  |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
 
 let
-        C_section[i3,j3] = 0;
+    C_section[i3,j3] = 0;
 .
 
 
@@ -84,11 +84,10 @@ affine bpmax_inner_reductions
 }
 input
 	  int   seq2_t         { i,  j           | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
-	  float S2_A           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
-	  float S2_B           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+	  
 	  float S2_C           { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
-	  float FTable_A       { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
-	  float FTable_B       { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	  float Packed_Table_A { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
+	  float Packed_Table_B { i3, j3          | 0<=i3<=N_tile-1    &&  0<=j3<=N_tile-1 };
 output
 	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 local
@@ -98,7 +97,11 @@ local
 	  float FTable_C_3    { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 && i2 < j2  };
 	  
 	  float FTable_BB     { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 +1 <= k2 < j2};
-	  float FTable_AA     { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 && i2 < j2  };
+	  float FTable_AA     { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2  };
+	  
+	  float S2_BB         { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 +1 <= k2 < j2};
+	  float S2_AA         { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 };
+	  
 	  
 let
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,19 +126,19 @@ let
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // Step 2.1 : Do it first with the Bs
-   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1 <= ek2 < ej2} 
+    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1 <= ek2 < ej2} 
     matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     ( 
-    	(ei2, ej2, ek2, i3, j3 -> ei2, ek2, i3, j3)@S2_A, 
-    	(ei2, ej2, ek2, i3, j3 -> i3, j3)@FTable_B
+    	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, i3, j3)@S2_AA, 
+    	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, ek2, i3, j3)@FTable_BB
 	)returns (FTable_C_1); // replace it with FTable_C
 	
    // Step 2.2 : Then do it with the As
    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
    matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     (
-    	(ei2, ej2, ek2, i3, j3 -> i3, j3)@FTable_A, 
-    	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@S2_B
+    	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, i3, j3)@FTable_AA, 
+    	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, ek2, i3, j3)@S2_BB
 	)returns (FTable_C_2); // replace it with FTable_C
 	
      
@@ -151,15 +154,29 @@ let
     
     /// Finally transform the memory for register tiling  
     use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
-    transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ei2, ej2]
+    transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ek2, ej2]
     (
     	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@FTable_C
-    ) returns (FTable_B);
+    ) returns (FTable_BB);
     
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2} 
     transform_section_like_A_for_register_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
     (
     	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@FTable_C
-    )returns (FTable_A);
+    )returns (FTable_AA);
+    
+    
+    /// Finally transform the memory for register tiling  
+    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
+    transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ek2, ej2]
+    (
+    	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@S2_C
+    ) returns (S2_BB);
+    
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2} 
+    transform_section_like_A_for_register_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
+    (
+    	(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@S2_C
+    )returns (S2_AA);
 .
 
