@@ -112,12 +112,15 @@ inline double __min_double(double x, double y){
 #define FTable_section(i3,j3) FTable_section[i3][j3]
 #define FTable_C_section(i3,j3) FTable_C_section[i3][j3]
 
-void bpmax_outer_south_west(long M, long N, long N_sec, long N_tile, long R_i, long R_j, long MR, long NR, long I1, long J1, long K1, long I2, long J2, int* seq1, float** S1, float** FTable_section, float** FTable_C_section){
+void bpmax_outer_south_west(long M, long N, long N_sec, long N_tile, long R_i, long R_j, long MR, long NR, long I1, long J1, long I2, long J2, int* seq1, float** S1, float** FTable_section, float** FTable_C_section){
 	///Parameter checking
-	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R_i >= 0 && N_tile >= R_i+1 && R_j >= 0 && N_tile >= R_j+1 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && K1 >= I1 && J1 >= K1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R_i >= 0 && N_tile >= R_i+1 && R_j >= 0 && N_tile >= R_j+1 && MR >= 1 && NR >= 1 && I1 >= 0 && J1 >= I1 && M >= J1+1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
+
+    R_i = CALCULATE_R_i(I2, R_i);
+    R_j = CALCULATE_R_j(I2, J2, R_j);
 	//Memory Allocation
 	
 	#define S0(i3,j3) FTable_C_section(i3,j3) = FTable_C_section(i3,j3)

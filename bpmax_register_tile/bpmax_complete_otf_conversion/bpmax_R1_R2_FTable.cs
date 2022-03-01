@@ -60,7 +60,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, r1_insta
       											"(i1,j1 -> -1,   -1,   -1)",
       											"(i1,j1 ->  1,  -i1,   j1-7)",
       											"(i1,j1 ->  N,   -1,   -1)");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r1_instance_label, 0, 1, "FTable_B");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r1_instance_label, 0, 1, "FTable_BB");
 
 
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, r1_instance_label, 1, 0, 
@@ -75,7 +75,7 @@ setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, r1_insta
       											"(i1,j1 -> -1,  -1,     -1  )",
       											"(i1,j1 ->  1,  -i1,  j1-7  )",
       											"(i1,j1 ->  N,  -1,     -1  )");
-setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r2_instance_label, 0, 0, "FTable_A");
+setMemorySpaceForUseEquationOptimization(prog, inner_reduction_system, r2_instance_label, 0, 0, "FTable_AA");
 setSpaceTimeMapForUseEquationOptimization(prog, inner_reduction_system, r2_instance_label, 0, 1, 
       											"(i, j -> -1,   -1,     -1)",
       											"(i, j ->  1,    i,      j)",

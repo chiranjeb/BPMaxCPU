@@ -120,6 +120,7 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
+    R = CALCULATE_R_i(I2, R);
 	//Memory Allocation
 	int mz1;
 	

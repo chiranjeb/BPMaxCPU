@@ -119,6 +119,8 @@ void bpmax_ftable_init(long M, long N, long N_sec, long N_tile, long R_i, long R
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
+    R_i = CALCULATE_R_i(I2, R_i);
+    R_j = CALCULATE_R_j(I2, J2, R_j);
 	//Memory Allocation
 	
 	#define S0(i3,j3) FTable_C_I1_J1_I2_J2(i3,j3) = e_inter_score(seq1(I1),seq2_t(I2,i3))

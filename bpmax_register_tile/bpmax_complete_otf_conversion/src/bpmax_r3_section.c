@@ -118,7 +118,8 @@ void bpmax_r3_section(long M, long N, long N_sec, long N_tile, long R_i, long R_
 		exit(-1);
 	}
 	//Memory Allocation
-	
+	R_i = CALCULATE_R_i(I2, R_i);
+    R_j = CALCULATE_R_j(I2, J2, R_j);
 	#define S0(i3,j3) FTable_C_section(i3,j3) = __max_float(FTable_C_section(i3,j3),(S1(I1,K1))+(FTable_section(i3,j3)))
 	{
 		//Domain
