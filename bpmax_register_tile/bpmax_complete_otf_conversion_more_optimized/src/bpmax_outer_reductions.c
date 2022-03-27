@@ -167,15 +167,63 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 		 	 }
 		 }
 	}
-#if OUTER_REDUCTIONS_TIMING
-    gettimeofday(&time, NULL);
-    elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
-    printf("Outer Reductions for FTable(%d, %d): Execution time : %lf sec. GFLOPS: %f\n", I1, J1, elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time));
-#endif
-    #undef S0
-    #undef S_1
-    #undef S2
-    #undef S3
+	#undef S0
+	#undef S_1
+	#undef S2
+	#undef S3
+	#undef S4
+	
+	//Memory Free
+	free(_lin_FTable_C_I1_J1_0);
+	for (mz1=0;mz1 < N_sec; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				free(FTable_C_I1_J1_0[mz1][mz2][mz3]);
+			}
+			free(FTable_C_I1_J1_0[mz1][mz2]);
+		}
+		free(FTable_C_I1_J1_0[mz1]);
+	}
+	free(FTable_C_I1_J1_0);
+	
+	free(_lin_FTable_C_I1_J1_1);
+	for (mz1=0;mz1 < N_sec; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			free(FTable_C_I1_J1_1[mz1][mz2]);
+		}
+		free(FTable_C_I1_J1_1[mz1]);
+	}
+	free(FTable_C_I1_J1_1);
+	
+	free(_lin_FTable_C_I1_J1_2);
+	for (mz1=0;mz1 < N_sec; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			free(FTable_C_I1_J1_2[mz1][mz2]);
+		}
+		free(FTable_C_I1_J1_2[mz1]);
+	}
+	free(FTable_C_I1_J1_2);
+	
+	free(_lin_FTable_BB);
+	for (mz1=0;mz1 < N_sec; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			for (mz3=0;mz3 < N_sec; mz3++) {
+				free(FTable_BB[mz1][mz2][mz3]);
+			}
+			free(FTable_BB[mz1][mz2]);
+		}
+		free(FTable_BB[mz1]);
+	}
+	free(FTable_BB);
+	
+	free(_lin_FTable_AA);
+	for (mz1=0;mz1 < N_sec; mz1++) {
+		for (mz2=0;mz2 < N_sec; mz2++) {
+			free(FTable_AA[mz1][mz2]);
+		}
+		free(FTable_AA[mz1]);
+	}
+	free(FTable_AA);
 }
 
 //Memory Macros
@@ -184,7 +232,13 @@ void bpmax_outer_reductions(long M, long N, long N_sec, long N_tile, long R, lon
 #undef FTable_A
 #undef FTable_B
 #undef FTable_C
-
+#undef FTable_Pack_A
+#undef FTable_Pack_B
+#undef FTable_C_I1_J1_0
+#undef FTable_C_I1_J1_1
+#undef FTable_C_I1_J1_2
+#undef FTable_BB
+#undef FTable_AA
 #undef FTable_C_I1_J1
 
 

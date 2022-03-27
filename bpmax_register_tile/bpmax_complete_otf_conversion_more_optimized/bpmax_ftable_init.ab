@@ -1,0 +1,58 @@
+
+float e_intra_score (int,int) ;
+float e_inter_score (int,int) ;
+float e_get_minimum (int,int) ;
+
+affine bpmax_ftable_init
+{
+	M, N, N_sec, N_tile, R_i, R_j, I1, J1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R_i<N_tile && 0<=R_j<N_tile && 0<=I1<=J1<=M-1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	int    seq1                          { i      | 0 <= i < M                            };
+    int    seq2_t                        { i ,  j | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  S1                            { i ,  j | 0 <= i <= j < M };
+	float  S2_C                          { i3, j3 | 0<=i3<=N_tile  &&  0<=j3<=N_tile-1 };
+	
+output
+	float FTable_C_I1_J1_I2_J2           { i3, j3 | 0<=i3<=N_tile && 0<=j3<=N_tile-1  };
+
+local
+	float FTable_C_I1_J1_I2_J2_l         { i3, j3 | R_i<=i3<=N_tile && R_j<=j3<=N_tile-1  };
+
+let
+	//FTable_C_I1_J1_I2_J2 [ i3, j3] =  e_get_minimum(seq1[I1], seq1[I1]);
+	FTable_C_I1_J1_I2_J2_l[i3, j3] = case
+		{ | I1 == J1 && I2 == J2 && i3 < N_tile && i3 == j3 }     : e_inter_score(seq1[I1], seq2_t[I2, i3]); 
+	    { | i3 == N_tile} || 
+	    { | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 > j3  }     : e_get_minimum(seq1[I1], seq1[I1]);
+		{ | I1 <  J1 && I2 == J2 && i3 < N_tile && i3 == j3 }||
+		{ | I1 <= J1 && I2 == J2 && i3 < N_tile && i3 < j3  }||
+		{ | I1 <= J1 && I2 < J2  && i3 < N_tile}                  : S1[I1, J1]  + S2_C[i3, j3];
+	esac;	
+.
+
+
+affine bpmax_init
+{
+	M, N, N_sec, N_tile, R, I1, J1 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && 0<=I1<=J1<=M-1
+}
+input
+	int    seq1    { i                     | 0<=i< M} ;
+    int    seq2_t  { i,  j                 | 0<=i<=N_sec-1      &&  0<=j<=N_tile-1 }; 
+	float  S1      { i,j                   | 0<=i<= j < M };
+    float  S2_C    { i2, j2, i3, j3        | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+output
+	float FTable_C_I1_J1 { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+let
+
+	use {ei2, ej2|  0<=ei2<=ej2<=N_sec-1} 
+	    bpmax_ftable_init[M, N, N_sec, N_tile, R, R, I1, J1, ei2, ej2] 
+	    (
+	    	(ei2, ej2, i->i)@seq1 , 
+	        (ei2, ej2, i, j->i, j)@seq2_t,
+	    	(ei2, ej2, i1, j1 -> i1, j1)@S1, 
+	     	S2_C
+	     )returns (FTable_C_I1_J1);
+.

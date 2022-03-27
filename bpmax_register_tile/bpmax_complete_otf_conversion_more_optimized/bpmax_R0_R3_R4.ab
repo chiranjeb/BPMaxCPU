@@ -1,0 +1,144 @@
+float e_intra_score (int,int) ;
+
+
+affine transform_section_like_A_for_register_tile 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float C  { i3, j3  | 0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+	
+output
+	float A { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	A [i3, j3] = C[i3, j3];
+.
+
+affine transform_section_like_B_for_register_tile 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile  && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float C  { i3, j3  |  0<=i3<=N_tile && 0<=j3<=N_tile-1 };
+output
+	float B { i3, j3  |  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+let
+	B [i3, j3] = C[i3+1, j3];
+.
+
+
+affine matrix_max_plus_section 
+{
+	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
+	N >= 8 &&  N_sec >= 2 && N_tile >=4  && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 <= J2
+}
+input
+    float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+    float B       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
+output
+    float C_section { i3, j3  | R<=i3<=N_tile-1 && 0<=j3<=N_tile-1  };
+let
+	C_section[i3,j3] = 0;
+.		           		
+
+
+
+affine bpmax_r3_section
+{
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, K1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float S1               { i,  j    |   0<=i<=j<=M-1 };
+	float FTable_section   { i3, j3   |   0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+output
+   float FTable_C_section  { i3, j3   |   R_i<=i3<=N_tile-1 && R_j<=j3<=N_tile-1 };
+
+let
+	FTable_C_section[i3, j3] = max(FTable_C_section, S1[I1, K1]+FTable_section[i3, j3]);
+.
+
+affine bpmax_r4_section
+{
+	M, N, N_sec, N_tile, R_i, R_j, MR, NR, I1, J1, K1, I2, J2 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R_i<N_tile && 0<=R_j<N_tile && MR >=1 && NR>=1 && 0<=I1<=J1<=M-1 && I1<=K1<J1 && 0<=I2<=J2<=N_sec-1
+}
+input
+	float FTable_section   { i3, j3  |   0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float S1               { i,  j   |   0<=i<=j<=M-1 };
+output
+   float FTable_C_section  {i3, j3   |   R_i<=i3<=N_tile-1 && R_j<=j3<=N_tile-1 };
+
+let
+	FTable_C_section[i3, j3] = max(FTable_C_section, FTable_section[i3, j3] + S1[K1+1, J1]);
+.
+
+
+
+
+
+affine bpmax_outer_reductions
+{   
+	M, N, N_sec, N_tile, R, MR, NR, P, I1, J1 , K1 | 
+	M >= 1 &&  N >= 8 &&  N_sec >= 2 && N_tile >= 4 && 0<=R<N_tile && MR >=1 && NR>=1 && 1 <= P <=128 && 0<=I1<=J1<=M-1 && I1<=K1<J1 
+}
+input
+	int   seq1           { i                      |  0<=i<=M-1 } ;
+	float S1             { i,  j                  |  0<=i<=j<=M-1 };
+	float FTable_A       { i2, j2, i3, j3         |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_B       { i2, j2, i3, j3         |  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+    float FTable_C       { i1, j1, i2, j2, i3, j3 |  0<=i1<=j1<=M-1     &&  0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1 };
+	float FTable_Pack_A  { i, i3, j3              |  0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+	float FTable_Pack_B  { i, i3, j3              |  0 <= i <P && 0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+output
+   	float FTable_C_I1_J1 { i2, j2, i3, j3   | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	
+local
+   	float FTable_C_I1_J1_0 { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2<=k2<=j2};
+   	float FTable_C_I1_J1_1 { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	float FTable_C_I1_J1_2 { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 };
+   	float FTable_BB        { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2<=k2<= j2};
+	float FTable_AA        { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   && 0<=j3<=N_tile-1};
+   	
+let
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
+    	transform_section_like_A_for_register_tile[N, N_sec, N_tile, R, MR, NR, ei2, ej2]
+    	(
+    		(ei2, ej2, i2, j2 -> ei2, ej2, i2, j2)@FTable_A
+    	)returns (FTable_AA);
+    	
+	use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 && ei2<=ek2<=ej2} 
+    	transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ek2, ej2]
+   		(
+    		(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@FTable_B
+    	) returns (FTable_BB);
+    
+    
+   use { ei2, ej2, k2 | 0<=ei2<=ej2<=N_sec-1 && ei2<=k2<=ej2} 
+   	   matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, k2]  
+       (
+    		(ei2, ej2, k2, i3, j3  -> ei2, k2, i3, j3)@FTable_A, 
+	    	(ei2, ej2, k2, i3, j3  -> k2, ej2, i3, j3)@FTable_B
+	   )
+	   returns (FTable_C_I1_J1_0); // replace it with FTable_C_I1_J1 manually
+	  		
+	  		
+   use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
+    	bpmax_r3_section[M, N, N_sec, N_tile, R, R, MR, NR, I1, J1, K1, ei2, ej2]  
+    	(
+    		(ei2, ej2, i, j -> i, j)@S1,
+    		(ei2, ej2, i3, j3 -> ei2, ej2, i3, j3)@FTable_B
+	    )
+	  	returns (FTable_C_I1_J1_1); // replace it with FTable_C_I1_J1 manually
+	  		
+
+    use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1} 
+    	bpmax_r4_section[M, N, N_sec, N_tile, R, R, MR, NR, I1, J1, K1, ei2, ej2]  
+    	(
+    		(ei2, ej2, i3, j3 -> ei2, ej2, i3, j3)@FTable_A,
+    		(ei2, ej2, i, j -> i, j)@S1
+	    )
+	  	returns (FTable_C_I1_J1_2); // replace it with FTable_C_I1_J1 manually
+.
