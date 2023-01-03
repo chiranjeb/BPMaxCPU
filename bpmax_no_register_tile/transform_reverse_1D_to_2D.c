@@ -107,42 +107,66 @@ inline double __min_double(double x, double y){
 
 
 //Memory Macros
-#define seq2_t(i,j) seq2_t[i][j]
-#define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
-#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define seq2(i) seq2[i]
+#define seq2_t(j) seq2_t[j]
 
-void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, int** seq2_t, float**** S2_C, float**** FTable_C, float** C_section){
+void transform_reverse_1D_to_2D(long N, long N_sec, long N_tile, long I2, long R, int* seq2, int* seq2_t){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2+1 && N_sec >= J2+1))) {
+	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && I2 >= 0 && N_sec >= I2+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
-	
-	#define S0(i3,j3) C_section(i3,j3) = 0
+        int *seq2_rev;
+        if ( R != 0)
+        {
+            seq2_rev = (int *)malloc( sizeof(int) * N_sec * N_tile);
+            for( int i = 0; i < R; i++)
+             seq2_rev[i] = 0;
+        }
+        else
+        {
+            seq2_rev = (int *)malloc( sizeof(int) * N);
+        }  
+        for ( int i = 0; i< N; ++i)
+        {
+            seq2_rev[i+R] = seq2[N-1-i];
+            seq2_rev[i+R] = seq2[N-1-i];
+        } 
+
+        #if 0  
+        printf ("\n   Input:");
+        for ( int i = 0; i < N_sec * N_tile; i++)
+        {
+            printf ("%d ", (i< N)?seq2[i]:0);
+        }
+ 
+        printf ("\n Reverse:");
+        for ( int i = 0; i < N_sec * N_tile; i++)
+        {
+            printf ("%d ", seq2_rev[i]);
+        }  
+        printf( "\n"); 
+        #endif      
+        #define S0(j) seq2_t(j) = seq2_rev[I2 * N_tile + j]
 	{
 		//Domain
-		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3 && j3>=0 && N_tile>=j3+1}
-		int c1,c2;
-		for(c1=0;c1 <= N_tile;c1+=1)
+		//{j|N>=8 && N_sec>=2 && N_tile>=4 && I2>=0 && N_sec>=I2+1 && j>=0 && N_tile>=j+1}
+		int c1;
+		for(c1=0;c1 <= N_tile-1;c1+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	S0((c1),(c2));
-		 	 }
+		 	S0((c1));
 		 }
 	}
 	#undef S0
+        free(seq2_rev);	
 	
 	//Memory Free
 }
 
 //Memory Macros
+#undef seq2
 #undef seq2_t
-#undef S2_C
-#undef FTable_C
-#undef C_section
 
 
 //Common Macro undefs

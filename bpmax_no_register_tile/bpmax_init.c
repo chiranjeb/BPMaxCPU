@@ -104,32 +104,35 @@ inline double __min_double(double x, double y){
 
 
 
+//SubSystem Function Declarations
+void bpmax_ftable_init(long, long, long, long, long, long, long, long, long, long, int*, int**, float**, float**, float**);
 
 
 //Memory Macros
+#define seq1(i) seq1[i]
 #define seq2_t(i,j) seq2_t[i][j]
+#define S1(i,j) S1[i][j]
 #define S2_C(i2,j2,i3,j3) S2_C[i2][j2][i3][j3]
-#define FTable_C(i2,j2,i3,j3) FTable_C[i2][j2][i3][j3]
-#define C_section(i3,j3) C_section[i3][j3]
+#define FTable_C_I1_J1(i2,j2,i3,j3) FTable_C_I1_J1[i2][j2][i3][j3]
 
-void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, int** seq2_t, float**** S2_C, float**** FTable_C, float** C_section){
+void bpmax_init(long M, long N, long N_sec, long N_tile, long R, long I1, long J1, int* seq1, int** seq2_t, float** S1, float**** S2_C, float**** FTable_C_I1_J1){
 	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2+1 && N_sec >= J2+1))) {
+	if (!((M >= 1 && N >= 8 && N_sec >= 2 && N_tile >= 4 && R >= 0 && N_tile >= R+1 && I1 >= 0 && J1 >= I1 && M >= J1+1))) {
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
 	//Memory Allocation
 	
-	#define S0(i3,j3) C_section(i3,j3) = 0
+	#define S0(i,j,i2) bpmax_ftable_init(M,N,N_sec,N_tile,(j==0)?R:0, (j==0&& i2 == 0)?R:0,I1,J1,j,i2,seq1,seq2_t,S1,S2_C[j][i2],FTable_C_I1_J1[j][i2])
 	{
 		//Domain
-		//{i3,j3|N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2+1 && N_sec>=J2+1 && i3>=0 && N_tile>=i3 && j3>=0 && N_tile>=j3+1}
-		int c1,c2;
-		for(c1=0;c1 <= N_tile;c1+=1)
+		//{i,j,i2|i==0 && j>=0 && i2>=j && N_sec>=i2+1 && M>=1 && N>=8 && N_sec>=2 && N_tile>=4 && R>=0 && N_tile>=R+1 && I1>=0 && J1>=I1 && M>=J1+1}
+		int c2,c3;
+		for(c2=0;c2 <= N_sec-1;c2+=1)
 		 {
-		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	for(c3=c2;c3 <= N_sec-1;c3+=1)
 		 	 {
-		 	 	S0((c1),(c2));
+		 	 	S0((0),(c2),(c3));
 		 	 }
 		 }
 	}
@@ -139,10 +142,11 @@ void bpmax_inner_reductions_finalize(long N, long N_sec, long N_tile, long R, lo
 }
 
 //Memory Macros
+#undef seq1
 #undef seq2_t
+#undef S1
 #undef S2_C
-#undef FTable_C
-#undef C_section
+#undef FTable_C_I1_J1
 
 
 //Common Macro undefs

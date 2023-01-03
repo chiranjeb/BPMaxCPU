@@ -21,6 +21,15 @@ FTable_r_tile_format_B = "UseEquation_FTable_BB";
 
 
 
+#setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   -i,    j,  0,  j, 0 )");
+#setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j, k  ->   -i,    k,  3,  j, 0 )");
+#setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j, k  ->   -i,    k,  3,  j, 1 )");
+
+#setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_A,  "(i, j     ->   -i,    j,  4,  j, 0 )");
+#setSpaceTimeMap(prog, inner_reduction_system,  r2_instance_label,       "(i, j, k  ->   -i,    k,  5,  j, 0 )");
+#setSpaceTimeMap(prog, inner_reduction_system,  inner_red_final_label,   "(i, j     ->   -i,    j,  0,  j, 0 )");
+
+
 setSpaceTimeMap(prog, inner_reduction_system,  inner_diagonal_label,    "(i, j     ->   -i,    j,  0,  j, 0 )");
 setSpaceTimeMap(prog, inner_reduction_system,  FTable_r_tile_format_B,  "(i, j, k  ->   -i,    k,  3,  j, 0 )");
 setSpaceTimeMap(prog, inner_reduction_system,  r1_instance_label,       "(i, j, k  ->   -i,    k,  3,  j, 1 )");

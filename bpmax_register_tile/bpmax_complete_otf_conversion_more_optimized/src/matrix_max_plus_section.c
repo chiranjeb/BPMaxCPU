@@ -106,112 +106,12 @@ inline double __min_double(double x, double y){
 
 
 //Local Function Declarations
+float reduce_matrix_max_plus_section_C_section_1(long, long, long, long, long, long, long, long, long, int, int, float**, float**);
 
 //Memory Macros
 #define A(i3,j3) A[i3][j3]
 #define B(i3,j3) B[i3][j3]
-#define C(i3,j3) C[i3][j3]
-
-//#define ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG true
-#define ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG false 
-
-void matrix_max_plus(long N, long N_sec, long N_tile, long START_I, long START_K, long START_J, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C){
-	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && START_I >= 0 && N_tile >= START_I+1 && START_J >= 0 && N_tile >= START_J+1 && START_K >= 0 && N_tile >= START_K+1 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
-		printf("The value of parameters are not valid.\n");
-		exit(-1);
-	}
-	#define S1(i,j,i2) //C(j,i2) = 1.401298464324817E-45
-	#define S0(i0,i1,i2) {float __temp__ = (A(i0,i1))+(B(i1,i2)); C(i0,i2) = __max_float(C(i0,i2),__temp__); }
-	{
-		//Domain
-		//{i,j,i2|i==-1 && N>=8 && N_sec>=2 && N_tile>=4 && START_I>=0 && N_tile>=START_I+1 && START_J>=0 && N_tile>=START_J+1 && START_K>=0 && N_tile>=START_K+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && j>=START_I && N_tile>=j+1 && i2>=START_J && N_tile>=i2+1}
-		//{i0,i1,i2|i1>=0 && N_tile>=i1+1 && N>=8 && N_sec>=2 && N_tile>=4 && START_I>=0 && N_tile>=START_I+1 && START_J>=0 && N_tile>=START_J+1 && START_K>=0 && N_tile>=START_K+1 && MR>=1 && NR>=1 && I2>=0 && J2>=I2 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i0>=START_I && N_tile>=i0+1 && i1>=START_K && i2>=START_J && N_tile>=i2+1}
-		int c1,c2,c3;
-		for(c2=START_I;c2 <= N_tile-1;c2+=1)
-		 {
-		 	for(c3=START_J;c3 <= N_tile-1;c3+=1)
-		 	 {
-		 	 	S1((-1),(c2),(c3));
-		 	 }
-		 }
-		for(c1=START_I;c1 <= N_tile-1;c1+=1)
-		 {
-		 	for(c2=START_K;c2 <= N_tile-1;c2+=1)
-		 	 {
-		 	 	for(c3=START_J;c3 <= N_tile-1;c3+=1)
-		 	 	 {
-		 	 	 	S0((c1),(c2),(c3));
-		 	 	 }
-		 	 }
-		 }
-	}
-    #undef S1
-    #undef S0
-}
-
-void matrix_max_plus_register_tile(long N, long N_sec, long N_tile, long START_I, long START_K, long START_J, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C){
-	///Parameter checking
-	if (!((N >= 8 && N_sec >= 2 && N_tile >= 4 && START_I >= 0 && N_tile >= START_I+1 && START_J == 0 && START_K == 0 && MR >= 1 && NR >= 1 && I2 >= 0 && J2 >= I2 && N_sec >= J2+1 && K2 >= I2 && J2 >= K2))) {
-		printf("matrix_max_plus_register_tile: The value of parameters are not valid.\n");
-		exit(-1);
-	}
-
-
-    float *m_PackA = &A[0][0];
-    float *m_PackB = &B[0][0];
-    float *C_1D = &C[0][0];
-    #if 1
-    for ( int jj=0; jj<N_tile; jj+=NR )
-	{
-        for ( int ii=START_I; ii<N_tile; ii+=MR )
-        {
-            int mr = min(MR, N_tile-ii);
-            if ( mr == 3 && NR == 24)
-            {
-                register_tile_3_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 2 && NR == 24)
-            {
-                register_tile_2_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 1 && NR == 24)
-            {
-                register_tile_1_24( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 3 && NR == 8)
-            {   
-                //printf("***********reister_tile 3, 8\n");
-                register_tile_3_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 2 && NR == 8)
-            {   
-                printf("**********reister_tile 2, 8\n");
-                register_tile_2_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 1 && NR == 8)
-            {   
-                //printf("**************reister_tile 1, 8\n");
-                register_tile_1_8( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 3 && NR == 16)
-            {
-                register_tile_3_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else if ( mr == 4 && NR == 16)
-            {
-                register_tile_4_16( N_tile, &m_PackA[ii*N_tile], &m_PackB[jj*N_tile], &C_1D[ii * N_tile + jj], 0, 0, N_tile );
-            }
-            else
-            {
-                printf("\n************ Unknown Register Tile ********************");
-		        exit(-1);
-            }
-        }
-    }
-    #endif
-    Dump2D (N_tile, C, "matrix_max_plus_register_tile  C");
-}
+#define C_section(i3,j3) C_section[i3][j3]
 
 void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, long K2, float** A, float** B, float** C_section){
 	///Parameter checking
@@ -219,41 +119,39 @@ void matrix_max_plus_section(long N, long N_sec, long N_tile, long R, long MR, l
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
-
-#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
-    printf("\n============================================================================================");
-    printf("\nmatrix_max_plus_section I2(%ld), J2(%ld), K2(%ld)", I2, J2, K2);   
-    printf("\n============================================================================================\n");
-
-    Dump2D (N_tile, A, ":matrix_max_plus_register_tile() A", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);
-    Dump2D (N_tile, B, "matrix_max_plus_register_tile  B", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
-    Dump2D (N_tile, C_section, "matrix_max_plus_register_tile  C - before", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
-#endif
-
-    long START_I, START_K, START_J;
-    START_I = START_K = START_J = 0;
-    if ( I2 == 0)
-    {
-        START_I = R;
-        if ( K2 == 0) START_K = R;
-        if ( J2 == 0) START_J = R;
-    }
-#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
-    printf("\nmatrix_max_plus_section START_I(%ld), START_J(%ld), START_K(%ld)", START_I, START_J, START_K);   
-#endif
-#if REGISTER_TILED_KERNEL
-    if (START_J == 0 && START_K == 0)
-        matrix_max_plus_register_tile(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-    else
-     {   
-        matrix_max_plus(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-     }
-#else
-    matrix_max_plus(N, N_sec, N_tile, START_I, START_K, START_J, MR, NR, I2, J2, K2, A, B, C_section);
-#endif
-#if ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG
-    Dump2D (N_tile, C_section, "matrix_max_plus_register_tile  C - after", ENABLE_MATRIX_MAX_PLUS_SECTION_DEBUG);;
-#endif
+	//Memory Allocation
+	
+	#define S0(i3,j3) C_section(i3,j3) = reduce_matrix_max_plus_section_C_section_1(N,N_sec,N_tile,R,MR,NR,I2,J2,K2,i3,j3,A,B)
+	{
+		//Domain
+		//{i3,j3|N_tile>=j3+1 && N_tile>=4 && N>=8 && N_sec>=2 && j3>=0 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3+1 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3>=0 && J2>=I2}
+		int c1,c2;
+		for(c1=0;c1 <= N_tile-1;c1+=1)
+		 {
+		 	for(c2=0;c2 <= N_tile-1;c2+=1)
+		 	 {
+		 	 	S0((c1),(c2));
+		 	 }
+		 }
+	}
+	#undef S0
+	
+	//Memory Free
+}
+float reduce_matrix_max_plus_section_C_section_1(long N, long N_sec, long N_tile, long R, long MR, long NR, long I2, long J2, long K2, int i3p, int j3p, float** A, float** B){
+	float reduceVar = -FLT_MAX;
+	#define S1(i3,j3,k) {float __temp__ = (A(i3,k))+(B(k,j3)); reduceVar = __max_float(reduceVar,__temp__); }
+	{
+		//Domain
+		//{i3,j3,k|N_tile>=j3p+1 && N_tile>=4 && N>=8 && N_sec>=2 && j3p>=0 && R>=0 && N_tile>=R+1 && MR>=1 && NR>=1 && I2>=0 && N_tile>=i3p+1 && N_sec>=J2+1 && K2>=I2 && J2>=K2 && i3p>=0 && J2>=I2 && k>=0 && N_tile>=k+1 && N_tile>=j3+1 && j3>=0 && N_tile>=i3+1 && i3>=0 && i3p==i3 && j3p==j3}
+		int c3;
+		for(c3=0;c3 <= N_tile-1;c3+=1)
+		 {
+		 	S1((i3p),(j3p),(c3));
+		 }
+	}
+	#undef S1
+	return reduceVar;
 }
 
 //Memory Macros

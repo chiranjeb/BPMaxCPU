@@ -132,16 +132,20 @@ void bpmax(long M, long N, long N_sec, long N_tile, long R, long MR, long NR, lo
 		printf("The value of parameters are not valid.\n");
 		exit(-1);
 	}
+
 #if BPMAX_TIMING
     printf("==> BPMax Start:"); fflush(stdout);
+ 
     struct timeval time;
     double elapsed_time;
     gettimeofday(&time, NULL);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
+ 
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000) - elapsed_time;
     printf("==> BPMax End: Execution time : %lf sec. GFLOPS: %f\n", elapsed_time, ((double)2*N*N*N*1E-9)/ (6*elapsed_time)); fflush(stdout);
     elapsed_time = (((double) time.tv_sec) + ((double) time.tv_usec)/1000000);
 #endif
+
 	//Memory Allocation
 	int mz1, mz2, mz3, mz4, mz5, mz6, mz7;
 	

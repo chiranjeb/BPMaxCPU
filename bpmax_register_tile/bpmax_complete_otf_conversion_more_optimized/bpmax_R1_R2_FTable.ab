@@ -32,7 +32,7 @@ let
 affine matrix_max_plus_section 
 {
 	N, N_sec, N_tile, R, MR, NR, I2, J2, K2 | 
-	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2+1 <= K2 < J2
+	N >= 8 &&  N_sec >= 2 && N_tile >=4 && 0<=R<N_tile && MR >=1 && NR>=1 && 0<=I2<=J2<=N_sec-1 && I2 <= K2 <= J2
 }
 input
     float A       { i3, j3  | 0<=i3<=N_tile-1 &&  0<=j3<=N_tile-1 };
@@ -93,11 +93,11 @@ output
 	  float FTable_C { i2, j2, i3, j3  | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile   &&  0<=j3<=N_tile-1 };
 local
 	  float FTable_C_0    { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 && i2 == j2 };
-	  float FTable_C_1    { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 +1 <= k2 < j2};
-	  float FTable_C_2    { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 +1 <= k2 < j2};
+	  float FTable_C_1    { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 <= k2 < j2};
+	  float FTable_C_2    { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 <= k2 < j2};
 	  float FTable_C_3    { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile && 0<=j3<=N_tile-1 && i2 < j2  };
 	  
-	  float FTable_BB     { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 +1 <= k2 < j2};
+	  float FTable_BB     { i2, j2, k2, i3, j3 | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2 && i2 <= k2 < j2};
 	  float FTable_AA     { i2, j2, i3, j3     | 0<=i2<=j2<=N_sec-1 &&  0<=i3<=N_tile-1 && 0<=j3<=N_tile-1 && i2 < j2  };
 	  
 let
@@ -123,15 +123,15 @@ let
     //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // Step 2.1 : Do it first with the Bs
-   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1 <= ek2 < ej2} 
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
     matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     ( 
-    	(ei2, ej2, ek2, i3, j3 -> ei2, ek2, i3, j3)@S2_A, 
+    	(ei2, ej2, ek2, i3, j3 -> ei2, ek2+1, i3, j3)@S2_A, 
     	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, ek2, i3, j3)@FTable_BB
 	)returns (FTable_C_1); // replace it with FTable_C
 	
    // Step 2.2 : Then do it with the As
-   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
+   use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
    matrix_max_plus_section[N, N_sec, N_tile, R, MR, NR, ei2, ej2, ek2]
     (
     	(ei2, ej2, ek2, i3, j3 -> ei2, ej2, i3, j3)@FTable_AA, 
@@ -150,10 +150,10 @@ let
 	
     
     /// Finally transform the memory for register tiling  
-    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 + 1  <= ek2 < ej2} 
+    use { ei2, ej2, ek2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2 && ei2 <= ek2 < ej2} 
     transform_section_like_B_for_register_tile[N, N_sec, N_tile, R, MR, NR,  ek2, ej2]
     (
-    	(ei2, ej2, ek2, i3, j3 -> ek2, ej2, i3, j3)@FTable_C
+    	(ei2, ej2, ek2, i3, j3 -> ek2+1, ej2, i3, j3)@FTable_C
     ) returns (FTable_BB);
     
     use { ei2, ej2 | 0<=ei2<=ej2<=N_sec-1 &&   ei2 < ej2} 

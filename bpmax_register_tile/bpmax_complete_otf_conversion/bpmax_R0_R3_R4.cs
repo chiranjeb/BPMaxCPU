@@ -24,7 +24,7 @@ FTable_r_tile_format_B = "UseEquation_FTable_BB";
 ###############################################     bpmax_r0_r3_r4            ########################################
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r3_instance_label,       "(i ,j         ->       0, i, j, 0, 0, 0)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r4_instance_label,       "(i ,j         ->       0, i, j, 0, 0, 0)");
-setSpaceTimeMap(prog, r0_r3_r4_instance_system,  FTable_r_tile_format_A,  "(i, j         ->       0, i, j, 0, 0, 0)");
+setSpaceTimeMap(prog, r0_r3_r4_instance_system,  FTable_r_tile_format_A,  "(i, j         ->       0, i, j, 0, 0, 1)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  FTable_r_tile_format_B,  "(i, j, k      ->       0, i, k, 1, j, 0)");
 setSpaceTimeMap(prog, r0_r3_r4_instance_system,  r0_instance_label,       "(i ,j, k      ->       0, i, k, 1, j, 1)");
 
