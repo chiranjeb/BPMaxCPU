@@ -27,8 +27,12 @@ This repository contains two different optimized CPU version of the BPMax.
 
 
 ## Source Code
-    BPMax Monoparametric Tile (MPT) +  Register Tile (RT) schedule (Tiled) + On the fly data transformation ([MPT+RT]:v3):
-                                        bpmax_register_tile/bpmax_complete_otf_transform_all/src
+    BPMax Monoparametric Tile (MPT) + Register Tile (RT) + No on the fly data transformation ([MPT+RT]:v1): bpmax_register_tile/bpmax_complete_otf_none/src
+    BPMax Monoparametric Tile (MPT) + Register Tile (RT) + On the fly data transformation FTable + S2 ([MPT+RT]:v2): bpmax_register_tile/bpmax_complete_otf_ftable_s2/src
+    BPMax Monoparametric Tile (MPT) + Register Tile (RT) + On the fly data transformation FTable ([MPT+RT]:v3): bpmax_register_tile/bpmax_complete_otf_ftable/src
+    BPMax Monoparametric Tile (MPT) : bpmax_no_register_tile
+                                        
+                                        
     
 
 #Previous Version
