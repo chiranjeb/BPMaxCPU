@@ -35,7 +35,7 @@ This repository contains two different optimized CPU version of the BPMax.
                                         
     
 
-#Previous Version
+# Previous Version
 
 ## Running the code
     After the code is built, you can execute "bpmax". There are many ways to invoke the program. 
