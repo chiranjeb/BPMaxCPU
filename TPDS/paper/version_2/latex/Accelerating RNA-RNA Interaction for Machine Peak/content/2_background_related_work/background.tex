@@ -1,0 +1,64 @@
+\IEEEPARstart{T}{his} section highlights the related work, namely the BPMax algorithm and the polyhedral model, and then provides a brief background of our code generation tool - \alphaz\ .
+
+\subsection{Related Work}
+One of the early studies on interactions between nucleotides of single RNA was proposed by Nussinov\cite{Nussinov1978} in 1978 that predicts secondary structure based on the probability that maximizes the number of base pairs. Nussinov's algorithm has a complexity of $\Theta(N^3)$ time and $\Theta(N^2)$ space. In 1981, Zuker and Stiegler~\cite{Zuker1981} proposed 
+a more sophisticated algorithm to predict an optimal secondary structure through free energy minimization (FEM). An energy minimization algorithm assumes that the correct structure has the lowest free energy.  It has also been formulated as a Bayesian inference problem~\cite{Ding1999}.
+
+
+There were prior works on the optimization and parallelization of these algorithms on the CPU platform. Li et al.\cite{Li2013} worked on the CPU and GPU versions of the Nussinov\cite{Nussinov1978} RNA folding. Swenson et al. \cite{Swenson2012}  worked on a parallel secondary structure prediction program for multi-core desktop. Wonnacott et al. \cite{Wonnacott2015} proposed automatic tiling of "mostly-tileable” loop nests and applied their technique to Nussinov’s algorithm. However, their implementation is significantly slower than the hand-written C codes. Palkowski et al. \cite{Palkowski2019} used the polyhedral model to optimize Nussinov's\cite{Nussinov1978} algorithm and generated an optimized program. Rizk et al.~\cite{Rizk2011} presented a GPU implementation of Zuker’s algorithm~\cite{Zuker1981}. However, most optimization efforts were related to single RNA strand folding. 
+
+
+Varadarajan~\cite{Varadarajan2016, Varadarajan2019} applied semi-automatic transformation using  \textbf{\alphaz} for a simplified surrogate mini-app that mimicked the dependence pattern to focus only on the most compute-intensive portion of the original piRNA. The original shared-memory OpenMP programs related to BPMax, BPPart, and piRNA try to achieve maximum parallelization without auto-vectorization and suffer very poor locality. She exploited locality using both coarse and fine-grain parallelism and achieved around $31 \times$ speedup.  
+
+Glidemaster\cite{Gildemaster2020} achieved significant speedup on a windowed version of the BPMax on GPU. However, only up to a limited number of nucleotide sequences or a window of nucleotide sequences can be processed on GPU due to memory constraints. Also, the cost of moving data out of the GPU memory negatively impacts the overall performance. Another challenge was to effective parallelization of some of the reduction terms. So, it is also important to speed up the algorithm on the CPU to be able to worker with larger sequences. It can also further open up the possibility of a higher degree of parallelism over multiple machines.
+
+\subsection{The BPMax Algorithm}
+
+BPMax~\cite{EbrahimpourBoroojeny2021} uses weighted base-pair counting.  It considers both intermolecular and intramolecular base pairings but disallows pseudo-knots or crossings. Mathematically, it produces a four-dimensional triangular table - $F$-table (a triangular collection of triangles) based on two RNA sequences of length $N$ and $M$ respectively.
+
+\begin{equation}
+\label{eqn:bpm_recurrence}
+F_{i_{1},j_{1}, i_{2}, j_{2}}  =max \left \{\begin{array}{lr}
+                 S_{i_{2}, j_{2}}^{(2)}   \hspace{10pt} j_{1}\le i_{1} \\
+                 \\
+                 S_{i_{1}, j_{1}}^{(1)}   \hspace{10pt} j_{2}\le i_{2} \\
+                 \\
+                 \text{iscore}(i_{1}, i_{2})   \hspace{20pt}  i_{1} = j_{1} \text{ and }  i_{2} = j_{2} \\
+                 \\
+                 \max[ \colorboxed{brown}{F_{i_{1}+1, j_{1}-1, i_{2}, j_{2}}} + \text{score}(i_{1}, j_{1}), \\
+                      \colorboxed{gray}{F_{i_{1}, j_{1}, i_{2}+1, j_{2}-1}} + \text{score}(i_{2}, j_{2}), \\
+                      H_{i_{1},j_{1},i_{2},j_{2}}]   \hspace{30pt}  otherwise
+               \end{array}
+           \right. \\
+\end{equation}
+\begin{equation}
+\label{eqn:bpm_recurrence_h}
+H_{i_{1},j_{1},i_{2},j_{2}} \\ = \max \left \{\begin{array}{lr}
+                 S^{(1)}(i_{1}, j_{1})  + S^{(2)}(i_{2}, j_{2}), \\
+                 \\
+                D_{i_{1},j_{1},i_{2},j_{2}}\\
+                 \\
+                 \colorboxed{green}{\max\limits_{k_{2}=i_{2}}^{j_{2}-1} S^{(2)}(i_{2}, k_{2}) + F_{i_{1},j_{1}, k_{2}+1, j_{2}}}\\
+                 \\
+                 \colorboxed{orange}{{\max\limits_{k_{2}=i_{2}}^{j_{2}-1} F_{i_{1},j_{1}, i_{2}, k_{2}} + S^{(2)}(k_{2}+1, j_{2})}}\\
+                 \\
+                 \colorboxed{violet}{\max\limits_{k_{1}=i_{1}}^{j_{1}-1}  S^{(1)}(i_{1}, k_{1}) + F_{k_{1}+1,j_{1},i_{2}, j_{2}}}\\
+                 \\
+                 \colorboxed{yellow}{\max\limits_{k_{1}=i_{1}}^{j_{1}-1} F_{i_{1},k_{1}, i_{2}, j_{2}}+ S^{(1)}(k_{1}+1, j{1})} \\
+               \end{array}
+           \right. \\
+\end{equation}
+\begin{equation}
+\label{eqn:bpm_recurrence_h_dmaxp1}
+D_{i_{1},j_{1},i_{2},j_{2}} \\ = 
+                 \colorboxed{blue}{\max\limits_{k_{1}=i_{1}}^{j_{1}-1} \max\limits_{k_{2}=i_{2}}^{j_{2}-1} F_{i_{1},k_{1}, i_{2}, k_{2}}+ F_{k_{1}+1,j_{1}, k_{2}+1, j_{2}}}\\
+\end{equation}
+
+
+Equations~\ref{eqn:bpm_recurrence} and~\ref{eqn:bpm_recurrence_h} completely specify the BPMax algorithm.  There are five reductions, each of which is highlighted in a different color. We also use the same colors to highlight the dependence pattern in Section~\ref{sec:method}.  The blue reduction ($R^{0}$) represents the double max-plus operation. It is the most compute-intensive portion of the algorithm. The other reductions are $R^{1}$ (green), $R^{2}$ (orange), $R^{3}$ (purple), and $R^{4}$ (yellow). $S^{1}$ and $S^{2}$ are optimal single-stranded structures computed in a Nussinov-like algorithm which has cubic complexity.
+
+
+\subsection{Polyhedral Model}
+\emph{The Polyhedral model}~\cite{sanjay-fst-tcs, sanjay-dc, sanjay-thesis, quinton-jvsp89, quinton, quinton84c, feautrier91, feautrier92a, feautrier92b} is a mathematical framework for automatic optimization and parallelization of affine programs. The model provides an abstraction to represent static control parts like variables, iteration space (loop nests), and dependencies using integer points in polyhedra.
+
+

@@ -1,0 +1,32 @@
+\begin{table}[htbp]
+\caption{\uppercase{Second Level Tile, Inner Reductions}}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{} & \textbf{\textit{Subsystem}}& \textbf{\textit{Schedule}} \\
+\hline
+ & $Diagonal Tile$ & $(i_{2},j_{2} \mapsto -i_{2}, j_{2}, 0, j_{2}, 0)$   \\
+\cline{2-3} 
+\hline
+%\cline{2-3} 
+ & $MT(S^{2})^{A}$ & $(i_{2},j_{2} \mapsto -i_{2}, j_{2}, 0, j_{2}, 1)$   \\
+\cline{2-3} 
+${\mathrm{a}}$ & $MT(F)^{B}$ & $(i_{2},j_{2},k_{2} \mapsto -i_{2}, k_{2}, 3, j_{2}, 0)$    \\
+ \cline{2-3} 
+ &  $MMP$ ($R_{1}$) & $(i_{2},j_{2},k_{2} \mapsto -i_{2}, k_{2}, 3, j_{2}, 1)$ \\
+\hline
+ & $MT(F)^{A}$ & $(i_{2},j_{2} \mapsto -i_{2}, j_{2}, 4, j_{2}, 0)$    \\
+\cline{2-3} 
+${\mathrm{b}}$ & $MT(S^{2})^{B}$ & $(i_{2},j_{2},k_{2} \mapsto -i_{2}, k_{2}, 5, j_{2}, 0)$    \\
+ \cline{2-3} 
+ & $MMP$ ($R_{2}$) & $(i_{2},j_{2},k_{2} \mapsto -i_{2}, k_{2}, 5, j_{2}, 1)$ \\
+\hline
+& $Finalize$ & $(i_{2},j_{2} \mapsto -i_{2}, j_{2}, 0, j_{2}, 0)$ \\
+\hline
+\multicolumn{3}{l}{${\mathrm{a}}$ - Optimized $R_{1}$}\\
+\multicolumn{3}{l}{${\mathrm{b}}$ - Optimized $R_{2}$}\\
+\end{tabular}
+\label{tab:bpm_l2_inner_reduction_schedule}
+\end{center}
+\end{table}
+

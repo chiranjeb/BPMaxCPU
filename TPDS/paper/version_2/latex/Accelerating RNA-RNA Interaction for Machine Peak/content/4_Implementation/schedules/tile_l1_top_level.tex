@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\caption{\uppercase{First Level Tile Schedule}}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{\textit{Subsystem}}& \textbf{\textit{Schedule}}$^{\mathrm{a}}$ \\
+\hline
+$S^{(1)}, S^{(2)}$ & $(i_{1} \mapsto 0, 0, i_{1}, 0, 0, 0, 0)$   \\
+\cline{1-2} 
+%\hspace{5mm}
+$Initialization$ & $(i_{1},j_{1},i_{2},j_{2} \mapsto 2, j_{1}-i_{1}, i_{1}, -1, i_{2}, j_{2},0)$   \\
+\cline{1-2} 
+%\hspace{5mm}
+$Point\-wise^{sw}$ & $(i_{1},j_{1},i_{2},j_{2} \mapsto 2, j_{1}-i_{1}, i_{1}, -1, i_{2}, j_{2},1)$   \\
+\cline{1-2}
+$Reductions^{outer}$ & $(i_{1},j_{1},k_{1} \mapsto 2, j_{1}-i_{1}, i_{1}, k_{1}, 0, 0, 0)$    \\
+\cline{1-2}
+$Reductions^{inner}$ & $(i_{1},j_{1},k_{1} \mapsto 2, j_{1}-i_{1}, M, 0, i_{1}, 0, 0)$    \\
+ \cline{1-2} 
+\hline
+%\multicolumn{2}{l}{}\\
+\multicolumn{2}{l}{$^{\mathrm{a}}$Parallel dimension 5}
+\end{tabular}
+\label{tab:tile_l1}
+\end{center}
+\end{table}
