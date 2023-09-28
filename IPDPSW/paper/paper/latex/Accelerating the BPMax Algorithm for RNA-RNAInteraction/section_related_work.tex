@@ -1,0 +1,12 @@
+\section{\uppercase{Related Work}}
+%One of the early studies on interactions between nucleotides of single RNA was proposed by Nussinov in 1978 that predicts secondary structure\cite{Nussinov1978}. Palkowski et al. \cite{Palkowski2019} have used the polyhedral model to optimize this algorithm.
+%This algorithm computes a structure based on the probability that maximizes the number of base-pairs. This has a complexity of $\Theta(N^3)$ time and $\Theta(N^2)$ space. 
+%Later new algorithms got introduced to improve the energy model. Most of these algorithms use base pair maximization (BPM). 
+%Work was done to optimize and parallelize these algorithms on CPU platform. 
+% Li et al. has worked on CPU and GPU version of BPM \cite{Li2013} to improve its performance. Swenson et al. \cite{Swenson2012}  worked on a parallel secondary structure prediction program for multi-core desktop. However, all these effort were related to single RNA strand folding.
+
+There was no previous example of significant success of RRI optimization using polyhedral compilation to the best of our knowledge.  Palkowski et al. \cite{Palkowski2019} have used the polyhedral model to optimize Nussinov's algorithm ~\cite{Nussinov1978}. However, it is related to single RNA strand folding only.
+
+Varadrajan~\cite{Varadarajan2016, Varadarajan2019} applied semi-automatic transformation using \alphaz\ for a simplified surrogate mini-app that mimicked the dependence pattern to focus only on the most compute-intensive portion of the original piRNA. The original shared-memory OpenMP programs related to BPMax, BPPart, and piRNA try to achieve maximum parallelization without auto-vectorization and suffer very poor locality. She exploited locality using both coarse and fine-grain parallelism and achieved around $100 \times$ speedup.  
+
+Glidemaster\cite{Gildemaster2020} achieved significant speedup on a windowed version of the BPMax on GPU. However, only up to a limited number of nucleotide sequences or a window of nucleotide sequences can be processed on GPU due to memory constraints. Also, the cost of moving data out of the GPU memory negatively impacts the overall performance. So, it is crucial to speedup the algorithm on the CPU to avoid these constraints. It can also further open up the possibility of a higher degree of parallelism over multiple machines.

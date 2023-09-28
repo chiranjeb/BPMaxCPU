@@ -1,0 +1,209 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[export]{adjustbox}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{listings}
+\setlength{\marginparwidth}{3cm}
+\usepackage{subcaption}
+\usepackage{enumitem}
+
+\usepackage[colorinlistoftodos]{todonotes} %add disable in the params to remove all todos
+%commands for todos
+\newcommand{\Todo}[1]{\todo[inline, color=red!40]{#1}}
+\newcommand{\Fixme}[1]{\todo[inline, color=orange!40]{#1}}
+\newcommand{\Comment}[1]{\todo[inline, color=green!40]{#1}}
+\newcommand{\alphaz}{\textsc{\texttt{AlphaZ}}}
+\newcommand{\alfa}{\textsc{\texttt{Alpha}}}
+\newcommand{\squeezeup}{\vspace{-2.5mm}}
+
+
+
+% remove it:start???
+\usepackage{xcolor}
+
+
+\newsavebox\MBox
+\newcommand\Cline[2][red]{{\sbox\MBox{$#2$}%
+  \rlap{\usebox\MBox}\color{#1}\rule[-1.2\dp\MBox]{\wd\MBox}{0.5pt}}}
+  
+  
+ \lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  %basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  basicstyle=\scriptsize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=-8pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+  xleftmargin=-5pt,
+  framexleftmargin=-5pt,
+  framexrightmargin=-2pt,
+  framexbottommargin=0pt,
+  framextopmargin=0pt,
+}
+\newcommand*{\colorboxed}{}
+\def\colorboxed#1#{%
+  \colorboxedAux{#1}%
+}
+\newcommand*{\colorboxedAux}[3]{%
+  % #1: optional argument for color model
+  % #2: color specification
+  % #3: formula
+  \begingroup
+    \colorlet{cb@saved}{.}%
+    \color#1{#2}%
+    \boxed{%
+      \color{cb@saved}%
+      #3%
+    }%
+  \endgroup
+}
+% remove it:end???    
+\begin{document}
+
+\title{Accelerating the BPMax Algorithm for RNA-RNA Interaction}
+
+\author{\IEEEauthorblockN{Chiranjeb Mondal}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{Colorado State University}\\
+Fort Collins, CO, USA \\
+chiranjeb.mondal@colostate.edu}
+\and
+\IEEEauthorblockN{Sanjay Rajopadhye}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{Colorado State University}\\
+Fort Collins, CO, USA \\
+sanjay.rajopadhye@colostate.edu}
+}
+\maketitle
+\begin{abstract}
+RNA-RNA interactions (RRI) play an important role in various biological processes such as gene transcription, and are known to play a critical role in diseases such as cancer and Alzheimer’s, necessitating efficient computational tools. To date, RRI programs like BPMax were developed and optimized by hand, and this is prone to human error, and costly to develop and maintain.  Its high complexity ($\Theta(N^3M^3)$ in time and $\Theta(N^2M^2)$ in space) make it both essential and a challenge to parallelize it.   In this paper, we present a parallelization of BPMax on a single shared memory CPU platform.  From a mathematical specification of the dynamic programming algorithm, we generate highly optimized code that achieves over $100\times$ speedup over the baseline program employing a standard ``diagonal-by-diagonal'' execution order. We achieve 76~GFLOPS, which is about a fifth of our platform's peak theoretical single-precision performance for max-plus computation. The main kernel in the algorithm whose complexity is $\Theta(N^3M^3)$ attains 117~GFPLOS. We do this with a polyhedral code generation tool, \alphaz, that takes user-specified mapping directives and automatically generates optimized C code that enhances parallelism and locality.
+\alphaz\ allows the user to explore various schedules, memory-maps, and parallelization approaches, as well as tiling of the most dominant part of the computation.
+
+
+%We make  handwritten C code related to the actual algorithm, except a few compiler directives and minor optimizations of variable initialization.  
+%Besides overall speedup, our focus was to optimize the most compute-intensive part of the BPMax program which has complexity of $O(M^3N^3)$.  Our optimization speeds up this portion of the computation by 170x over the base version which is a sequential improvement between $1.4\times$ to $2\times$ over a similar type of kernel optimized previously using polyhedral acceleration on moderate size input sequences.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+RRI, BPMax, polyhedral model, tiling
+\end{IEEEkeywords}
+%\todo{Test}
+\section{\uppercase{Introduction}}
+Ribonucleic acid (RNA) is the origin of life. It plays an essential role in the coding, decoding, regulation, and expression of genes. RNA is a single strand formed by a sequence of four different types of nucleotides – Adenine (A), Uracil (U), Guanine (G), and Cytosine (C), which form a repeating structure.  Different nucleotides may form bonds of varying strength. A single RNA strand folds into itself. Also, two different RNA strands can interact with each other, resulting in the secondary structure, which can provide valuable  information about a biological function.
+%Guanine forms the strongest bond with Cytosine, Adenine forms the next strongest bond with Uracil, and Uracil forms the weakest bond with Guanine. 
+%A single RNA strand folds into itself. Also, two different RNA strands can interact with each other, resulting in the secondary structure. Knowledge of such structure can provide useful information about a biological function and may be used in experiments. 
+
+% Please refer to  ~\cite{Mortimer_2014}, ~\cite{Ledda2018} for more information.
+
+
+%\Todo{Please take care of the warnings.  They are because you did a cut and paste of your equations, and the subtraction operator is not the usual - but an extend-dash.  You may comment out todo notes that have been resolved, Like I have for the claims in the abstract.}
+
+%Researchers have long been studying these interactions and proposed different interaction models.  One of the early studies on interactions between nucleotides of single RNA was proposed by Nussinov in 1978 that predicts secondary structure\cite{Nussinov1978}. RNA-RNA interactions have been moved to spotlight in biology since mid 1990s with significant RNA interference discovery. 
+Researchers have long been studying these interactions and proposed different models. In 1978, Nussinov presented a model \cite{Nussinov1978} that predicts secondary structure from single RNA folding. RNA-RNA interactions have been moved to the spotlight in biology since the mid-1990s with significant RNA interference discovery. Chitsaz et al.\cite{Chitsaz2009} developed piRNA - one of the most comprehensive thermodynamic models for RRI.  It has an $\Theta(N^4M^2+N^2M^4)$  time and $\Theta(N^4+M^4)$ space complexity, %where $M$ and $N$ is the number of nucleotides present in each RNA sequence.
+for sequences of length $M$ and $N$. It uses $96$ dynamic tables.  However, running this compute and memory intensive program is extremely challenging. It takes days and months to get experimental results. So, Ebrahimpour-Boroojeny et al. \cite{EbrahimpourBoroojeny2019}  retreated from the slow comprehensive model and developed the BPPart for base-pair partition and BPMax for base-pair maximization. They use a simplified energy model and consider only base pair counting. Both of them have similar asymptotic time and space complexity of $\Theta(M^3N^3)$  and $\Theta(M^2N^2)$. BPPart uses $11$ tables, and BPMax uses a single one.  Nevertheless, the original implementation of even BPMax suffers from poor performance as the input size grows.
+
+Ebrahimpour-Boroojeny et al. conclude that BPMax \cite{EbrahimpourBoroojeny2019} captures a significant portion of the thermodynamic information. The Pearson and Spearman’s rank correlation between piRNA and BPMax is  $0.904$ at $-180$\textdegree\textit{C} and  $0.836$  at 37\textdegree\textit{C} highlighting its importance.  BPMax and other RRI algorithms such as piRNA~\cite{Chitsaz2009}, IRIS~\cite{Pervouchine2004IRISIR}, RIP~\cite{Huang2009} follow similar recurrence patterns. So, besides the practical usefulness of BPMax, the learning and insights gleaned from this optimization approach can be applied to the other RRI interaction algorithms with similar recurrence patterns.
+
+
+Performance optimization requires exploiting parallelism and locality at multiple levels. It is a difficult task and often leads to hand-crafted code. Manual optimization is neither easily portable (e.g., to different platforms where different kinds of optimization are needed) nor easily maintainable (e.g., changing the optimization strategy may require changes to many parts of the code). This challenge grows as the complexity of the program increases. It is highly desirable that the highly optimized programs get generated from a simple correct program together with a set of performance tuning hints or directives.
+
+Fortunately, RRI algorithms fit the requirements of the \emph{polyhedral model}~\cite{sanjay-fst-tcs, quinton-jvsp89, feautrier91, feautrier92a, feautrier92b}  - a mathematical formalism that allows for just such program transformations.  The polyhedral compilation has been the subject of intense research for 35~years, and yet, even a state-of-the-art polyhedral tool like PLUTO~\cite{Bondhugula2015PLuToAP, Bondhugula2008} does not yield satisfactory performance~\cite{Varadarajan2016}. Many of the performance optimization strategies need some careful thought by an expert.  This gap can be bridged by a tool that allows semi-automatic transformation like Chill~\cite{Chen08chill:a}. At CSU, we are developing and working with a similar tool, \alphaz~\cite{sanjay-lcpc2012}, that operates at a higher level of abstraction.
+%\noindent
+%\begin{itemize}[wide, nosep, labelindent = 0pt, topsep = 1ex]
+\begin{itemize}[wide, nosep, labelindent = 0pt]
+\item [The paper makes the following contributions:]
+%\item This is the first time a complex RRI program like BPMax has been optimized using a polyhedral compilation framework such as \alphaz\ in its entirety. It is also the first attempt to optimize BPMax on the CPU.
+\item This is the first time a complex RRI program like BPMax has been optimized using \alphaz\ in its entirety. Previous attempts were limited to a micro-kernel only. It is also the first attempt to optimize BPMax on the CPU.
+\item We generate highly optimized code for BPMax using polyhedral transformations that achieves over $100\times$ speedup over the original program shown in Figure~\ref{fig:bpm_quick_compare}. The most compute-intensive part of the BPMax achieves a $170\times$ speedup over the original implementation, a  $1.5\times$ - $2\times$ improvement over a similar kernel optimized previously. 
+\item The compilation scripts and optimized version of the BPMax program are available in GitHub public repository ~\cite{MondalBPMax}.
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[htbp]{0.49\linewidth}
+\centering
+\includegraphics[scale=0.52, trim=4 4 4 4,clip]{figure_highlight_speed_up2.png}
+\caption{Speedup over base program}
+\label{fig:quick_speedup}
+\end{subfigure}
+\begin{subfigure}[htbp]{0.49\linewidth}
+\centering
+\includegraphics[scale=0.52, trim=4 4 4 4,clip]{figure_highlight_perf2.png}
+\caption{Single-precision performance}
+\label{fig:quick_performance}
+\end{subfigure}
+\caption{Summary of the optimization results}
+\label{fig:bpm_quick_compare}
+\end{figure}
+
+The paper proceeds as follows. We first set up the context and background of our work to highlight the BPMax algorithm, discuss the polyhedral model's role, and application of \alphaz\ . Then, we discuss multiple phases of the optimization process, the rationale behind different schedules, processor allocations, and memory mappings. Finally, we go over our performance results and conclude the paper with challenges and future directions.
+
+\input{section_related_work}
+\input{section_background}
+\input{section_methods}
+\input{section_results}
+
+\section{\uppercase{CONCLUSION}}
+This work demonstrates the optimization process of a complete RRI program using polyhedral transformations. Our result shows that the tiling improves the performance of the most dominant part of the computation. However, the inner reductions are still inefficient, which limits the overall performance improvement. Also, the double max-plus operation remains bandwidth-bound even after tiling transformation. This indicates that an additional level of tiling at the register level is required to make the program compute-bound and improve performance.  We also plan to apply tiling on $R_1$ and $R_2$ and distribute the computation over a cluster using  MPI. All these transformations remain a challenge for \alphaz\ , and we hope to overcome them in the future.
+
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://mirror.ctan.org/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+%\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+% <OR> manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+
+
+%\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{biblio}
+\end{document}
