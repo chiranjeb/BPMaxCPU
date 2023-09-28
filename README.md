@@ -1,4 +1,4 @@
-# BPMax CPU Latest Version
+# BPMax CPU Version
 
 This repository contains two different optimized CPU versions of the BPMax.
 
